@@ -1,6 +1,6 @@
 import pytest
 import logging
-from data_reporter.reporter import QueryReader
+from data_reporter.reporting.reporter import QueryReader
 from data_reporter.data.config import FACT_TABLE_PATH
 import pandas as pd
 
@@ -23,5 +23,3 @@ def test_query():
     assert isinstance(df, pd.DataFrame)
     assert len(df) == 10
     assert all(exp in df.columns for exp in exp_cols)
-
-
