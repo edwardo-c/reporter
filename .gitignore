@@ -1,2 +1,5 @@
 venv/
 tests/_pycache_
+_pycache_/
+config/
+data_reporter/_pycache_
