@@ -19,7 +19,7 @@ def test_csv_str():
 def test_query():
     qr = QueryReader(FACT_TABLE_PATH)
     exp_cols = ['order_id' , 'customer_id', 'product_id', 'quantity', 'price', 'order_date']
-    df = qr._query_csv(f"SELECT *")
+    df = qr._query_csv(f"SELECT * FROM")
     assert isinstance(df, pd.DataFrame)
     assert len(df) == 10
     assert all(exp in df.columns for exp in exp_cols)
