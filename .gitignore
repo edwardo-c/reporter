@@ -1,7 +1,6 @@
-__pycache__/
-reporter/__pycache__
-data/__pycache__
+**/__pycache__
+
+
+.pytest_cache/
 venv/
-tests/_pycache_
 config/
-data_reporter/_pycache_
