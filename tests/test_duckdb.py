@@ -1,11 +1,15 @@
-import pytest
+# Standard library imports
 import logging
-from data_reporter.reporting.reporter import QueryReader
-from data_reporter.data.config import FACT_TABLE_PATH
+
+# Third party imports
+import pytest
 import pandas as pd
 
-logging.basicConfig(level=logging.INFO)
+# Local application imports
+from data_reporter.data.config import FACT_TABLE_PATH
+from data_reporter.reporter import QueryReader
 
+logging.basicConfig(level=logging.INFO)
 
 def test_class_import():
     qr = QueryReader(FACT_TABLE_PATH)
