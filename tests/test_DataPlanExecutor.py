@@ -1,4 +1,6 @@
 # standard library imports
+import logging
+import pytest
 
 # third party imports
 import pandas as pd
@@ -6,6 +8,8 @@ import pandas as pd
 # application imports
 from plan_executor.executor import DataPlanExecutor
 from plan_executor import transforms
+
+logging.basicConfig(level=logging.INFO)
 
 def test_groupby():
     test_data = pd.DataFrame(
@@ -29,9 +33,10 @@ def test_groupby():
     
     grouped_data = e.processed_data
 
+    
     for group, data in grouped_data:
+        assert group == 'A' or group == 'C'
         if group == 'A':
             assert len(data) == 2
-        if group == 'B':
+        if group == 'C':
             assert len(data) == 1
-
