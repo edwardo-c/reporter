@@ -11,13 +11,17 @@ from plan_executor import registry
 
 logging.basicConfig(level=logging.INFO)
 
-def test_groupby():
-    test_data = pd.DataFrame(
+def gen_test_data() -> pd.DataFrame:
+    return pd.DataFrame(
         {
             'colA': ['A', 'A', 'C'],
             'colB': ['group1', 'group1', 'group2']
             }
         )
+
+
+def test_groupby():
+    test_data = gen_test_data()
 
     data_plan = [
         {
@@ -42,17 +46,12 @@ def test_groupby():
             assert len(data) == 1
 
 def test_filter_in():
-    """test for 'filer_in' step of DataPlanExecutor class"""
-    test_data = pd.DataFrame(
-        {
-            'colA': ['A', 'A', 'C'],
-            'colB': ['group1', 'group1', 'group2']
-            }
-        )
+    """test for 'filer' step of DataPlanExecutor class"""
+    test_data = gen_test_data()
     
     data_plan = [
         {
-            "op": "filter_in",
+            "op": "filter",
             "args": {
                 "col":"colA",
                 "val":"a",
@@ -72,3 +71,29 @@ def test_filter_in():
     assert (result['colA'] == 'A').all()
 
     # pytest .\tests\test_DataPlanExecutor.py
+
+def test_filter_out():
+    """test for 'filer' step of DataPlanExecutor class"""
+    test_data = gen_test_data()
+    
+    data_plan = [
+        {
+            "op": "filter",
+            "args": {
+                "col":"colA",
+                "val":"a",
+                "case_insensative": True,
+                "filter_in": False
+            }
+        },
+    ]
+
+    e = DataPlanExecutor(test_data, data_plan)
+    e.run()
+
+    result: pd.DataFrame = e.processed_data
+
+    assert isinstance(result, pd.DataFrame)
+    assert len(result) == 1
+    assert all(col in result.columns for col in ['colA', 'colB'])
+    assert (result['colA'] != 'A').all()

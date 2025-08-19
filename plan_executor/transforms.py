@@ -27,9 +27,10 @@ def groupby(df: pd.DataFrame, cfg: dict):
 class FilterConfig(TypedDict):
     col: str
     val: str
-    case_insensative: NotRequired[bool]
+    filter_in: NotRequired[bool]
+    case_insensitive: NotRequired[bool]
 
-@register_transform("filter_in")
+@register_transform("filter")
 def filter_in(df: pd.DataFrame, cfg: FilterConfig):
     
     temp_df: pd.DataFrame = df.copy()
@@ -41,12 +42,21 @@ def filter_in(df: pd.DataFrame, cfg: FilterConfig):
     if not val:
         logging.warning(f"expected val, none was given, result not filtered")
 
-    case_insensative: bool = cfg.get('case_insensative', True)
+    filter_in: bool = cfg.get('filter_in', True)
+
+    case_insensitive: bool = cfg.get('case_insensative', True)
+    
     temp_series: pd.Series = temp_df[col]
 
-    if case_insensative:
-        mask: pd.Series = temp_series.str.lower() == val.lower()
+    if case_insensitive:
+        if filter_in:
+            mask: pd.Series = temp_series.str.lower() == val.lower()
+        else:
+            mask: pd.Series = temp_series.str.lower() != val.lower()        
     else:
-        mask: pd.Series = temp_df[col] == val
+        if filter_in:
+            mask: pd.Series = temp_df[col] == val
+        else:
+            mask: pd.Series = temp_df[col] != val
 
     return temp_df[mask]
