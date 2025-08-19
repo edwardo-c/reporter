@@ -5,7 +5,7 @@ import tempfile
 import logging
 
 # Internal application imports
-from loaders import exports
+# from loaders import exports
 from loaders import registry
 assert "csv" in registry.EXPORT_REGISTRY
 
@@ -40,6 +40,8 @@ def test_csv_export():
         d.export()
         df = pd.read_csv(cfg['args']['final_path'])
         assert len(df) == 3
+
+        assert all(col in df.columns for col in ['colA', 'colB'])
 
     finally: # clean up
         sh.rmtree(temp_dir)
