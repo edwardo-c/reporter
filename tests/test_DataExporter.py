@@ -5,7 +5,6 @@ import tempfile
 import logging
 
 # Internal application imports
-# from loaders import exports
 from loaders import registry
 assert "csv" in registry.EXPORT_REGISTRY
 

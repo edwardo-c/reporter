@@ -7,7 +7,7 @@ import pandas as pd
 
 # application imports
 from plan_executor.executor import DataPlanExecutor
-from plan_executor import transforms
+from plan_executor import registry
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,3 +40,35 @@ def test_groupby():
             assert len(data) == 2
         if group == 'C':
             assert len(data) == 1
+
+def test_filter_in():
+    """test for 'filer_in' step of DataPlanExecutor class"""
+    test_data = pd.DataFrame(
+        {
+            'colA': ['A', 'A', 'C'],
+            'colB': ['group1', 'group1', 'group2']
+            }
+        )
+    
+    data_plan = [
+        {
+            "op": "filter_in",
+            "args": {
+                "col":"colA",
+                "val":"a",
+                "case_insensative": True
+            }
+        },
+    ]
+
+    e = DataPlanExecutor(test_data, data_plan)
+    e.run()
+
+    result: pd.DataFrame = e.processed_data
+
+    assert isinstance(result, pd.DataFrame)
+    assert len(result) == 2
+    assert all(col in result.columns for col in ['colA', 'colB'])
+    assert (result['colA'] == 'A').all()
+
+    # pytest .\tests\test_DataPlanExecutor.py
