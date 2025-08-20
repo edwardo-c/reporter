@@ -4,7 +4,7 @@
 import pandas as pd
 
 # internal application imports
-from loaders.registry import EXPORT_REGISTRY
+from data_exporter.registry import EXPORT_REGISTRY
 
 class DataExporter():
     def __init__(self, data: pd.DataFrame, cfg: dict):

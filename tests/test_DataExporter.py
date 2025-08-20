@@ -5,10 +5,10 @@ import tempfile
 import logging
 
 # Internal application imports
-from loaders import registry
+from data_exporter import registry
 assert "csv" in registry.EXPORT_REGISTRY
 
-from loaders.exporter import DataExporter
+from data_exporter.exporter import DataExporter
 assert "csv" in registry.EXPORT_REGISTRY
 
 logging.basicConfig(level=logging.INFO)

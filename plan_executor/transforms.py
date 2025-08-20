@@ -8,7 +8,7 @@ from plan_executor.registry import register_transform
 logging.basicConfig(level=logging.WARNING)
 
 def raise_err_required(func, attribute: str):
-    raise KeyError(f"")
+    raise KeyError(f"{func} {attribute} is required, none was given")
 
 @register_transform("groupby")
 def groupby(df: pd.DataFrame, cfg: dict):

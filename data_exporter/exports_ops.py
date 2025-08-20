@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 
-from loaders.registry import register_export
+from data_exporter.registry import register_export
 
 logging.basicConfig(level=logging.INFO)
 
