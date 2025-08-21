@@ -1,9 +1,11 @@
-import pandas as pd
+from typing import Callable
 
-REGISTRY = {}
+READERS_REGISTRY = {}
 
-def register(name, func):
-    REGISTRY[name] = func
-
-def get(name):
-    return REGISTRY[name]
+def register_reader(name: str):
+    
+    def inner_wrapper(func: Callable):
+        READERS_REGISTRY[name] = func
+        return func
+    
+    return inner_wrapper

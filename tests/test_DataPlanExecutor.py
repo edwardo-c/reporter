@@ -19,7 +19,6 @@ def gen_test_data() -> pd.DataFrame:
             }
         )
 
-
 def test_groupby():
     test_data = gen_test_data()
 
@@ -55,7 +54,7 @@ def test_filter_in():
             "args": {
                 "col":"colA",
                 "val":"a",
-                "case_insensative": True
+                "case_insensitive": True
             }
         },
     ]
@@ -73,7 +72,10 @@ def test_filter_in():
     # pytest .\tests\test_DataPlanExecutor.py
 
 def test_filter_out():
-    """test for 'filer' step of DataPlanExecutor class"""
+    """
+    test for 'filer' step of DataPlanExecutor class
+    should remove all instances of A in col
+    """
     test_data = gen_test_data()
     
     data_plan = [
@@ -82,7 +84,7 @@ def test_filter_out():
             "args": {
                 "col":"colA",
                 "val":"a",
-                "case_insensative": True,
+                "case_insensitive": True,
                 "filter_in": False
             }
         },
