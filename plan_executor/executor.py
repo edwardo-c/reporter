@@ -25,7 +25,4 @@ class DataPlanExecutor():
             df = func(df, args)
         
         return df
-    
-    def run(self):
-        self._apply_steps()
         

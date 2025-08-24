@@ -86,7 +86,7 @@ def test_filter_out():
                 "val":"a",
                 "case_insensitive": True,
                 "filter_in": False
-            }
+            },
         },
     ]
 

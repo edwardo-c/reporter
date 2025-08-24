@@ -4,6 +4,4 @@
 - item three
 
 ### [Released]
-- item one
-- item two
-- item three
+- SafeReader is no longer a class. State was not needed, can now be injected into any valid reader

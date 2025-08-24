@@ -17,7 +17,7 @@ def groupby(df: pd.DataFrame, cfg: dict):
         raise KeyError(f"groupby: 'by' is required, none was given")
     
     sort = cfg.get('sort', False)
-    dropna = cfg.get('dropna', True)
+    dropna = cfg.get('dropna', False)
 
     df_copy = df.copy(deep=True)
 
@@ -32,7 +32,11 @@ class FilterConfig(TypedDict):
 
 @register_transform("filter")
 def filter_in(df: pd.DataFrame, cfg: FilterConfig):
-    
+    """
+    if filter_in = True, return all values except val
+    else, return only rows with val
+    """
+
     temp_df: pd.DataFrame = df.copy()
     col = cfg['col']
     if not col:
