@@ -4,4 +4,4 @@
 .pytest_cache/
 venv/
 config/
-.env
+*.env
