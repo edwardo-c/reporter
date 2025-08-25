@@ -1,1 +1,0 @@
-FACT_TABLE_PATH = r"C:\Users\eddiec11us\dev_apps\reporter\data_reporter\data\fact_table.csv"
