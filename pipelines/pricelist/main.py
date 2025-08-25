@@ -1,12 +1,22 @@
+
+from dotenv import load_dotenv
 import pandas as pd
 
-from config.paths import PRICE_LIST_YAML
+from config.paths import PRICE_LIST_YAML, CONFIG_DOT_ENV
 from file_reader.dir_to_df import dir_to_df
 from plan_executor.executor import DataPlanExecutor
 from plan_executor.yaml_reader import import_data_plan
 
+load_dotenv(dotenv_path=CONFIG_DOT_ENV)
 
 def main():
+
+    """
+    read YAML
+    execute YAML
+    All actions should be in YAML
+    
+    """
 
     all_prices_cfg = {
         "directory": r"",

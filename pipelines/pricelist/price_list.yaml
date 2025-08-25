@@ -1,3 +1,12 @@
+imports:
+  all:
+  - op: 'dir_to_csv'
+    args:
+      dir: ${PRICE_GROUPS_DIR}
+  - op: 'archive'
+    args:
+      dir: ${PRICE_GROUPS_ARCHIVE_DIR}
+
 plans:
   shade:
     - op: filter
@@ -25,11 +34,11 @@ exports:
   - from: shade
     using: csv
     args:
-      path: "{OUT_DIR}/{acct_num}.csv"
+      path: "${SHADE_CSV_DIR}/{acct_num}.csv"
       index: false
   
   - from: non_shade
     using: csv
     args:
-      path: "{OUT_DIR}/{acct_num}.csv"
+      path: "${NON_SHADE_CSV_DIR}/{acct_num}.csv"
       index: false
