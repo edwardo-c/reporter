@@ -1,6 +1,3 @@
-# ---- Moving to a "step" in data plan executor ---- #
-
-
 # Standard library imports
 from pathlib import Path
 
@@ -8,8 +5,8 @@ from pathlib import Path
 import pandas as pd
 
 # Internal application imports
-from file_reader.registry import register_reader
-from file_reader.safe_reader import SafeReader
+from plan_executor.registry import register_operation
+from plan_executor.operations.safe_reader import read_safely
 
 def _collect_files(
         directory: Path,
@@ -32,15 +29,14 @@ def _collect_files(
 def _concat_with_safe_reader(file_paths: list, add_source: bool = True):
     frames: list[pd.DataFrame] = []
     for p in file_paths:
-        with SafeReader(p) as sr:
-            df = sr.data
-            if add_source:
-                df = df.copy()
-                df["__source_file"] = p.name
-            frames.append(df)
+        df = read_safely(p)
+        if add_source:
+            df = df.copy()
+            df["__source_file"] = p.name
+        frames.append(df)
     return pd.concat(frames, ignore_index=True, sort=False) if frames else pd.DataFrame()
 
-@register_reader('dir_to_df')
+@register_operation('dir_to_df')
 def dir_to_df(cfg: dict):
     """
     cfg:

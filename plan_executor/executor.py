@@ -2,8 +2,16 @@ from typing import Dict
 
 import pandas as pd
 
-from plan_executor.registry import REGISTRY_TRANSFORMS
+from plan_executor.registry import OPERATIONS_REGISTRY
 from plan_executor import registry
+
+def execute_steps(cfg: dict):
+    for op, args in cfg:
+        func = 
+    ...
+
+
+
 
 class DataPlanExecutor():
     def __init__(self, data: pd.DataFrame, data_plan: dict):

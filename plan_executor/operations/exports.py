@@ -2,11 +2,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from plan_executor.registry import register_export
+from plan_executor.registry import register_operation
 from utils.validators import valid_dir
 
 
-@register_export("csv_partitioned")
+@register_operation("csv_partitioned")
 def export_partitioned_csv(
         df: pd.DataFrame, 
         partition_by: str, 
