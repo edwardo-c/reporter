@@ -42,13 +42,13 @@ def dir_to_df(cfg: dict):
     cfg:
       directory: str|Path (required)
       recursive: bool = False
-      suffixes: list[str] = ['.csv', '.xlsx']
+      suffixes: list[str] = ['.csv',] # currently only accepts csvs
       add_source_col: bool = True
     """
 
     directory = Path(cfg['directory'])
     recursive = bool(cfg.get('recursive', False))
-    suffixes = tuple(cfg.get('suffixes', [".csv", ".xlsx"]))
+    suffixes = tuple(cfg.get('suffixes', [".csv"]))
     add_source = bool(cfg.get('add_source', True))
 
     files = _collect_files(directory=directory, suffixes=suffixes, recursive=recursive)

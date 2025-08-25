@@ -5,32 +5,10 @@ import pandas as pd
 from plan_executor.registry import OPERATIONS_REGISTRY
 from plan_executor import registry
 
-def execute_steps(cfg: dict):
-    for op, args in cfg:
-        func = 
-    ...
+def execute_steps(plan: dict):
+    for step in plan:
+        func = OPERATIONS_REGISTRY[step['op']]
+        cfg = step['cfg']
+        return func(cfg)
 
-
-
-
-class DataPlanExecutor():
-    def __init__(self, data: pd.DataFrame, data_plan: dict):
-        self.data: pd.DataFrame = data
-        self.data_plan: list[dict] = data_plan
-        self.registry = REGISTRY_TRANSFORMS
-        self.processed_data = self._apply_steps()
-
-    def _apply_steps(self):
-        df = self.data
-
-        for step in self.data_plan:
-            if not isinstance(step, dict):
-                raise ValueError(f"expected type dict, recieved {type(step)}")
-
-            op: str = step['op']
-            args: Dict = step['args']
-            func = self.registry[op]
-            df = func(df, args)
-        
-        return df
         

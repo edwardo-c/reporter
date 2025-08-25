@@ -1,45 +1,34 @@
-# # standard library imports
+# standard library imports
 
-# # Third party imports
-# import pandas as pd
+# Third party imports
+import pandas as pd
 
-# # Internal Application Imports
-# from config.paths import PRICE_LIST_YAML
-# from utils.yaml_loader import load_yaml # also loads dotenv secrets
-# from  import dir_to_df
-# from plan_executor.executor import DataPlanExecutor
-# from plan_executor.yaml_reader import import_data_plan
+# Internal Application Imports
+from config.paths import PRICE_LIST_YAML
+from utils.yaml_loader import load_yaml # also loads dotenv secrets
+from plan_executor.executor import execute_steps
 
-# def main():
+def main():
 
-#     """
-#     read YAML
-#     execute YAML
-#     """
-#     cfg = load_yaml(PRICE_LIST_YAML)
-
-#     all_plans = cfg["imports"]["all"]
-#     print(all_plans)
-
+    """
+    read YAML
+    execute YAML
+    """
+    # load entire configuration for process
+    cfg = load_yaml(PRICE_LIST_YAML)
     
+    # import data
+    data_load_cfg = cfg["load"]
+    df: pd.DataFrame = execute_steps(data_load_cfg)
+    
+    # manipulate shade data frame
 
-#     # all_prices_cfg = {
-#     #     "directory": r"",
-#     #     "recursive": False,
-#     #     "suffixes": [".csv"],
-#     #     "add_source": False
-#     #     }
+    # manipulate non-shade data frame
 
-#     # # capture all data frames [expected: CSV] and concat
-#     # all_prices: pd.DataFrame = dir_to_df(all_prices_cfg)
+    # export shade data frame
 
-#     # # filter frames into shade and non-shade
-#     # shade_data_plan: dict = import_data_plan(SHADE_YAML, plan_key="data_plan")
-#     # price_list_plan: dict = 
-#     # shade_data = DataPlanExecutor(all_prices, data_plan=shade_data_plan).processed_data
+    # export non-shade data frame
 
-#     # print(shade_data.head())
-#     # print(f"\n{shade_data.info()}")
+if __name__ == "__main__":
+    raise SystemExit(main())
 
-# if __name__ == "__main__":
-#     raise SystemExit(main())

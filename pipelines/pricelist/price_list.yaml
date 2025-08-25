@@ -1,11 +1,10 @@
-imports:
-  all:
-  - op: 'dir_to_csv'
-    args:
-      dir: ${PRICE_GROUPS_DIR}
-  - op: 'archive'
-    args:
-      dir: ${PRICE_GROUPS_ARCHIVE_DIR}
+load:
+  - op: 'dir_to_df'
+    cfg:
+      directory: ${PRICE_GROUPS_DIR}
+      recursive: false
+      suffixes: .csv
+      add_source_col: false
 
 plans:
   shade:
