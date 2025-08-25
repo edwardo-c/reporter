@@ -9,21 +9,24 @@ from utils.yaml_loader import load_yaml # also loads dotenv secrets
 from plan_executor.executor import execute_steps
 
 def main():
-
-    """
-    read YAML
-    execute YAML
-    """
     # load entire configuration for process
     cfg = load_yaml(PRICE_LIST_YAML)
     
     # import data
-    data_load_cfg = cfg["load"]
-    df: pd.DataFrame = execute_steps(data_load_cfg)
+    data_load_plan = cfg["load"]
+    df: pd.DataFrame = execute_steps(plan=data_load_plan)
     
     # manipulate shade data frame
+    shade_data_plan = cfg["plans"]["shade"]
+    shade_data = execute_steps(shade_data_plan, df=df)
 
     # manipulate non-shade data frame
+    non_shade_data_plan = cfg["plans"]["non_shade"]
+    non_shade_data = execute_steps(non_shade_data_plan, df=df)
+
+    # inspect:
+    print(non_shade_data.head())
+    print(f"\n{non_shade_data.info()}")
 
     # export shade data frame
 

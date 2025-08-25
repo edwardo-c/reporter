@@ -3,14 +3,14 @@ from typing import TypedDict, NotRequired
 
 import pandas as pd
 
-from plan_executor.registry import register_transform
+from plan_executor.registry import register_operation
 
 logging.basicConfig(level=logging.WARNING)
 
 def raise_err_required(func, attribute: str):
     raise KeyError(f"{func} {attribute} is required, none was given")
 
-@register_transform("groupby")
+@register_operation("groupby")
 def groupby(df: pd.DataFrame, cfg: dict):
     by = cfg['by']
     if not by:
@@ -30,37 +30,30 @@ class FilterConfig(TypedDict):
     filter_in: NotRequired[bool]
     case_insensitive: NotRequired[bool]
 
-@register_transform("filter")
-def filter_in(df: pd.DataFrame, cfg: FilterConfig):
-    """
-    if filter_in = True, return all values except val
-    else, return only rows with val
-    """
+@register_operation("filter")
+def filter_in(
+    df: pd.DataFrame,
+    *,
+    col: str,
+    val: str | None = None,
+    filter_in: bool = True,
+    case_insensitive: bool = True
+) -> pd.DataFrame:
+    # (1) validate
+    if col not in df.columns:
+        raise KeyError(f"Missing column: {col}")
+    if val is None:
+        return df  # or warn+return
 
-    temp_df: pd.DataFrame = df.copy()
-    col = cfg['col']
-    if not col:
-        raise_err_required(__name__, 'col')
-    
-    val = cfg['val']
-    if not val:
-        logging.warning(f"expected val, none was given, result not filtered")
-
-    filter_in: bool = cfg.get('filter_in', True)
-
-    case_insensitive: bool = cfg.get('case_insensative', True)
-    
-    temp_series: pd.Series = temp_df[col]
+    # (2) normalize
+    s = df[col].astype("string")
+    left  = s.str.strip()
+    right = str(val).strip()
 
     if case_insensitive:
-        if filter_in:
-            mask: pd.Series = temp_series.str.lower() == val.lower()
-        else:
-            mask: pd.Series = temp_series.str.lower() != val.lower()        
-    else:
-        if filter_in:
-            mask: pd.Series = temp_df[col] == val
-        else:
-            mask: pd.Series = temp_df[col] != val
+        left = left.str.casefold()
+        right = right.casefold()
 
-    return temp_df[mask]
+    # (3) mask
+    mask = (left == right) if filter_in else (left != right)
+    return df[mask]

@@ -1,16 +1,17 @@
 load:
   - op: 'dir_to_df'
-    cfg:
-      directory: ${PRICE_GROUPS_DIR}
-      recursive: false
-      suffixes: .csv
-      add_source_col: false
+    args:
+      cfg:
+        directory: ${PRICE_GROUPS_DIR}
+        recursive: false
+        suffixes: .csv
+        add_source: false
 
 plans:
   shade:
     - op: filter
       args:
-        col: Price Group
+        col: "Price Group"
         val: SHADE
         case_insensitive: true
         filter_in: true # keep only those with SHADE
@@ -21,13 +22,7 @@ plans:
         col: Price Group
         val: SHADE
         case_insensitive: true
-        filter_in: False # keep all except SHADE
-  
-  all:
-    - op: groupby
-      args:
-        by: Customer
-        dropna: true
+        filter_in: false # keep all except SHADE
 
 exports:
   - from: shade
