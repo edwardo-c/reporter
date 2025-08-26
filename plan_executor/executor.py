@@ -1,26 +1,21 @@
-import pandas as pd
 import inspect
+import pandas as pd
 from plan_executor.registry import OPERATIONS_REGISTRY
 
-def execute_steps(plan: list, **context) -> pd.DataFrame:
-    state = {"df": None, **context}
-
+def execute_steps(plan: list, df: pd.DataFrame | None = None):
     for step in plan:
         fn = OPERATIONS_REGISTRY[step["op"]]
-        args = step.get("args", {})
+        args = step.get("args", {}) or {}
 
-        # Build call kwargs: inject state keys only if the function accepts them
         sig = inspect.signature(fn)
-        call = {k: v for k, v in state.items() if k in sig.parameters}
-        # Step args (from YAML) always win
-        if isinstance(args, dict):
-            call.update(args)
+        params = set(sig.parameters)
 
-        result = fn(**call)
+        # pass df only if the op accepts it
+        if "df" in params:
+            result = fn(df=df, **args)
+        else:
+            result = fn(**args)
 
         if isinstance(result, pd.DataFrame):
-            state["df"] = result
-        elif isinstance(result, dict):
-            state.update(result)
-
-    return state["df"]  # you expect a DataFrame back
+            df = result
+    return df

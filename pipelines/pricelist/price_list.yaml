@@ -15,7 +15,7 @@ plans:
         val: SHADE
         case_insensitive: true
         filter_in: true # keep only those with SHADE
-  
+
   non_shade:
     - op: filter
       args:
@@ -25,14 +25,16 @@ plans:
         filter_in: false # keep all except SHADE
 
 exports:
-  - from: shade
-    using: csv
-    args:
-      path: "${SHADE_CSV_DIR}/{acct_num}.csv"
-      index: false
+  shade:
+    - op: csv_partitioned
+      args:
+        partition_by: "Customer"
+        root_dir: ${SHADE_CSV_DIR}
+        dry_run: false
   
-  - from: non_shade
-    using: csv
-    args:
-      path: "${NON_SHADE_CSV_DIR}/{acct_num}.csv"
-      index: false
+  non_shade:
+    - op: csv_partitioned
+      args:  
+        partition_by: "Customer"
+        root_dir: ${SHADE_CSV_DIR}
+        dry_run: false

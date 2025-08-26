@@ -5,7 +5,5 @@
     - YAML must have place holders for safe directories
     - create the 700 csvs locally, move using robocopy
 
-- item three
-
 ### [Released]
 - SafeReader is no longer a class. State was not needed, can now be injected into any valid reader
