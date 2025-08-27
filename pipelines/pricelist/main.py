@@ -30,8 +30,8 @@ def main():
     execute_steps(shade_export_plan, df=shade_data)
 
     # export non-shade data frame
-    non_shade_export_plan = cfg["exports"]["non_shade"]
-    execute_steps(non_shade_export_plan, df=non_shade_data)
+    # non_shade_export_plan = cfg["exports"]["non_shade"]
+    # execute_steps(non_shade_export_plan, df=non_shade_data)
 
 if __name__ == "__main__":
     raise SystemExit(main())

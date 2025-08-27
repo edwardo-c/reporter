@@ -15,11 +15,16 @@ plans:
         val: SHADE
         case_insensitive: true
         filter_in: true # keep only those with SHADE
+    - op: drop_null_dups
+      args:
+        null_col: "Customer Price Class"
+        keep_null: true
+        subset: ["Customer", "Part Number"]
 
   non_shade:
     - op: filter
       args:
-        col: Price Group
+        col: "Price Group"
         val: SHADE
         case_insensitive: true
         filter_in: false # keep all except SHADE
