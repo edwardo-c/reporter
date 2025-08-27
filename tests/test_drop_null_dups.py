@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from plan_executor.operations.cond_drop import drop_null_dups
+from plan_executor.operations.drop_null_dups import drop_null_dups
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,14 +29,12 @@ def test_drop_null_dups_prefer_null():
         }
     )
 
-    cfg = {
-        "null_col": "cls",
-        "keep_null": True,
-        "subset": ["cust", "part"]
-    }
+    null_col = "cls"
+    keep_null = True
+    subset = ["cust", "part"]
 
     # Act
-    result = drop_null_dups(df, cfg)
+    result = drop_null_dups(df, null_col, keep_null, subset)
 
     # Assert
     pd.testing.assert_frame_equal(result, expected)
@@ -61,16 +59,12 @@ def test_drop_null_dups_prefer_non_null():
         }
     )
 
-    cfg = {
-        "null_col": "cls",
-        "keep_null": False,
-        "subset": ["cust", "part"]
-    }
+    null_col = "cls"
+    keep_null = False
+    subset = ["cust", "part"]
 
     # Act
-    result = drop_null_dups(df, cfg)
+    result = drop_null_dups(df, null_col, keep_null, subset)
 
     # Assert
     pd.testing.assert_frame_equal(result, expected)
-
-    # pytest .\tests\test_cond_drop.py --log-cli-level=INFO

@@ -4,8 +4,8 @@ import pandas as pd
 
 from plan_executor.registry import register_operation
 
-@register_operation("drop_dup")
-def drop_null_dups(df: pd.DataFrame, cfg: dict):
+@register_operation("drop_null_dups")
+def drop_null_dups(df: pd.DataFrame, null_col: str = None, keep_null: bool = False, subset: list | str = None):
     """
     drops duplicates where column is null
     option to keep or drop nulls
@@ -15,17 +15,14 @@ def drop_null_dups(df: pd.DataFrame, cfg: dict):
     cfg["subset"] (list), if single str, place in list
     """
 
-    null_col = cfg.get("null_col")
     if null_col is None:
-        raise ValueError("cfg['null_col'] is required.")
+        raise ValueError("['null_col'] is required.")
 
-    subset = cfg.get("subset")
-    if subset is None:
-        raise ValueError("cfg['subset'] is required.")
+    if not subset:
+        raise ValueError("['subset'] is required.")
     if isinstance(subset, str):
         subset = [subset]
 
-    keep_null = bool(cfg.get("keep_null", False))
     na_position = 'first' if keep_null else 'last'
     
     # validate columns
