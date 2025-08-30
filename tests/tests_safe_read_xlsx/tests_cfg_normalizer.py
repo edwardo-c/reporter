@@ -3,18 +3,32 @@ import pytest
 import pandas as pd
 
 from plan_executor.operations.xlsx_reader import _config_normalizer
-
-# def test_cfg_normalizer(tmp_path):
-#     df = pd.DataFrame(
-#         {"col_a": [1, 2, 3],
-#          "col_b": [4, 5, 6]
-#         })
-#     df.to_excel(tmp_path / "t.xlsx")
+from config.paths import TEST_XLSX
 
 def test_invalid_arg():
     
+    # invalid data type
     with pytest.raises(TypeError):
         my_int = 1
         _config_normalizer(my_int)
 
-    # invalid_cfg = {"foo": "bar"}
+    # invalid key name
+    with pytest.raises(ValueError):
+        invalid_cfg = {"foo": "bar"}
+        _config_normalizer(invalid_cfg)
+    
+    # invalid path
+    with pytest.raises(FileNotFoundError):
+        invalid_cfg = {"path": "foo.bar.xlsx"}
+        _config_normalizer(invalid_cfg)
+
+    # missing alias for multiple files
+    with pytest.raises(ValueError):
+        missing_als = [{"path": TEST_XLSX, "alias": "a1"},
+                       {"path": TEST_XLSX}]
+        _config_normalizer(missing_als)
+
+def test_reader():
+    ...    
+
+    
