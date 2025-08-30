@@ -17,7 +17,6 @@ def main():
     df: pd.DataFrame = execute_steps(plan=data_load_plan)
     
     # manipulate shade data frame
-    # TODO: likely another operation is needed in shade, check price list app to see what dependencies it has
     shade_data_plan = cfg["plans"]["shade"]
     shade_data = execute_steps(shade_data_plan, df=df)
 
@@ -30,8 +29,8 @@ def main():
     execute_steps(shade_export_plan, df=shade_data)
 
     # export non-shade data frame
-    # non_shade_export_plan = cfg["exports"]["non_shade"]
-    # execute_steps(non_shade_export_plan, df=non_shade_data)
+    non_shade_export_plan = cfg["exports"]["non_shade"]
+    execute_steps(non_shade_export_plan, df=non_shade_data)
 
 if __name__ == "__main__":
     raise SystemExit(main())

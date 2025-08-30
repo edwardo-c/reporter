@@ -57,3 +57,18 @@ def filter_in(
     # (3) mask
     mask = (left == right) if filter_in else (left != right)
     return df[mask]
+
+@register_operation("filter_list")
+def filter_list(df: pd.DataFrame, values : list, col: str):
+    
+    # if not list
+    if not isinstance(values, list):
+        raise TypeError(f"expected type list, recieved {type(values)}")
+
+    # if col not in df
+    if col not in df.columns:
+        raise KeyError(f"filter_list: column {col} not in df")
+
+    result = df[~df[col].isin(values)]
+    
+    return result

@@ -12,7 +12,7 @@ plans:
     - op: filter
       args:
         col: "Price Group"
-        val: SHADE
+        val: NEPTUNE
         case_insensitive: true
         filter_in: true # keep only those with SHADE
     - op: drop_null_dups
@@ -25,7 +25,7 @@ plans:
     - op: filter
       args:
         col: "Price Group"
-        val: SHADE
+        val: NEPTUNE
         case_insensitive: true
         filter_in: false # keep all except SHADE
 
@@ -41,5 +41,5 @@ exports:
     - op: csv_partitioned
       args:  
         partition_by: "Customer"
-        root_dir: ${SHADE_CSV_DIR}
+        root_dir: ${NON_SHADE_CSV_DIR}
         dry_run: false
