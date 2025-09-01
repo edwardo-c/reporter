@@ -1,0 +1,31 @@
+# plans passed into plan executor for capturing all sales and importing in persistent duck db
+
+load:
+  - op: "xlsx_reader"
+    args:
+      file_cfgs:
+        - alias: "all_sales_2024"
+          path: ${INCENTIVE_COMP}
+          sheet_name: "Bill To"
+          header: 5
+          usecols: 
+            - "Account"
+            - "Customer Name"
+            - "Inventory CD"
+            - "Qty"
+            - "Unit Price"
+            - "Amount"
+            - "Classification(Sales Category)"
+            - "Invoice Date"
+          rename_map:
+            "Account": "acct_num"
+            "Customer Name": "cust_name"
+            "Inventory CD": "part_number"
+            "Qty": "qty"
+            "Unit Price": "unit_price"
+            "Amount": "amount"
+            "Classification(Sales Category)": "product_category"
+            "Invoice Date": "invoice_date"
+
+
+         
