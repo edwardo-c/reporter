@@ -6,20 +6,28 @@ from plan_executor.registry import OPERATIONS_REGISTRY
 
 logger = logging.getLogger(__name__)
 
-def execute_steps(plan: list, df: pd.DataFrame | None = None):
-    for step in plan:
+logger = logging.getLogger(__name__)
+
+def execute_steps(plan: list, data=None):
+    for i, step in enumerate(plan, 1):
         fn = OPERATIONS_REGISTRY[step["op"]]
-        args = step.get("args", {}) or {}
+        args = step.get("args") or {}
 
         sig = inspect.signature(fn)
-        params = set(sig.parameters)
+        params = sig.parameters
 
-        # pass df only if the op accepts it
         if "df" in params:
-            result = fn(df=df, **args)
+            result = fn(df=data, **args)
+        elif "data" in params:
+            result = fn(data=data, **args)
         else:
             result = fn(**args)
 
-        if isinstance(result, pd.DataFrame):
-            df = result
-    return df
+        logger.debug("Step %s '%s' -> %s", i, step["op"], type(result).__name__)
+
+        if result is not None:
+            data = result
+        else:
+            logger.debug("Step %s returned None; keeping previous data.", i)
+
+    return data

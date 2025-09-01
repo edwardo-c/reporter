@@ -1,4 +1,5 @@
 # standard library imports
+import logging
 from pathlib import Path
 
 # Third party imports
@@ -8,8 +9,11 @@ from dotenv import load_dotenv
 # Internal Application Imports
 from config.paths import ALL_SALES_ENV, ALL_SALES_YAML
 from plan_executor.executor import execute_steps
+from utils.logging_config import setup_logging
 from utils.yaml_loader import load_yaml
 
+setup_logging(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 load_dotenv(dotenv_path=Path(ALL_SALES_ENV))
 
 def main():
@@ -17,11 +21,10 @@ def main():
     cfg = load_yaml(ALL_SALES_YAML)
 
     load_plan = cfg["load"]
-    print(load_plan)
 
     df = execute_steps(load_plan)
 
-    print(type(df))
+    print(df)
 
 
 if __name__ == "__main__":
