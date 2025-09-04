@@ -6,8 +6,6 @@ from plan_executor.registry import OPERATIONS_REGISTRY
 
 logger = logging.getLogger(__name__)
 
-logger = logging.getLogger(__name__)
-
 def execute_steps(plan: list, data=None):
     for i, step in enumerate(plan, 1):
         fn = OPERATIONS_REGISTRY[step["op"]]

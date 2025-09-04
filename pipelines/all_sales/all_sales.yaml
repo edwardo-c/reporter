@@ -4,16 +4,15 @@ load:
   - op: "xlsx_reader"
     args:
       file_cfgs:
-        - alias: "all_sales_2024"
+        - alias: "all_direct_2025"
           path: ${INCENTIVE_COMP}
-          sheet_name: "Bill To"
+          sheet_name: "All Direct"
           header: 5
           usecols: 
             - "Account"
             - "Customer Name"
             - "Inventory CD"
             - "Qty"
-            - "Unit Price"
             - "Amount"
             - "Classification(Sales Category)"
             - "Invoice Date"
@@ -22,10 +21,39 @@ load:
             "Customer Name": "cust_name"
             "Inventory CD": "part_number"
             "Qty": "qty"
-            "Unit Price": "unit_price"
             "Amount": "amount"
             "Classification(Sales Category)": "product_category"
             "Invoice Date": "invoice_date"
 
-
-         
+        - alias: "pos_2025"
+          path: ${INCENTIVE_COMP}
+          sheet_name: "POS"
+          header: 5
+          usecols:
+            - "Customer"
+            - "SoldToName"
+            - "PiiPartNumber"
+            - "ShipQuantity"
+            - "ExtendedSales"
+            - "PiiCategory"
+            - "PeriodDate"
+          rename_map:
+            "Customer": "distributor"
+            "SoldToName": "cust_name"
+            "PiiPartNumber": "part_number"
+            "ShipQuantity": "qty"
+            "ExtendedSales": "amount"
+            "PiiCategory": "product_category"
+            "PeriodDate": "invoice_date"
+  - op: "stack_frames"
+    args:
+      schema:
+        - "distributor"
+        - "acct_num"
+        - "cust_name"
+        - "part_number"
+        - "qty"
+        - "amount"
+        - "product_category"
+        - "invoice_date"
+      

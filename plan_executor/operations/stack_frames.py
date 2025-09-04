@@ -8,24 +8,24 @@ from plan_executor.registry import register_operation
 logger = logging.getLogger(__name__)
 
 @register_operation("stack_frames")
-def stack_frames(frames: list[dict[str, pd.DataFrame]], *,
+def stack_frames(data: list[dict[str, pd.DataFrame]], *,
                  schema: list[str], source: bool = True):
     """Append dataframes into a single stacked dataframe"""
     
-    if not isinstance(frames, list):
-        raise TypeError(f"expected type list, received {type(frames)}")
+    if not isinstance(data, list):
+        raise TypeError(f"expected type list, received {type(data)}")
 
     if not isinstance(schema, list):
         raise ValueError(f"schema required, recieved none")
 
     # log missing fields
-    _missing_fields(frames=frames, schema=schema)
+    _missing_fields(data=data, schema=schema)
     
     data_sets = []
 
-    for f in frames:
+    for d in data:
         # expected [{"alias": "data_1", "data": pd.DataFrame},]
-        dfx, alias = f.get("data", pd.DataFrame()).copy(), f.get("alias", "no_alias_found")
+        dfx, alias = d.get("data", pd.DataFrame()).copy(), d.get("alias", "no_alias_found")
   
         if dfx.empty:
             logger.warning("empty data frame detected for alias: %s!", alias)
@@ -46,17 +46,17 @@ def stack_frames(frames: list[dict[str, pd.DataFrame]], *,
     return pd.concat(data_sets, ignore_index=True)
 
 
-def _missing_fields(frames: list[dict[str, pd.DataFrame]], 
+def _missing_fields(data: list[dict[str, pd.DataFrame]], 
                     schema: list[str]) -> dict[str, list]:
     """Check all dataframes for schema, return missing fields"""
     missing = []
-    for frame in frames:
-        if not isinstance(frame, dict):
+    for d in data:
+        if not isinstance(d, dict):
             raise ValueError(
-                f"expected type dict, recieved {type(frame)}")
+                f"expected type dict, recieved {type(d)}")
         
-        alias = frame.get("alias")
-        data = frame.get("data", pd.DataFrame())
+        alias = d.get("alias")
+        data = d.get("data", pd.DataFrame())
         
         if data.empty:
             logger.info("no data found in alias: %s", alias)

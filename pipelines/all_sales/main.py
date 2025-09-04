@@ -22,9 +22,10 @@ def main():
 
     load_plan = cfg["load"]
 
-    df = execute_steps(load_plan)
+    df: pd.DataFrame = execute_steps(load_plan)
+    # get frames to be stacked
 
-    print(df)
+    print(df.head())
 
 
 if __name__ == "__main__":

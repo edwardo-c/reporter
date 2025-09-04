@@ -39,9 +39,10 @@ def _copy_safe_path(src_path: Path) -> Path | None:
 def read_xlsx_safely(path, sheet_name=0, header=0, usecols=None) -> pd.DataFrame:
     """Validate source path, copy to local temp folder, return dataframe"""
     src_path = valid_path(path)
-    safe_path: Path = _copy_safe_path(src_path)
+    safe_path = _copy_safe_path(src_path)
+    read_path = str(safe_path.resolve())
     try:
-        return pd.read_excel(safe_path, sheet_name=sheet_name, header=header, usecols=usecols)
+        return pd.read_excel(read_path, sheet_name=sheet_name, header=header, usecols=usecols)
     except:
         raise KeyError(f"Unable to read dataframe from: {path}")
     finally:
