@@ -4,3 +4,4 @@ from .operations import csv_partitioned
 from .operations import drop_null_dups
 from .operations import xlsx_reader
 from .operations import stack_frames
+from .operations import duckdb

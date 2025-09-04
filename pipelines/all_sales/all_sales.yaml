@@ -56,4 +56,10 @@ load:
         - "amount"
         - "product_category"
         - "invoice_date"
+        
+  - op: "duckdb_upload"
+    args:
+      duckdb_path: ${ALL_SALES_DB}
+      table: "all_sales"
+      mode: "replace"
       

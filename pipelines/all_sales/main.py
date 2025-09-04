@@ -20,13 +20,9 @@ def main():
     """Extract all sales from network files and load into duck db"""
     cfg = load_yaml(ALL_SALES_YAML)
 
+    # load all sales into duck db
     load_plan = cfg["load"]
-
-    df: pd.DataFrame = execute_steps(load_plan)
-    # get frames to be stacked
-
-    print(df.head())
-
+    execute_steps(load_plan)
 
 if __name__ == "__main__":
     raise SystemExit(main())
