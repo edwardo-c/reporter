@@ -17,7 +17,7 @@ def valid_dir(directory: str | Path ) -> Path:
     return directory
 
 def valid_path(file_path: str | Path) -> Path:
-    """confirms path is valid and exists returns pathlib.Path Object"""
+    """confirms path is valid returns pathlib.Path Object"""
     # is it a string?        
     if not isinstance(file_path, (str, Path)):
         raise TypeError(f"valid_path: expected str|Path, received: {type(file_path)}")

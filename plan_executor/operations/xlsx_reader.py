@@ -1,4 +1,4 @@
-"""'Safely' (local temp) read xlsx files and return [{alias: Dataframe}]"""
+"""'Safely' (local temp) read xlsx files and return [{alias:str, data: pd.Dataframe},]"""
 from pathlib import Path
 
 import pandas as pd
@@ -164,3 +164,5 @@ def _config_normalizer(file_cfgs: list[dict]) -> list[dict[str, Path | str | int
 
     # return normalized cfg
     return file_cfgs
+
+

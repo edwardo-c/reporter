@@ -1,3 +1,9 @@
+"""
+reads all csv files from a directory to a single dataframe
+notes*: 'safely' = copy to local file, read from copy
+configuration of column names not yet implemented
+"""
+
 # Standard library imports
 from pathlib import Path
 
@@ -12,7 +18,14 @@ def _collect_files(
         directory: Path,
         suffixes: tuple[str, ...] = ('.csv', '.xlsx'),
         recursive: bool = False        
-    ):
+    ) -> list[Path]:
+    """
+    Capture all valid file paths from a directory
+    args:
+      directory: The directory to read file paths from
+      recursive (bool) capture all files in subdirectories
+      suffixes: suffix of file to be captured in return list
+    """
 
     if not directory.is_file() and not directory.exists():
         raise NotADirectoryError(f"not a directory: {directory}")
@@ -26,7 +39,10 @@ def _collect_files(
         raise ValueError(f"no {suffixes} files found in {directory}, recursive={recursive}")
     return files
 
-def _concat_with_safe_reader(file_paths: list, add_source: bool = True):
+def _concat_with_safe_reader(file_paths: list[Path], add_source: bool = True) -> pd.DataFrame:
+    """
+    concat all files safely* from a list
+    """
     frames: list[pd.DataFrame] = []
     for p in file_paths:
         df = read_safely(p)
@@ -39,6 +55,7 @@ def _concat_with_safe_reader(file_paths: list, add_source: bool = True):
 @register_operation('dir_to_df')
 def dir_to_df(cfg: dict):
     """
+    Read configuration and orchestrate safe reading and concat
     cfg:
       directory: str|Path (required)
       recursive: bool = False
