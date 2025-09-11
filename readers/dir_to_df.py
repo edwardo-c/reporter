@@ -12,7 +12,7 @@ import pandas as pd
 
 # Internal application imports
 from plan_executor.registry import register_operation
-from plan_executor.operations.safe_reader import read_safely
+from readers.safe_reader import read_safely
 
 def _collect_files(
         directory: Path,

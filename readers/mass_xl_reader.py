@@ -1,4 +1,4 @@
-"""Read directory of predictable excel files"""
+"""Read directory of files"""
 
 from pathlib import Path
 import shutil as sh
@@ -7,13 +7,21 @@ from collections import defaultdict
 
 import pandas as pd
 
+from plan_executor.operations.force_reader import ForceReader
+
+"""
+DirReader
+"""
+
+
+
 class MassXlReader:
     """
     Read safe copy of directory
     args:
       dir: the directory to read from
       recursive (bool) read sub directories
-      schema_map: columns to use and rename to {'str in file name': {'COL_A': 'col_a, 'COL_B': 'col_b',}}
+      global_rename_map: columns to use and rename to {'str in file name': {'COL_A': 'col_a, 'COL_B': 'col_b',}}
         {'column alias': 'column to keep'}
       force (bool): convert unreadable files, else skip unreadable file
       
@@ -27,36 +35,51 @@ class MassXlReader:
         }
         force=True
       ) as MXR:
-         
-    
     """
     def __init__(
-        self, 
-        dir: Path,
-        recursive: bool, 
-        global_rename_map: dict,
-        force: bool = True):
-        
+          self, 
+          dir: Path, 
+          recursive: bool, 
+          global_rename_map: dict, 
+          force: bool = True
+    ):
+
         self.dir = dir
         self.recursive = recursive
-        self.schema_map = schema_map
-        self.force = force
-
+        self.grm = global_rename_map
+        self.fr = ForceReader
+        self.dst_dir: Path | None = None
         self._files = []
-        self.dst_dir = Path(tempfile.mkdtemp())
     
     def __enter__(self):
-        breakpoint()
         return self
     
     def __exit__(self, exc_type, exc_value, traceback):
-        sh.rmtree(self.dst_dir)
         print("__exit__: clean up time!")
 
     # ------ Internals -------
-    def force_read():
-        ...
+    def run(self):
+      """
+      get files
+      
+      loop over files
+        column rename(store df)
+      
+      stack frames
 
+      """
+      
+      with Path(tempfile.TemporaryDirectory()) as td:
+          # build dst_dir 
+          
+          # move self.dir to td (local)
+          dst_dir = sh.copytree()
+          ...
+
+      # get all files from dir
+
+      # read each file
+      files = ""
 
     def _safe_copy_dir(self):
         """moves dir to local temp dir"""

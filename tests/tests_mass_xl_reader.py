@@ -5,7 +5,7 @@ import pandas as pd
 
 from utils.logging_config import setup_logging
 
-from plan_executor.operations.mass_xl_reader import MassXlReader
+from readers.mass_xl_reader import MassXlReader
 
 setup_logging(level=logging.WARNING)
 logger = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ import logging
 
 import pandas as pd
 
-from plan_executor.operations.xlsx_reader import _config_normalizer, _column_rename, read_xlsx
+from readers.xlsx_reader import _config_normalizer, _column_rename, read_xlsx
 from config.paths import TEST_XLSX
 
 logging.basicConfig(level=logging.INFO)

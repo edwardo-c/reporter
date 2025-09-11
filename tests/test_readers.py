@@ -2,8 +2,8 @@ import pytest
 
 import pandas as pd
 
-from plan_executor.operations.safe_reader import read_safely
-from plan_executor.operations.safe_reader import PathCFG
+from readers.safe_reader import read_safely
+from readers.safe_reader import PathCFG
 
 def test_missing_src_path(tmp_path):
     df = pd.DataFrame({"X": [1], "Y": [10]})

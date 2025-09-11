@@ -4,7 +4,7 @@ import os
 
 import pandas as pd
 
-from plan_executor.operations.dir_to_df import dir_to_df
+from readers.dir_to_df import dir_to_df
 
 # empty directory raises
 def test_empty_dir(tmp_path: Path):

@@ -5,7 +5,7 @@ import pandas as pd
 
 from plan_executor.registry import register_operation
 from utils.validators import valid_path
-from plan_executor.operations.safe_reader import read_xlsx_safely
+from readers.safe_reader import read_xlsx_safely
 
 @register_operation("xlsx_reader")
 def read_xlsx(file_cfgs: 
