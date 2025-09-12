@@ -2,7 +2,6 @@
 Copies a csv to a local temp dir, reads from temp, deletes temp after
 Only works for csvs.
 """
-
 from pathlib import Path
 import shutil as sh
 import tempfile
@@ -47,3 +46,5 @@ def read_xlsx_safely(path, sheet_name=0, header=0, usecols=None) -> pd.DataFrame
         raise KeyError(f"Unable to read dataframe from: {path}")
     finally:
         sh.rmtree(safe_path.parent)
+
+

@@ -7,13 +7,11 @@ from collections import defaultdict
 
 import pandas as pd
 
-from plan_executor.operations.force_reader import ForceReader
+from readers.force_reader import ForceReader
 
 """
 DirReader
 """
-
-
 
 class MassXlReader:
     """
