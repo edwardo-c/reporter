@@ -6,6 +6,9 @@ import win32com.client as win32
 from typing import Callable
 from functools import partial
 
+# TODO: passing in directory 
+
+
 # hidden lifecycle: copy to temp, auto-cleanup
 @contextmanager
 def safe_local_copy(src: Path, is_dir: bool = False):
@@ -54,7 +57,7 @@ def excel_app_init():
     finally:
         app.Quit()
 
-# D) your force reader FUNCTION (passable to read_safely)
+# force reader FUNCTION (passable to read_safely)
 def force_reader(local_path: Path, *, app: object | None = None, **cfg) -> pd.DataFrame:
     """attempt to read file, if unable convert to temp xlsx and attempt again"""
     sfx = local_path.suffix.lower()
@@ -108,7 +111,9 @@ def _path_validator(src: Path | str) -> dict:
 
 
 def _collect_files(dir: Path, pattern: str, recursive: bool = False) -> list[Path]:
-    return sorted(dir.rglob(pattern) if recursive else dir.glob(pattern))
+    paths = sorted(dir.rglob(pattern) if recursive else dir.glob(pattern))
+    paths = [p for p in paths if p.is_file()]
+    return paths
 
 def _dir_reader(src, pattern, recursive, reader, **cfg):
     """read files in a directory matching pattern"""
@@ -160,7 +165,6 @@ def read_safely(
         raise NotImplementedError()
 
     if path_type == "dir":
-        return _dir_reader(src=src, 
-                           pattern=pattern, 
-                           recursive=recursive, 
-                           reader=reader) 
+        frames = _dir_reader(src=src, pattern=pattern, recursive=recursive, reader=reader)
+        return pd.concat(frames) if stack else frames
+

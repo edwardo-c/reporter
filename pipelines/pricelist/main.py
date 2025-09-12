@@ -36,8 +36,9 @@ def main_refactor():
     import pandas as pd
     from readers.xlReader import read_safely
     from pathlib import Path
-    dir = Path(r"")
+    dir = Path(r"C:\Users\eddiec11us\Documents\tests\price_lists_tests")
     frames: list[pd.DataFrame] = read_safely(src=dir, stack=True)
+    print(frames.head())
 
 if __name__ == "__main__":
     raise SystemExit(main_refactor())
