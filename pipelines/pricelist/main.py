@@ -38,8 +38,6 @@ def main_refactor():
     from pathlib import Path
     dir = Path(r"")
     frames: list[pd.DataFrame] = read_safely(src=dir, stack=True)
-    stacked = pd.concat(frames)
-
 
 if __name__ == "__main__":
     raise SystemExit(main_refactor())
