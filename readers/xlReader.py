@@ -1,12 +1,12 @@
 from contextlib import contextmanager
-from pathlib import Path
-import shutil, tempfile
-import pandas as pd
-import win32com.client as win32
-from typing import Callable
 from functools import partial
+from pathlib import Path
+import shutil
+import tempfile
+from typing import Callable
+import win32com.client as win32
 
-# TODO: passing in directory 
+import pandas as pd
 
 
 # hidden lifecycle: copy to temp, auto-cleanup
@@ -63,10 +63,10 @@ def force_reader(local_path: Path, *, app: object | None = None, **cfg) -> pd.Da
     sfx = local_path.suffix.lower()
 
     if sfx == ".csv":
-        return pd.read_csv(local_path, **cfg)
+        return pd.read_csv(local_path, index_col=False**cfg)
 
     def _read_xlsx(p: Path) -> pd.DataFrame:
-        return pd.read_excel(p, **cfg)
+        return pd.read_excel(p, index_col=False **cfg)
 
     def _convert_and_read(p: Path) -> pd.DataFrame:
         if app is not None:
@@ -109,7 +109,6 @@ def _path_validator(src: Path | str) -> dict:
     else:
         return {'file': src}
 
-
 def _collect_files(dir: Path, pattern: str, recursive: bool = False) -> list[Path]:
     paths = sorted(dir.rglob(pattern) if recursive else dir.glob(pattern))
     paths = [p for p in paths if p.is_file()]
@@ -128,31 +127,29 @@ def _cfg_validator():
 
 # Public api call, converts to local path and manages clean up
 def read_safely(
-        src: Path,
+        src: Path | str,
         recursive: bool = False,
         reader: Callable = force_reader,
         pattern: str = '*',
         stack: bool = True,
         **cfg
-    ) -> pd.DataFrame:
+    ) -> list[pd.DataFrame] | pd.DataFrame:
     """
-    reads file or files in dir matching pattern
-    accepts all pandas args in **cfg
-    TODO: wire pandas args
+    reads dataframes locally with pandas for file or directory
+    moves the files to a local temp for preservation of original,
+    and faster reading of network files
+
     args:
-      stack: if stack and src is dir, stack dataframes
-      pattern: glob pattern for dir reading
-      reader: 
-
-    ---TODO: Goal:
-    1. read from a directory and stack (price lists)
-        input: dir, stack = True
-    2. read from a directory recursively, rename columns then stack (pos)
-        input: dir, recursive = True, cfg for each, global rename map 
-    3. read multiple sheets from a single worksheet (
-        incentive comp / sar detail PQ interface ws
-        )
-
+        - src: file path or dir continaing files to read
+        - recursive: read sub directories within file
+        - reader: function to read a file, default = force_reader:
+            force_reader: reads csv, xlsx, or extension mismatch files 
+                by converting to xlsx then applying pandas read
+        - pattern: pattern used in path.(r)glob in file collection
+        - stack: concat all frames if stack else return list[pd.DataFrame,]
+        - cfg: TODO: implement pandas read args - extend with column renaming
+    examples:
+    
     """
 
     validated = _path_validator(src)
