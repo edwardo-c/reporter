@@ -36,10 +36,10 @@ def main_refactor():
     import pandas as pd
     from readers.xlReader import read_safely
     from pathlib import Path
-    dir = Path(r"C:\Users\eddiec11us\Documents\tests\October 2024")
+    dir = Path(r"")
     frames: list[pd.DataFrame] = read_safely(src=dir, stack=True)
     stacked = pd.concat(frames)
-    
+
 
 if __name__ == "__main__":
     raise SystemExit(main_refactor())
