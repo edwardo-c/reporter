@@ -63,10 +63,10 @@ def force_reader(local_path: Path, *, app: object | None = None, **cfg) -> pd.Da
     sfx = local_path.suffix.lower()
 
     if sfx == ".csv":
-        return pd.read_csv(local_path, index_col=False**cfg)
+        return pd.read_csv(local_path, index_col=False, **cfg)
 
     def _read_xlsx(p: Path) -> pd.DataFrame:
-        return pd.read_excel(p, index_col=False **cfg)
+        return pd.read_excel(p, index_col=False, **cfg)
 
     def _convert_and_read(p: Path) -> pd.DataFrame:
         if app is not None:
@@ -122,7 +122,20 @@ def _dir_reader(src, pattern, recursive, reader, **cfg):
             frames = [rd(local_path=f) for f in _collect_files(local, pattern, recursive)]
     return frames
 
-def _cfg_validator():
+def _cfg_validator(cfg: dict):
+    """
+    inspects cfg for proper accepted arguements
+    expected shape:
+    {'file_name': {
+        header: int, 
+        sheet_name: str | int
+        use_cols: list
+        rename_map: defaultdict[list] | dict
+        }
+    }
+    """
+    # make sure each key (file_name) lines up with a file
+    # strict mode for (file_name in) or (file_name ==) inside cfg matching
     ...
 
 # Public api call, converts to local path and manages clean up
@@ -133,7 +146,7 @@ def read_safely(
         pattern: str = '*',
         stack: bool = True,
         **cfg
-    ) -> list[pd.DataFrame] | pd.DataFrame:
+    ) -> pd.DataFrame | list[pd.DataFrame]:
     """
     reads dataframes locally with pandas for file or directory
     moves the files to a local temp for preservation of original,
@@ -149,19 +162,19 @@ def read_safely(
         - stack: concat all frames if stack else return list[pd.DataFrame,]
         - cfg: TODO: implement pandas read args - extend with column renaming
     examples:
-    
+        ...
     """
 
     validated = _path_validator(src)
     (path_type, src), = validated.items()
     
     if cfg: 
-        raise NotImplementedError()
+        cfg = _cfg_validator()
 
     if path_type == "file":
         raise NotImplementedError()
 
     if path_type == "dir":
-        frames = _dir_reader(src=src, pattern=pattern, recursive=recursive, reader=reader)
+        frames = _dir_reader(src=src, pattern=pattern, recursive=recursive, reader=reader, **cfg)
         return pd.concat(frames) if stack else frames
 

@@ -48,6 +48,9 @@ def main_refactor():
 
     # correct frame values
     # returnable col
+    # keep only agreement rows
+    # category normalization
+    
 
 if __name__ == "__main__":
     raise SystemExit(main_refactor())

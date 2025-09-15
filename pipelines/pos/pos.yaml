@@ -1,4 +1,4 @@
-directory: ${}
+directory: ${TEST_DIR}
 
 files:
   - match_regex: "accu tech"
