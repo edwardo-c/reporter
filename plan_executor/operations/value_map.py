@@ -2,7 +2,7 @@ import pandas as pd
 from plan_executor.registry import register_operation
 
 @register_operation("value_map")
-def replace_values(df: pd.DataFrame, value_map: dict, case_insensitive: bool = True) -> pd.DataFrame:
+def replace_values(df: pd.DataFrame, value_map: dict, *, case_insensitive: bool = True) -> pd.DataFrame:
     """
     fill each "col_name" (key) with value_map (value)
     """
@@ -12,37 +12,39 @@ def replace_values(df: pd.DataFrame, value_map: dict, case_insensitive: bool = T
         )
     
     # check for missing columns
-    missing = [col for col in value_map.keys() if col not in df.columns]
-    # if even one is missing, raise because silent errors will happen downstream
+    missing = set(value_map) - set(df.columns)
+    
+    # raise to avoid silent errors in will happen downstream
     if missing:
         raise KeyError(f"{__name__} missing columns {missing}")
 
-    df_copy: pd.DataFrame = df.copy()
+    out: pd.DataFrame = df.copy()
+    cols = list(value_map)
 
+    # quick exit for exact matches
     if not case_insensitive:
-        df_copy[list(value_map)] = df_copy[list(value_map)].replace(value_map)
-        return df_copy
+        out[cols] = out[cols].replace(value_map)
+        return out
 
-    if case_insensitive:
-        value_map = _lower_map(value_map)
-        df_copy = _lower_df(df, value_map)
-
-    for col, map in value_map.items():
-        df_copy[col] = df_copy[col].replace(map)
-
-    return df_copy
-
-def _lower_df(df: pd.DataFrame, value_map: dict[str, dict]):
-    """
-    convert column values to lower case
-    """
-    for col in value_map.keys():
-        df[col] = df[col].str.lower()
-    
-    return df
-
-def _lower_map(replace_values_map: dict[str, dict]):
-    return {
-    col: {str(k).lower(): v for k, v in rename_map.items()} 
-    for col, rename_map in replace_values_map.items()
+    ci_map = {
+        col: {str(k).casefold(): v for k, v in col_map.items()}
+        for col, col_map in value_map.items()
     }
+
+    for col in cols:
+        
+        # the column to change
+        base = out[col]
+        
+        # the shadow values to be matched against
+        s = base.astype('string').str.strip().str.casefold()
+        
+        # match the values
+        repl = s.map(ci_map[col])
+
+        # fill values not matched
+        base = repl.fillna(base)
+
+        out[col] = base
+    
+    return out
