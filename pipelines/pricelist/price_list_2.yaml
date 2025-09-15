@@ -1,0 +1,13 @@
+steps:
+  - op: "value_map"
+    args:
+      "value_map":
+        "Price Group":
+          "core": "Mounts"
+          "kiosk": "Kiosks"
+          "ds": "Digital Signage"
+          "et": "Emerging Technologies & Displays"
+          "e-tail": "E-Tail"
+          "hosp": "Hospitality"
+          "neptune": Neptune
+          "retail": TruVue

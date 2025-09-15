@@ -35,8 +35,9 @@
 import pandas as pd
 from readers.xlReader import read_safely
 from utils.yaml_loader import load_yaml
+from plan_executor.executor import execute_steps
 from pathlib import Path
-
+from config.paths import PRICE_LIST_YAML_REFACTOR
 
 def main_refactor():
 
@@ -46,11 +47,20 @@ def main_refactor():
     dir = Path(r"C:\Users\eddiec11us\Documents\tests\price_lists_tests")
     pricing_df = read_safely(src=dir, stack=True)
 
-    # correct frame values
-    # returnable col
-    # keep only agreement rows
+    yaml_all = load_yaml(PRICE_LIST_YAML_REFACTOR)
+
     # category normalization
-    
+    clean_plan = yaml_all["steps"]
+
+    df = execute_steps(clean_plan, pricing_df)
+
+    print(df.head())
+
+    # correct frame values: 
+    # returnable col
+
+    # keep only agreement rows
+
 
 if __name__ == "__main__":
     raise SystemExit(main_refactor())

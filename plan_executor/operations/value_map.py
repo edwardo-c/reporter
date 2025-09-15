@@ -19,6 +19,10 @@ def replace_values(df: pd.DataFrame, value_map: dict, case_insensitive: bool = T
 
     df_copy: pd.DataFrame = df.copy()
 
+    if not case_insensitive:
+        df_copy[list(value_map)] = df_copy[list(value_map)].replace(value_map)
+        return df_copy
+
     if case_insensitive:
         value_map = _lower_map(value_map)
         df_copy = _lower_df(df, value_map)
