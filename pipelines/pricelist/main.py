@@ -32,13 +32,22 @@
 #     non_shade_export_plan = cfg["exports"]["non_shade"]
 #     execute_steps(non_shade_export_plan, df=non_shade_data)
 
+import pandas as pd
+from readers.xlReader import read_safely
+from utils.yaml_loader import load_yaml
+from pathlib import Path
+
+
 def main_refactor():
-    import pandas as pd
-    from readers.xlReader import read_safely
-    from pathlib import Path
+
+    frames_cfg = load_yaml
+    
+    # get single pricing frame
     dir = Path(r"C:\Users\eddiec11us\Documents\tests\price_lists_tests")
-    frames: list[pd.DataFrame] = read_safely(src=dir, stack=True)
-    print(frames.head())
+    pricing_df = read_safely(src=dir, stack=True)
+
+    # correct frame values
+    # returnable col
 
 if __name__ == "__main__":
     raise SystemExit(main_refactor())

@@ -1,10 +1,6 @@
 import os
 import yaml
 from pathlib import Path
-from dotenv import load_dotenv
-from config.paths import CONFIG_DOT_ENV
-
-load_dotenv(dotenv_path=Path(CONFIG_DOT_ENV))
 
 def load_yaml(path):
     raw = Path(path).read_text(encoding="utf-8")
