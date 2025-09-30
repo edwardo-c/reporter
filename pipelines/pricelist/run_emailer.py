@@ -17,13 +17,13 @@ def main():
         "pav": "pav body test",
         "nep": "nep body test"}
 
-    e = PriceListEmailer(
+    with PriceListEmailer(
         contacts_file_path=contacts_file_path,
-        files_dir=files_dir, 
-        email_body_map=email_body_map
-    )
-
-    e.email()
+        files_dir=files_dir,
+        email_body_map=email_body_map,
+    ) as e:   
+        sent = e.email()
+        print(f"Sent {sent} emails. Outlook will finish sending in the background.")
 
 if __name__ == "__main__":
     main()
