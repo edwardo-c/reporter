@@ -66,8 +66,9 @@ class PriceListEmailer:
 
     def _send_email(self, *, contacts: list[str], subject: str, body: str, attachment: Path | None = None):
         """Compose & send one message."""
+        mail.SentOnBehalfOf = "sales@peerless-av.com"
         mail = self._outlook.CreateItem(olMailItem)
-        mail.To = ", ".join(contacts)
+        mail.To = "; ".join(c.strip() for c in contacts if c)
         mail.Subject = subject
         mail.Body = body
         if attachment:
