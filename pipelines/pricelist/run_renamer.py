@@ -9,6 +9,7 @@ import os
 import re
 import requests
 import pandas as pd
+from shutil import copy2
 
 
 def main():
@@ -20,16 +21,18 @@ def main():
         {"Peerless-AV": Path(os.getenv("PAV_ATTACHMENTS")),
          "Neptune": Path(os.getenv("NEP_ATTACHMENTS"))}, accts)
     
-    rename_map = _rename_map(files_to_move)
+    rename_map = _rename_map(files_to_move, Path(os.getenv("EN_DST")))
 
-    breakpoint()
+    _move_to_dst(rename_map)
 
 
-def _move_to_dst(conversion_map: Iterable[Tuple[Path, Path]]):
+def _move_to_dst(conversion_maps: Iterable[Tuple[Path, Path]]):
     """Copies files per (src, dst) pairs"""
-    ...
+    for map in conversion_maps:
+        src, dst = map
+        copy2(src=src, dst=dst)
 
-def _rename_map(files_to_move: dict[str, Path]):
+def _rename_map(files_to_move: dict[str, Path], target_dir: Path):
     """files_to_move 
     {BrandName: [Path to be moved],}
     """
@@ -37,7 +40,7 @@ def _rename_map(files_to_move: dict[str, Path]):
         yr = re.search(yr_pattern, s)
         eff_date = re.search(eff_date_pattern, s)
         acct_name = re.search(acct_name_pattern, s)
-        return f"{yr.group(0)} {brand} {acct_name.group(1)} Price List - {eff_date.group(0).replace(".","")}{yr.group(0)[2:]}"
+        return f"{yr.group(0)} {brand} {acct_name.group(1)} Price List - {eff_date.group(0).replace(".","")}{yr.group(0)[2:]}.xlsx"
 
     yr_pattern = r"\b20[0-9]{2}\b"
     eff_date_pattern = r"\b[0-9]{2}\.[0-9]{2}\b"
@@ -48,7 +51,7 @@ def _rename_map(files_to_move: dict[str, Path]):
     
     for brand, files in files_to_move.items():
         for src in files:
-            dst = src.parent / _gen_dst(src.stem, brand)
+            dst = target_dir / _gen_dst(src.stem, brand)
             result.append((src, dst))
     
     return result
