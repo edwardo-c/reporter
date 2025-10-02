@@ -1,0 +1,30 @@
+all_sales:
+  file_path: ${ALL_SALES}
+  params:
+    - sheet_name: "2025"
+      header: 10
+      usecols:
+        - "Customer Account Number"
+        - "Classification(Sales Category)"
+        - "Amount"
+        - "Invoice Date"
+      rename_map:
+        "Customer Account Number": "acct_num"
+        "Classification(Sales Category)": "part_category"
+        "Amount": "amount"
+        "Invoice Date": "invoice_date"
+    - sheet_name: "2024"
+      header: 1
+      usecols:
+        - "Account No."
+        - "Category"
+        - "Amount"
+        - "Invoice Date"
+      rename_map:
+        "Account No.": "acct_num"
+        "Category": "part_category"
+        "Amount": "amount"
+        "Invoice Date": "invoice_date"
+
+# get account group and join in from acumatica -> Odata
+# get accounts with PFA, inner join to reduce list

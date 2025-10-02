@@ -7,13 +7,12 @@ Created as a supplement to the VBA price list application
 - split into csvs with python -m pipelines.pricelist.main
 - create via VBA script
 
-
-## TODO: SCRIPTS NEEDED!
 - manually create any left overs with unimplemented pipeline
     - Powerhouse
     - Visions
     - Grainger  
 
-- copy ENs to folder with different file naming convention
-- upload to peernet
-- notify all via salesforce
+- copy ENs with seperate naming via python -m pipelines.pricelist.run_renamer
+
+- Manual upload to peernet
+- Manual salesforce notification to sales reps

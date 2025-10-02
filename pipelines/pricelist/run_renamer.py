@@ -70,8 +70,7 @@ def _gather_files(brand_dir_map: dict[str, Path], valid_ids: set):
         for brand, dir in brand_dir_map.items()
     }
 
-
-def _get_src_IDs():
+def _get_src_IDs() -> set[str]:
     """pulls customer id data for en directly from Acu"""
     url = os.getenv("CUSTOMERS_FEED")
     username = os.getenv("ACU_USERNAME")
