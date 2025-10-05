@@ -22,7 +22,11 @@ def refresh_data():
 
     cleaned = _clean_data(raw_sales)
 
+    _duckdb_load(cleaned)
+
+def _duckdb_load(df: pd.DataFrame):
     breakpoint()
+    ...
 
 def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # temporary solution for testing, pull from acumatica eventually
