@@ -14,12 +14,18 @@ olMailItem = 0  # Outlook constant
 
 class PriceListEmailer:
     """
-    Send emails to contacts using account number as key
+    Send emails with price list attachment to contacts
+    using account number from file name as key
 
     args:
-        contacts_file_path: csv file path holding contacts
-        files_dir: dict['pav': Path, 'nep': Path]
-        email_body_map: dict['pav': str, 'nep': str]
+        - contacts_file_path: csv file path holding contacts; 
+          Required Columns: ["ACU Customer ID", "Email"]
+            
+        - files_dir: {'BrandName': Path/To/Dir/Holding/Attachments,}
+          File paths inside are expected to have 7-9 digit account number
+-
+        - email_body_map: callable function used for both brand emails,
+          expects f{brand} in function for brand callout in body
     """
 
     def __init__(self, contacts_file_path: str, files_dir: Dict[str, Path], email_body_map: Dict[str, str]):

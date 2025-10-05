@@ -8,7 +8,7 @@ import pandas as pd
 
 # Internal Imports
 from readers.xlReader import read_safely
-from pipelines.pricelist.csv_partitioner import run
+from pipelines.pricelist.split_into_csvs.csv_partitioner import run
 from config.paths import PRICE_LIST_ENV
 
 def main():

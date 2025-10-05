@@ -4,7 +4,7 @@ import os
 
 import pandas as pd
 
-from pipelines.pricelist import csv_partitioner as ep
+from pipelines.pricelist.split_into_csvs import csv_partitioner as ep
 
 def test_brand_col():
     

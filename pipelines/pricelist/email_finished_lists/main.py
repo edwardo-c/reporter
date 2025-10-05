@@ -1,4 +1,4 @@
-from pipelines.pricelist.emailer import send_emails
+from pipelines.pricelist.email_finished_lists.emailer import send_emails
 from dotenv import load_dotenv
 from config.paths import PRICE_LIST_ENV
 from os import getenv
