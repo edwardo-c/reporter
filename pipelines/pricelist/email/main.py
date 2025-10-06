@@ -19,14 +19,14 @@ def main():
 
     load_dotenv(PRICE_LIST_ENV)
 
-    results: int = send_emails(
+    email_count: int = send_emails(
         contacts_file_path=getenv("CONTACTS"),
         files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
                     'Neptune': getenv("NEP_ATTACHMENTS")},
         email_body=_boilerplate_email
     )
 
-    print(f"sent {results} emails")
-
+    print(f"sent {email_count} emails")
+    
 if __name__ == "__main__":
     main()
