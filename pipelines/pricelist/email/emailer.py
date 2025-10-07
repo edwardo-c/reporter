@@ -140,13 +140,3 @@ class PriceListEmailer:
                     if (acct_num := _extract_acct_num(f))} 
             for brand, file_dir in self._files_dir.items() 
         }
-    
-        
-
-        # pav_glob = Path(self._files_dir["pav"]).glob("*.xlsx")
-        # nep_glob = Path(self._files_dir["nep"]).glob("*.xlsx")
-
-        # pav_map = {k: p for p in pav_glob if (k := _extract_acct_num(p))}
-        # nep_map = {k: p for p in nep_glob if (k := _extract_acct_num(p))}
-
-        # return {"pav": pav_map, "nep": nep_map}

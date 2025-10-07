@@ -2,10 +2,10 @@
 
 ## What It Does
 Emails customers their specific Price List (attachment) for
-two brands. Uses active outlook client for individual sending
+both brands. Uses active outlook client for individual sending.
 
 ## Why It Matters
-Enables us to react to price changes faster by automating and distribution of customer specific price lists. 
+Enables us to react to price changes faster by automating the distribution of customer specific price lists. 
 
 ## How To Use
 - Update config.pricelist.env

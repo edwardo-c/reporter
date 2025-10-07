@@ -23,7 +23,7 @@ def main():
         contacts_file_path=getenv("CONTACTS"),
         files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
                     'Neptune': getenv("NEP_ATTACHMENTS")},
-        email_body=_boilerplate_email
+        email_body=_correction_email
     )
 
     print(f"sent {email_count} emails")

@@ -1,16 +1,22 @@
 """Refresh of direct sales in duckdb"""
 
+# Standard library imports
+from contextlib import contextmanager
 from dotenv import load_dotenv
-from config.paths import STATUS_REPORTS_ENV, STATUS_REPORTS_YAML, ACUMATICA_CREDENTIALS
 from os import getenv
+from pathlib import Path
+import shutil
+import tempfile
+
+# Third Party Imports
+import pandas as pd
+import duckdb
+
+# Internal Imports
+from config.paths import (
+    STATUS_REPORTS_ENV, STATUS_REPORTS_YAML, ACUMATICA_CREDENTIALS)
 from utils.yaml_loader import load_yaml
 from utils.acumatica_odata import get_acumatica_table
-from pathlib import Path
-import tempfile
-import shutil
-from contextlib import contextmanager
-import pandas as pd
-from os import getenv
 
 load_dotenv(STATUS_REPORTS_ENV)
 
@@ -22,12 +28,17 @@ def refresh_data():
 
     cleaned = _clean_data(raw_sales)
 
-    _duckdb_load(cleaned)
+    _duckdb_load(cleaned, database=getenv("DUCKDB"), table_name="category_sales")
 
-def _duckdb_load(df: pd.DataFrame):
-    breakpoint()
-    ...
+def _duckdb_load(
+        df: pd.DataFrame, *, 
+        database: str, 
+        table_name: str, 
+    ):
 
+    with duckdb.connect(database=database) as con:
+        con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df")
+    
 def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # temporary solution for testing, pull from acumatica eventually
     customers = {"AVI062740", "ELE232213", "KAN482651"}
