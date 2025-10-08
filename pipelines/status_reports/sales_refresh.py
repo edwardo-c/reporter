@@ -2,8 +2,6 @@
 
 # Standard library imports
 from contextlib import contextmanager
-from dotenv import load_dotenv
-from os import getenv
 from pathlib import Path
 import shutil
 import tempfile
@@ -12,37 +10,27 @@ import tempfile
 import pandas as pd
 import duckdb
 
-# Internal Imports
-from config.paths import (
-    STATUS_REPORTS_ENV, STATUS_REPORTS_YAML, ACUMATICA_CREDENTIALS)
-from utils.yaml_loader import load_yaml
-from utils.acumatica_odata import get_acumatica_table
-
-load_dotenv(STATUS_REPORTS_ENV)
-
-def refresh_data():
-
-    cfg = load_yaml(STATUS_REPORTS_YAML)["all_sales"]
+def refresh_data(*, data_cfg: dict, database: str):
     
-    raw_sales = read_raw_sales_data(cfg=cfg)
+    raw_sales = read_raw_sales_data(cfg=data_cfg)
 
-    cleaned = _clean_data(raw_sales)
+    with duckdb.connect(database=database) as conn:
+        customers = _get_customers(conn=conn)
+        cleaned = _clean_data(raw_sales, customers)
+        _duckdb_load(cleaned, conn=conn)
 
-    _duckdb_load(cleaned, database=getenv("DUCKDB"), table_name="category_sales")
+def _duckdb_load(df: pd.DataFrame, *, conn: object):
+    conn.execute(f"CREATE TABLE category_sales AS SELECT * FROM df")
 
-def _duckdb_load(
-        df: pd.DataFrame, *, 
-        database: str, 
-        table_name: str, 
-    ):
+def _get_customers(conn: object):
+        return set(conn.query(
+            """
+            SELECT 
+                DISTINCT(acct_num)
+            FROM customers
+            """).fetchdf()["acct_num"])
 
-    with duckdb.connect(database=database) as con:
-        con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df")
-    
-def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    # temporary solution for testing, pull from acumatica eventually
-    customers = {"AVI062740", "ELE232213", "KAN482651"}
-
+def _clean_data(df: pd.DataFrame, customers: set) -> pd.DataFrame:
     out = (
         df
         # keep only valid customers
