@@ -8,31 +8,21 @@ import tempfile
 
 # Third Party Imports
 import pandas as pd
-import duckdb
 
 def refresh_data(*, data_cfg: dict, conn: object):
-    
+    """Read, clean, and load sales data from network file to duckdb"""
+
     raw_sales = read_raw_sales_data(cfg=data_cfg)
-    customers = _get_customers(conn=conn)
-    cleaned = _clean_data(raw_sales, customers)
+    cleaned = _clean_data(raw_sales)
     _duckdb_load(cleaned, conn=conn)
 
 def _duckdb_load(df: pd.DataFrame, *, conn: object):
     conn.execute(f"CREATE OR REPLACE TABLE category_sales AS SELECT * FROM df")
 
-def _get_customers(conn: object):
-        return set(conn.query(
-            """
-            SELECT 
-                DISTINCT(acct_num)
-            FROM customers
-            """).fetchdf()["acct_num"])
-
-def _clean_data(df: pd.DataFrame, customers: set) -> pd.DataFrame:
+def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    """consolidate and normalize data"""
     out = (
         df
-        # keep only valid customers
-        .query("acct_num in @customers") 
         # clean/add columns
         .assign(
             year=lambda d: d["invoice_date"].dt.year,
@@ -45,7 +35,6 @@ def _clean_data(df: pd.DataFrame, customers: set) -> pd.DataFrame:
         .agg(total=("amount", "sum"))
     )
     return out
-
 
 def read_raw_sales_data(cfg: dict):
     """Iterate over params in cfg, read from same file"""    
@@ -64,6 +53,7 @@ def read_raw_sales_data(cfg: dict):
     return pd.concat(frames)
 
 def _column_renamer(df: pd.DataFrame, rename_map: dict):
+    """return dataframe with renamed column"""
     copy = df.copy()
     copy = copy.rename(columns=rename_map)
     return copy

@@ -3,6 +3,8 @@
 import pandas as pd
 
 def get_data_map(conn: object, report_cfg: dict):
+    """Primary runner for preparing data map {acct_num: {ExcelRange: Value}}"""
+
     df: pd.DataFrame = _query(conn=conn)
 
     report_map = _df_to_cfg(df, report_cfg)
@@ -10,7 +12,22 @@ def get_data_map(conn: object, report_cfg: dict):
     return report_map
 
 def _df_to_cfg(df:pd.DataFrame, report_map: dict):
+    """
+    Map keys from report_map to values of df using cols as intersect
 
+    Example:
+      df= {
+        acct_num: [abc, def], 
+        2025_Total: [123, 456]
+      }
+
+      report_map: {"A1": "2025_Total"}
+
+      result: {
+        'abc': {"A1": 123},
+        'def': {"A1: 456},
+      }
+    """
     df_dict = df.to_dict('records')
 
     result_map = {}

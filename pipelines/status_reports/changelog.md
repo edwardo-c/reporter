@@ -5,10 +5,9 @@ load of category_sales data into persistent duckdb
 safe read of network file
 
 [UNRELEASED]
-mapping of signed vs unsigned customers - dictates which template to use
-.duckdb table for customers: account_number(varchar) | report_type(varchar) | signed(bool)
-join Customers to sales data
-Refactor: One global getenv call
+- mapping of signed vs unsigned customers, added to customers tbl, but will need to be referenced in hot loop
+- .duckdb table for customers: account_number(varchar) | report_type(varchar) | signed(bool)
+- join Customers to sales data
 
 [SMELLS]
 little bit of arguement soup going on. lots of passing of conn, and yaml configs
