@@ -10,17 +10,15 @@ import tempfile
 import pandas as pd
 import duckdb
 
-def refresh_data(*, data_cfg: dict, database: str):
+def refresh_data(*, data_cfg: dict, conn: object):
     
     raw_sales = read_raw_sales_data(cfg=data_cfg)
-
-    with duckdb.connect(database=database) as conn:
-        customers = _get_customers(conn=conn)
-        cleaned = _clean_data(raw_sales, customers)
-        _duckdb_load(cleaned, conn=conn)
+    customers = _get_customers(conn=conn)
+    cleaned = _clean_data(raw_sales, customers)
+    _duckdb_load(cleaned, conn=conn)
 
 def _duckdb_load(df: pd.DataFrame, *, conn: object):
-    conn.execute(f"CREATE TABLE category_sales AS SELECT * FROM df")
+    conn.execute(f"CREATE OR REPLACE TABLE category_sales AS SELECT * FROM df")
 
 def _get_customers(conn: object):
         return set(conn.query(

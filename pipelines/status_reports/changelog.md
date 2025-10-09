@@ -4,7 +4,8 @@ load of category_sales data into persistent duckdb
 safe read of network file
 
 [UNRELEASED]
-arrange category_sales data with query
+func: takes table and report_map, merges values to map
+arrange category_sales data to be inputted into report
 .duckdb table for customers: account_number(varchar) | report_type(varchar) | signed(bool)
 join Customers to sales data
 Refactor: One global getenv call
