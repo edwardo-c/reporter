@@ -18,7 +18,10 @@ def main():
 
     with duckdb.connect(cfg["paths"]["database"]) as conn:
         refresh_data(data_cfg=cfg["data"], conn=conn)
-        data_map = get_data_map(conn=conn)
+        data_map = get_data_map(
+            conn=conn, 
+            report_cfg=cfg.get("report_map")
+        )
 
     # link data map to report layout
     breakpoint()

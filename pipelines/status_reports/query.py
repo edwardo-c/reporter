@@ -2,12 +2,26 @@
 
 import pandas as pd
 
-def get_data_map(conn: object):
+def get_data_map(conn: object, report_cfg: dict):
     df: pd.DataFrame = _query(conn=conn)
 
-    # TODO: match df to data map, thinking df.to_dict('records') will help here
+    report_map = _df_to_cfg(df, report_cfg)
 
-    return df
+    return report_map
+
+def _df_to_cfg(df:pd.DataFrame, report_map: dict):
+
+    df_dict = df.to_dict('records')
+
+    result_map = {}
+    record_map = {}
+    for record in df_dict:
+        for range, col in report_map.items():
+            record_map[range] = record[col] 
+        # add to result map with acct_num key
+        result_map[record["acct_num"]] = record_map
+
+    return result_map
 
 def _query(conn: object):
     query = """
