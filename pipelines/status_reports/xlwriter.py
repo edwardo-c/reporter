@@ -47,12 +47,10 @@ def _fill_report_template(
         path_in: str, path_out: Path,
         report_map: dict[str, float]
     ):    
-    breakpoint()
     wb = load_workbook(path_in)
     ws = wb[SHEET_NAME]
     for range, val in report_map.items():
         ws[range].value = val
     wb.save(path_out)
     wb.close()
-    breakpoint()
 
