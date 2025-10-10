@@ -7,8 +7,11 @@ from config.internal_paths import STATUS_REPORTS_CFG, STATUS_REPORTS_ENV
 from pipelines.status_reports.sales_refresh import refresh_data
 from utils.yaml_loader import load_yaml
 from pipelines.status_reports.query import get_data_map
+from pipelines.status_reports.xlwriter import generate_reports
 
 import duckdb
+
+SHEET_NAME = "Summary"
 
 def main():
 
@@ -24,7 +27,7 @@ def main():
         )
 
     # link data map to report layout
-    breakpoint()
+    generate_reports()
 
     # paste data map to report
 
