@@ -27,6 +27,7 @@ data:
         "Invoice Date": "invoice_date"
 
 "report_map":
+  "B1": "header"
   # current_year
   "G5": "current_year_mounts"
   "G6": "current_year_tech"
@@ -68,3 +69,7 @@ data:
 paths:
   database: ${DUCKDB}
   signed_report: ${SIGNED_REPORT}
+  out_dir: ${OUT_DIR}
+  templates:
+    true: ${SIGNED_REPORT}
+    false: ${UNSIGNED_REPORT}

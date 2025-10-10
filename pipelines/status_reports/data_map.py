@@ -2,18 +2,32 @@
 
 import pandas as pd
 
-def get_data_map(conn: object, report_cfg: dict):
-    """Primary runner for preparing data map {acct_num: {ExcelRange: Value}}"""
+def get_data_map(conn: object, report_cfg: dict, timeframe: str):
+    """
+    Primary runner for preparing data map {acct_num: {ExcelRange: Value}}
+    
+    args:
+
+      conn: connection object to duckdb to pull data from
+    
+      report_cfg: map of cell {range: column_name} to pull value from
+        cell_range is the range to paste the data to
+        column_name is the column name to extract the data from
+      
+      default_values: default values to each cell map
+    """
 
     df: pd.DataFrame = _query(conn=conn)
 
-    report_map = _df_to_cfg(df, report_cfg)
+    report_map = _df_to_cfg(df, report_cfg, timeframe=timeframe)
 
     return report_map
 
-def _df_to_cfg(df:pd.DataFrame, report_map: dict):
+def _df_to_cfg(df:pd.DataFrame, report_cfg: dict[str, str],
+               timeframe: str) -> list[dict[str, dict[str, dict]]]:
     """
     Map keys from report_map to values of df using cols as intersect
+    return {fileName: CellValueMap,}
 
     Example:
       df= {
@@ -30,15 +44,41 @@ def _df_to_cfg(df:pd.DataFrame, report_map: dict):
     """
     df_dict = df.to_dict('records')
 
-    result_map = {}
-    record_map = {}
-    for record in df_dict:
-        for range, col in report_map.items():
-            record_map[range] = record[col] 
-        # add to result map with acct_num key
-        result_map[record["acct_num"]] = record_map
+    out = []
+    default = {"E3": f"As of {timeframe}"}
 
-    return result_map
+    for record in df_dict:
+        
+        signed = bool(record["signed"])
+ 
+        out_file_name = _gen_file_name(
+            signed=signed,
+            name = record["header"],
+            timeframe=timeframe
+        )
+
+        record_map = {range: record[col_name] 
+                      for range, col_name in report_cfg.items()}
+        record_map.update(default)
+
+        entry = {
+            'meta': {
+                'out_file_name': out_file_name, 
+                'signed': signed, 
+                'acct_num': record["acct_num"]
+            },
+            'value_map': record_map}
+
+        out.append(entry)
+
+    return out
+
+def _gen_file_name(signed: bool, name: str, timeframe: str) -> str:
+    base_name = f"{name} Status Report - {timeframe}.xlsx"
+    if not signed:
+        return f"UNEXECUTED - {base_name}"
+    else:
+        return base_name
 
 def _query(conn: object):
     query = """
@@ -58,6 +98,8 @@ def _query(conn: object):
     )
     SELECT
       c.acct_num,
+      c.header,
+      c.signed,
       c.level_one_mount_goal,
       c.level_one_tech_goal,
       c.level_one_kiosks_goal,
