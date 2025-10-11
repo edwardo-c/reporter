@@ -1,5 +1,16 @@
-Initial import of customer_benefits table:
-one row per customer with all rebate information
-goal, percent rebate, category, etc
+# status_report.main
 
-This is should be the only manual step in the entire pipeline
+## What It Does
+Creates a 'status report' for customers with a program funding agreement.
+Refreshes data in the sales table.
+    __Sales table includes one row per part purchased__
+    _Does NOT include sales rep credit - multiple reps get credit for one row so_
+    _that would be inacurate of the customers' sales._
+
+## Why it Exists
+Needed a simple way to generate multiple reports. These reports inform a
+customer of how much they have to spend in order to receive rebates.
+Now we can notify them monthly of their progress.
+
+## How To Run
+python -m pipelines.status_reports.main

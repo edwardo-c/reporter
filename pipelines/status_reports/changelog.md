@@ -1,13 +1,16 @@
 [RELEASED]
+signed and unsigned template mapping complete, added as attribute to customers table
 arrange category_sales data to be inputted into report
-current and previous year query scaffold started
+SQL query of data to be inputted complete
 load of category_sales data into persistent duckdb
 safe read of network file
 
 [UNRELEASED]
-- mapping of signed vs unsigned customers, added to customers tbl, but will need to be referenced in hot loop
-- .duckdb table for customers: account_number(varchar) | report_type(varchar) | signed(bool)
-- join Customers to sales data
+- switch from grouped data in category sales to line level. add group by in query instead
+- convert into smaller pipelines. 
+    1. prepare sales data and load into duckdb
+    2. generate status reports
+    3. generate QBRs (same data set)
 
 [SMELLS]
 little bit of arguement soup going on. lots of passing of conn, and yaml configs
