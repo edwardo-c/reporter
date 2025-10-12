@@ -1,11 +1,17 @@
-import pytest
+from typing import Any
+
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 import pandas as pd
+import pytest
+
 from data_toolkit.readers.single_file import read_data
 
-
-def test_single_file(cfg, expected_columns, expected_results):
+def test_single_file_reader(
+        cfg: dict[str, Any], 
+        expected_columns: set[str], 
+        expected_results: pd.DataFrame
+    ):
     """
     test: 
     - reading single file with two sheets starting at different rows
@@ -19,11 +25,13 @@ def test_single_file(cfg, expected_columns, expected_results):
     pd.testing.assert_frame_equal(df, expected_results, check_like=True)
 
 @pytest.fixture
-def expected_columns():
+def expected_columns() -> set[str]:
+    """Return set of expected columns through cfg fixture"""
     return {'part_number', 'category', 'amount'}
 
 @pytest.fixture
-def expected_results():
+def expected_results() -> pd.DataFrame:
+    """Expected dataframe post stacking of through cfg"""
     return pd.DataFrame(
         {
             'part_number': ['a123', 'b456', 'd456', 'e456'], 
@@ -33,7 +41,7 @@ def expected_results():
     )
 
 @pytest.fixture
-def cfg(two_sheet_xlsx):
+def cfg(two_sheet_xlsx) -> dict[str, list[dict[str, str | list | dict]]]:
     return {
         'file_path': two_sheet_xlsx,
         'params': [
@@ -63,13 +71,13 @@ def cfg(two_sheet_xlsx):
 @pytest.fixture
 def two_sheet_xlsx(tmp_path) -> str:
     """
-    fixture of xlsx with two sheets
+    return path of temporary .xlsx file with two sheets
     each sheet has three columns of two rows: 9 values total including headers
     sheet_1 starts at row 1
     sheet_2 starts at row 10
     """
-    out_path = str(tmp_path / "t.xlsx")
 
+    out_path = str(tmp_path / "t.xlsx")
     wb = Workbook()
     
     def _write_to_excel(
