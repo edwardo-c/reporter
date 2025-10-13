@@ -11,7 +11,7 @@ def refresh_data(*, data_cfg: dict, conn: object):
 
     raw_sales = read_data(cfg=data_cfg)
     cleaned = _clean_data(raw_sales)
-    create_or_replace(table_name="category_sales", df=cleaned, conn=conn)
+    create_or_replace(table_name="sales", df=cleaned, conn=conn)
 
 def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """consolidate and normalize data"""

@@ -82,7 +82,7 @@ def _gen_file_name(signed: bool, name: str, timeframe: str) -> str:
 
 def _query(conn: object):
     query = """
-    WITH sales AS(
+    WITH category_sales AS(
       SELECT
         acct_num,
         SUM(CASE WHEN year = 2025 AND part_category = 'MOUNT' THEN amount ELSE 0 END) AS current_year_mounts,
@@ -93,7 +93,7 @@ def _query(conn: object):
         SUM(CASE WHEN year = 2024 AND part_category = 'DVLED' THEN amount ELSE 0 END) as previous_year_dvled,
         SUM(CASE WHEN year = 2024 AND part_category = 'KIOSK' THEN amount ELSE 0 END) as previous_year_kiosks,
         SUM(CASE WHEN year = 2024 AND part_category = 'TV' THEN amount ELSE 0 END) AS previous_year_tech
-      FROM category_sales
+      FROM sales
       GROUP BY acct_num
     )
     SELECT
@@ -124,16 +124,16 @@ def _query(conn: object):
       c.level_three_tech_percent,
       c.level_three_kiosks_percent,
       c.level_three_dvled_percent,
-      s.current_year_mounts,
-      s.current_year_dvled,
-      s.current_year_tech,
-      s.current_year_kiosks,
-      s.previous_year_mounts,
-      s.previous_year_dvled,
-      s.previous_year_kiosks,
-      s.previous_year_tech
+      cs.current_year_mounts,
+      cs.current_year_dvled,
+      cs.current_year_tech,
+      cs.current_year_kiosks,
+      cs.previous_year_mounts,
+      cs.previous_year_dvled,
+      cs.previous_year_kiosks,
+      cs.previous_year_tech
     FROM customers AS c
-    JOIN sales AS s ON s.acct_num = c.acct_num
+    JOIN category_sales AS cs ON cs.acct_num = c.acct_num
     """
 
     return conn.sql(query).df()
