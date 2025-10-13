@@ -57,8 +57,15 @@ def _df_to_cfg(df:pd.DataFrame, report_cfg: dict[str, str],
             timeframe=timeframe
         )
 
-        record_map = {range: record[col_name] 
-                      for range, col_name in report_cfg.items()}
+        record_map = {
+          xl_range: (
+              f"{record[col_name]} Program Funding Status" if (xl_range == "B1") and signed
+              else f"DRAFT - {record[col_name]} Program Funding Status" if (xl_range == "B1") and not signed
+              else record[col_name]
+          )
+          for xl_range, col_name in report_cfg.items()
+        }
+
         record_map.update(default)
 
         entry = {
@@ -82,18 +89,20 @@ def _gen_file_name(signed: bool, name: str, timeframe: str) -> str:
 
 def _query(conn: object):
     query = """
-    WITH category_sales AS(
+    WITH category_sales AS (
       SELECT
         acct_num,
         SUM(CASE WHEN year = 2025 AND part_category = 'MOUNT' THEN amount ELSE 0 END) AS current_year_mounts,
         SUM(CASE WHEN year = 2025 AND part_category = 'DVLED' THEN amount ELSE 0 END) AS current_year_dvled,
-        SUM(CASE WHEN year = 2025 AND part_category = 'TV' THEN amount ELSE 0 END) as current_year_tech,
+        SUM(CASE WHEN year = 2025 AND part_category = 'TV'    THEN amount ELSE 0 END) AS current_year_tech,
         SUM(CASE WHEN year = 2025 AND part_category = 'KIOSK' THEN amount ELSE 0 END) AS current_year_kiosks,
-        SUM(CASE WHEN year = 2024 AND part_category = 'MOUNT' THEN amount ELSE 0 END) as previous_year_mounts,
-        SUM(CASE WHEN year = 2024 AND part_category = 'DVLED' THEN amount ELSE 0 END) as previous_year_dvled,
-        SUM(CASE WHEN year = 2024 AND part_category = 'KIOSK' THEN amount ELSE 0 END) as previous_year_kiosks,
-        SUM(CASE WHEN year = 2024 AND part_category = 'TV' THEN amount ELSE 0 END) AS previous_year_tech
+        SUM(CASE WHEN year = 2024 AND part_category = 'MOUNT' THEN amount ELSE 0 END) AS previous_year_mounts,
+        SUM(CASE WHEN year = 2024 AND part_category = 'DVLED' THEN amount ELSE 0 END) AS previous_year_dvled,
+        SUM(CASE WHEN year = 2024 AND part_category = 'KIOSK' THEN amount ELSE 0 END) AS previous_year_kiosks,
+        SUM(CASE WHEN year = 2024 AND part_category = 'TV'    THEN amount ELSE 0 END) AS previous_year_tech
       FROM sales
+      WHERE year IN (2024, 2025)
+        AND part_category IN ('MOUNT','DVLED','TV','KIOSK')
       GROUP BY acct_num
     )
     SELECT
@@ -124,16 +133,17 @@ def _query(conn: object):
       c.level_three_tech_percent,
       c.level_three_kiosks_percent,
       c.level_three_dvled_percent,
-      cs.current_year_mounts,
-      cs.current_year_dvled,
-      cs.current_year_tech,
-      cs.current_year_kiosks,
-      cs.previous_year_mounts,
-      cs.previous_year_dvled,
-      cs.previous_year_kiosks,
-      cs.previous_year_tech
+      COALESCE(cs.current_year_mounts,   0) AS current_year_mounts,
+      COALESCE(cs.current_year_dvled,    0) AS current_year_dvled,
+      COALESCE(cs.current_year_tech,     0) AS current_year_tech,
+      COALESCE(cs.current_year_kiosks,   0) AS current_year_kiosks,
+      COALESCE(cs.previous_year_mounts,  0) AS previous_year_mounts,
+      COALESCE(cs.previous_year_dvled,   0) AS previous_year_dvled,
+      COALESCE(cs.previous_year_kiosks,  0) AS previous_year_kiosks,
+      COALESCE(cs.previous_year_tech,    0) AS previous_year_tech
     FROM customers AS c
-    JOIN category_sales AS cs ON cs.acct_num = c.acct_num
+    LEFT JOIN category_sales AS cs
+      ON cs.acct_num = c.acct_num;
     """
 
     return conn.sql(query).df()
