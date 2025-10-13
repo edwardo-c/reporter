@@ -20,7 +20,7 @@ def main():
     cfg = load_yaml(STATUS_REPORTS_CFG)
 
     with duckdb.connect(cfg["paths"]["database"]) as conn:
-        
+
         refresh_data(data_cfg=cfg["data"], conn=conn)
         
         report_maps = get_data_map(

@@ -8,15 +8,11 @@ data:
         - "Classification(Sales Category)"
         - "Amount"
         - "Invoice Date"
-        - "Qty"
-        - "Inventory CD"
       rename_map:
         "Customer Account Number": "acct_num"
         "Classification(Sales Category)": "part_category"
         "Amount": "amount"
         "Invoice Date": "invoice_date"
-        "Qty": "qty"
-        "Inventory CD": "part_numer"
     - sheet_name: "2024"
       header: 1
       usecols:
@@ -24,15 +20,11 @@ data:
         - "Category"
         - "Amount"
         - "Invoice Date"
-        - "Qty"
-        - "Inventory CD"
       rename_map:
         "Account No.": "acct_num"
         "Category": "part_category"
         "Amount": "amount"
         "Invoice Date": "invoice_date"
-        "Qty": "qty"
-        "Inventory CD": "part_numer"
 
 "report_map":
   "B1": "header"
