@@ -72,7 +72,7 @@ def cfg(two_sheet_xlsx) -> dict[str, list[dict[str, str | list | dict]]]:
 def two_sheet_xlsx(tmp_path) -> str:
     """
     return path of temporary .xlsx file with two sheets
-    each sheet has three columns of two rows: 9 values total including headers
+    each sheet has three columns of two rows: 9 values total
     sheet_1 starts at row 1
     sheet_2 starts at row 10
     """
