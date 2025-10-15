@@ -1,0 +1,40 @@
+out_map:
+    "Neptune": ${NEP_OUT} 
+    "Peerless-AV": ${PAV_OUT} 
+
+odata_cfg:
+    username: "${ACU_USERNAME}"
+    password: ${ACU_PW}
+    url: ${PRICE_LOOKUP_ALL}
+    params:
+        "$select":
+          "PartNumber,Price,MAPUS,MAPCA,MSRP,UPC,CountryOfOrigin,Category\
+           ,Returnable,Description,Lengthin,Widthin,Heightin,ShipWeightlb\
+           ,ExpirationDate,Customer,CustomerName,Promotion,PriceGroup\
+           ,CustomerPriceClass"
+        "$format": "json"
+    # strict column order due to dependencies in VBA app
+    column_order:
+      - "PartNumber"
+      - "Price"
+      - "MAPUS"
+      - "MAPCA"
+      - "MSRP"
+      - "UPC"
+      - "CountryOfOrigin"
+      - "Category"
+      - "Returnable"
+      - "Description"
+      - "Lengthin"
+      - "Widthin"
+      - "Heightin"
+      - "ShipWeightlb"
+      - "ExpirationDate"
+      - "Customer"
+      - "CustomerName"
+      - "Promotion"
+      - "PriceGroup"
+      - "CustomerPriceClass"
+
+        
+        
