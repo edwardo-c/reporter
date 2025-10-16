@@ -89,9 +89,9 @@ def _gen_file_name(signed: bool, name: str, timeframe: str) -> str:
 
 def _query(conn: object):
     query = """
-    WITH category_sales AS (
+    WITH parent_category_sales AS (
       SELECT
-        acct_num,
+        COALESCE(c.parent_acct, s.acct_num) AS acct_num,
         SUM(CASE WHEN year = 2025 AND part_category = 'MOUNT' THEN amount ELSE 0 END) AS current_year_mounts,
         SUM(CASE WHEN year = 2025 AND part_category = 'DVLED' THEN amount ELSE 0 END) AS current_year_dvled,
         SUM(CASE WHEN year = 2025 AND part_category = 'TV'    THEN amount ELSE 0 END) AS current_year_tech,
@@ -100,15 +100,28 @@ def _query(conn: object):
         SUM(CASE WHEN year = 2024 AND part_category = 'DVLED' THEN amount ELSE 0 END) AS previous_year_dvled,
         SUM(CASE WHEN year = 2024 AND part_category = 'KIOSK' THEN amount ELSE 0 END) AS previous_year_kiosks,
         SUM(CASE WHEN year = 2024 AND part_category = 'TV'    THEN amount ELSE 0 END) AS previous_year_tech
-      FROM sales
+      FROM sales AS s
+      LEFT JOIN customers AS c ON c.child_acct = s.acct_num
       WHERE year IN (2024, 2025)
-        AND part_category IN ('MOUNT','DVLED','TV','KIOSK')
-      GROUP BY acct_num
-    )
-    SELECT
-      c.acct_num,
-      c.header,
+          AND part_category IN ('MOUNT','DVLED','TV','KIOSK')
+      GROUP BY COALESCE(c.parent_acct, s.acct_num)
+    ),
+    parents AS (
+      SELECT DISTINCT COALESCE(parent_acct, child_acct) AS acct_num
+      FROM customers
+    ) 
+    SELECT 
+      p.acct_num,
+      COALESCE(pcs.current_year_mounts,  0) AS current_year_mounts,
+      COALESCE(pcs.current_year_dvled,   0) AS current_year_dvled,
+      COALESCE(pcs.current_year_tech,    0) AS current_year_tech,
+      COALESCE(pcs.current_year_kiosks,  0) AS current_year_kiosks,
+      COALESCE(pcs.previous_year_mounts, 0) AS previous_year_mounts,
+      COALESCE(pcs.previous_year_dvled,  0) AS previous_year_dvled,
+      COALESCE(pcs.previous_year_tech,   0) AS previous_year_tech,
+      COALESCE(pcs.previous_year_kiosks, 0) AS previous_year_kiosks,
       c.signed,
+      c.header,
       c.level_one_mount_goal,
       c.level_one_tech_goal,
       c.level_one_kiosks_goal,
@@ -119,7 +132,7 @@ def _query(conn: object):
       c.level_one_dvled_percent,
       c.level_two_mount_goal,
       c.level_two_tech_goal,
-      c.level_two_kiosks_goal,	
+      c.level_two_kiosks_goal,
       c.level_two_dvled_goal,
       c.level_two_mount_percent,
       c.level_two_tech_percent,
@@ -132,18 +145,12 @@ def _query(conn: object):
       c.level_three_mount_percent,
       c.level_three_tech_percent,
       c.level_three_kiosks_percent,
-      c.level_three_dvled_percent,
-      COALESCE(cs.current_year_mounts,   0) AS current_year_mounts,
-      COALESCE(cs.current_year_dvled,    0) AS current_year_dvled,
-      COALESCE(cs.current_year_tech,     0) AS current_year_tech,
-      COALESCE(cs.current_year_kiosks,   0) AS current_year_kiosks,
-      COALESCE(cs.previous_year_mounts,  0) AS previous_year_mounts,
-      COALESCE(cs.previous_year_dvled,   0) AS previous_year_dvled,
-      COALESCE(cs.previous_year_kiosks,  0) AS previous_year_kiosks,
-      COALESCE(cs.previous_year_tech,    0) AS previous_year_tech
-    FROM customers AS c
-    LEFT JOIN category_sales AS cs
-      ON cs.acct_num = c.acct_num;
+      c.level_three_dvled_percent
+    FROM parents AS p
+    LEFT JOIN parent_category_sales AS pcs 
+      ON p.acct_num = pcs.acct_num
+    LEFT JOIN customers AS c
+      ON c.child_acct = p.acct_num;
     """
 
     return conn.sql(query).df()
