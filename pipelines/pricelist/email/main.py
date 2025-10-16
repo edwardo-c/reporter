@@ -24,17 +24,12 @@ def main():
     load_dotenv(PRICE_LIST_ENV)
     cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
-    contacts = get_contacts(cfg["sf_auth"])
-    
-
-    breakpoint()
-
-    # email_count: int = send_emails(
-    #     contacts_file_path=getenv("CONTACTS"),
-    #     files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
-    #                 'Neptune': getenv("NEP_ATTACHMENTS")},
-    #     email_body=_boilerplate_email
-    # )
+    email_count: int = send_emails(
+        contacts=get_contacts(cfg["sf_auth"]),
+        files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
+                    'Neptune': getenv("NEP_ATTACHMENTS")},
+        email_body=_boilerplate_email
+    )
 
     print(f"sent {email_count} emails")
     

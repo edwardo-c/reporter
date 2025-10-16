@@ -14,7 +14,7 @@ from typing import Callable
 olMailItem = 0  # Outlook constant
 
 def send_emails(
-        contacts_file_path: Path,
+        contacts: Path | dict[str, list[str]],
         files_dir: dict,
         email_body: Callable):
     """
@@ -32,22 +32,25 @@ def send_emails(
           expects f{brand} in function for brand callout in body
     """
     with PriceListEmailer(
-        contacts_file_path=contacts_file_path,
+        contacts=contacts,
         files_dir=files_dir,
-        email_body = email_body
+        email_body = email_body,
+        prod=False
     ) as e:
         return e.email()
 
 
 class PriceListEmailer:
     def __init__(
-            self, contacts_file_path: str, 
+            self, 
+            contacts: str | dict[str, list[str]], 
             files_dir: Dict[str, Path], 
-            email_body: Callable):
-        self._contacts_file_path = contacts_file_path
+            email_body: Callable,
+            prod: bool):
+        self.contacts = contacts
         self._files_dir = files_dir
         self._email_body = email_body
-
+        self.prod: bool = prod
         self._outlook = None
         self._owns_outlook = False
 
@@ -66,7 +69,14 @@ class PriceListEmailer:
 
     def email(self) -> int:
         """Main runner: matches contacts to files and sends mail."""
-        contacts_cache = self._compile_contacts()
+        
+        prod = self.prod
+
+        if isinstance(self.contacts, (Path, str)):
+            contacts_cache = self._extract_contacts_from_csv(str(self.contacts))
+        else:
+            contacts_cache = self.contacts
+
         files_cache = self._compile_file_cache()
 
         sent_count = 0
@@ -81,6 +91,7 @@ class PriceListEmailer:
                     subject=f"{brand} Monthly Price List: {acct_num}",
                     body=body,
                     attachment=file,
+                    prod=prod
                 )
                 sent_count += 1
         return sent_count
@@ -90,7 +101,8 @@ class PriceListEmailer:
             contacts: list[str], 
             subject: str, 
             body: str, 
-            attachment: Path | None = None
+            attachment: Path | None = None,
+            prod: bool = False
         ):
         """Compose & send one message."""
         mail = self._outlook.CreateItem(olMailItem)
@@ -102,11 +114,16 @@ class PriceListEmailer:
             mail.Attachments.Add(str(attachment))
 
         mail.DeleteAfterSubmit = True  # don’t clog Sent Items
-        # mail.Display()
-        mail.Send()
+        if prod:
+            # mail.Send()
+            ...
+        else:
+            mail.Display()
+            breakpoint()
+
         time.sleep(0.05)  # light throttle
 
-    def _compile_contacts(self) -> dict[str, list[str]]:
+    def _extract_contacts_from_csv(self) -> dict[str, list[str]]:
         """Return {account -> [contacts]} from CSV."""
         contacts_path: Path = valid_path(self._contacts_file_path)
         if contacts_path.suffix != ".csv":
