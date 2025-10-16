@@ -1,0 +1,4 @@
+"sf_auth":
+  "username": ${SF_USER}
+  "password": ${SF_PW}
+  "security_token": ${SF_TOKEN}

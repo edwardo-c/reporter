@@ -1,7 +1,11 @@
 from pipelines.pricelist.email.emailer import send_emails
 from dotenv import load_dotenv
-from config.paths import PRICE_LIST_ENV
+from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
+from utils.yaml_loader import load_yaml
 from os import getenv
+
+from pipelines.pricelist.email.contacts import get_contacts
+
 
 def _boilerplate_email(brand: str) -> str:
     return (
@@ -18,13 +22,19 @@ def main():
     print("Running Emailer")
 
     load_dotenv(PRICE_LIST_ENV)
+    cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
-    email_count: int = send_emails(
-        contacts_file_path=getenv("CONTACTS"),
-        files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
-                    'Neptune': getenv("NEP_ATTACHMENTS")},
-        email_body=_correction_email
-    )
+    contacts = get_contacts(cfg["sf_auth"])
+    
+
+    breakpoint()
+
+    # email_count: int = send_emails(
+    #     contacts_file_path=getenv("CONTACTS"),
+    #     files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
+    #                 'Neptune': getenv("NEP_ATTACHMENTS")},
+    #     email_body=_boilerplate_email
+    # )
 
     print(f"sent {email_count} emails")
     
