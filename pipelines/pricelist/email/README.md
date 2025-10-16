@@ -12,5 +12,5 @@ Enables us to react to price changes faster by automating the distribution of cu
     - NEP_ATTACHMENTS: dir holding finished NEP price list files 
     - PAV_ATTACHMENTS: dir holding finished PAV price list files
     - CONTACTS: latest export of contacts
-    - python -m pipelines.pricelist.email_finished_lists.main
+    - python -m pipelines.pricelist.email.main
 
