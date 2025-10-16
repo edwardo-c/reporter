@@ -14,3 +14,6 @@ Enables us to react to price changes faster by automating the distribution of cu
     - CONTACTS: latest export of contacts
     - python -m pipelines.pricelist.email.main
 
+[UNRELEASED]
+Send price lists to sales reps
+pull contacts directly from salesforce

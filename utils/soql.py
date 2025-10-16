@@ -3,7 +3,8 @@ import pandas as pd
 
 def run_SOQL(
         auth: dict[str, str], 
-        query: str) -> pd.DataFrame:
+        query: str,
+        df: bool) -> pd.DataFrame | dict:
     
     # --- auth (prod) ---
     sf = Salesforce(
@@ -16,8 +17,8 @@ def run_SOQL(
     # --- run SOQL ---
     records = sf.query_all(query=query)["records"]
 
-    # --- to DataFrame ---
-    df = (pd.json_normalize(records)
-            .drop(columns="attributes", errors="ignore"))
-
-    return df
+    if df:
+        return (pd.json_normalize(records)
+               .drop(columns="attributes", errors="ignore"))
+    else:
+        return records
