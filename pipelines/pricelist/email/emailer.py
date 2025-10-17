@@ -16,7 +16,8 @@ olMailItem = 0  # Outlook constant
 def send_emails(
         contacts: Path | dict[str, list[str]],
         files_dir: dict,
-        email_body: Callable):
+        email_body: Callable,
+        prod: bool):
     """
     Send emails with price list attachment to contacts
     using account number from file name as key
@@ -35,10 +36,9 @@ def send_emails(
         contacts=contacts,
         files_dir=files_dir,
         email_body = email_body,
-        prod=False
+        prod=prod
     ) as e:
         return e.email()
-
 
 class PriceListEmailer:
     def __init__(
@@ -114,13 +114,12 @@ class PriceListEmailer:
             mail.Attachments.Add(str(attachment))
 
         mail.DeleteAfterSubmit = True  # don’t clog Sent Items
+        breakpoint()
         if prod:
             # mail.Send()
             ...
         else:
             mail.Display()
-            breakpoint()
-
         time.sleep(0.05)  # light throttle
 
     def _extract_contacts_from_csv(self) -> dict[str, list[str]]:

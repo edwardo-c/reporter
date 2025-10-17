@@ -77,5 +77,6 @@ SELECT
 FROM Account
 WHERE 
     Price_List_Delivery_to_Salesperson__c != NULL
-    AND ACU_Customer_ID__c !=NULL
+    AND ACU_Customer_ID__c != NULL
+    AND Owner.Alias != 'EarlN'
 """

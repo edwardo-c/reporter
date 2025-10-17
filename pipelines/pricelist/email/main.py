@@ -28,7 +28,8 @@ def main():
         contacts=get_contacts(cfg["sf_auth"]),
         files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
                     'Neptune': getenv("NEP_ATTACHMENTS")},
-        email_body=_boilerplate_email
+        email_body=_boilerplate_email,
+        prod=False
     )
 
     print(f"sent {email_count} emails")
