@@ -1,6 +1,6 @@
 """SOQL queries to return Internal and External price list recipient contact information"""
 
-from utils.soql import run_SOQL
+from utils.salesforce import run_SOQL
 
 def get_contacts(auth: dict) -> dict[str, list]:
     """
