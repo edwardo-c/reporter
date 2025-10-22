@@ -36,7 +36,9 @@ def main():
         sf=sf,
         acumatica_df=acumatica_df, 
         salesforce_df=salesforce_df,
-        id_map=cfg["id_map"]
+        price_list_key_to_id=cfg["id_map"]["price_list"],
+        standard_price_book_id=cfg["id_map"]["standard_price_book"],
+        price_group_key_to_id=cfg["id_map"]["price_group"]
         )
 
 if __name__ == '__main__':
