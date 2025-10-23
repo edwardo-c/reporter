@@ -9,15 +9,15 @@ def upload_new_parts(
         salesforce_df: pd.DataFrame,
         price_list_key_to_id: dict[str, str],
         standard_price_book_id: str,
-        price_group_key_to_id):
+        price_group_key_to_id,
+        float_cols: list[str]):
     "arrange upload dict per missing part"
 
     # normalize join column
     salesforce_df = _standardize_join_col(df=salesforce_df, col_name="Name")
     acumatica_df = _standardize_join_col(df=acumatica_df, col_name="PartNumber")
 
-    float_cols = ["Dealer", "Partner", "Distributor","Special", "MSRP"]
-
+    # -------- wide, cleaned frame of all new parts --------
     parts_to_upload = (
         acumatica_df
         .merge(salesforce_df, how="left", on="_join_col", indicator=True)
@@ -34,6 +34,7 @@ def upload_new_parts(
         .assign(PriceGroupId=lambda d: d["PriceGroup"].map(price_group_key_to_id))
     )
 
+    # ------- Long data of pricing, each row is an api call ---------
     pricing_to_upload: pd.DataFrame = (
         parts_to_upload
         # convert to long data for single upload per row
@@ -73,7 +74,7 @@ def _upload_new_parts(sf: Salesforce, parts_to_upload: pd.DataFrame) -> dict[str
         if result["success"]:
             out[r.PartNumber] = result['id']
         
-        # left in for testing
+        # TODO: remove after testing
         break
 
     return out
@@ -103,7 +104,6 @@ def _upload_price_list_entries(
     for r in upload_df.itertuples():
         id = new_part_ids.get(r.PartNumber, None)
         if id:
-            breakpoint()
             sf.Price_List_Entry__c.create({
                 "Active__c": True,
                 "CurrencyIsoCode": "USD",
@@ -111,6 +111,7 @@ def _upload_price_list_entries(
                 "Price_List_Price__c": r.Price,
                 "Product__c": id
             })
+            breakpoint()
 
 def _standardize_join_col(df: pd.DataFrame, col_name: str):
     """Used for cleaning join column"""

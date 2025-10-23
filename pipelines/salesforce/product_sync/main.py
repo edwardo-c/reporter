@@ -38,8 +38,9 @@ def main():
         salesforce_df=salesforce_df,
         price_list_key_to_id=cfg["id_map"]["price_list"],
         standard_price_book_id=cfg["id_map"]["standard_price_book"],
-        price_group_key_to_id=cfg["id_map"]["price_group"]
-        )
+        price_group_key_to_id=cfg["id_map"]["price_group"],
+        float_cols=cfg["acumatica"]["float_columns"]
+    )
 
 if __name__ == '__main__':
     main()
