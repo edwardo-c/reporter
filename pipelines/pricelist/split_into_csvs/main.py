@@ -9,6 +9,7 @@ import pandas as pd
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_CFG_YAML
 from utils.acumatica_odata import get_acumatica_table
 from utils.yaml_loader import load_yaml
+from data_toolkit.cleaners.data_cleaner import DataCleaner
 
 def main():
 
@@ -17,7 +18,7 @@ def main():
     load_dotenv(PRICE_LIST_ENV)
     cfg: dict = load_yaml(PRICE_LIST_CFG_YAML)
 
-    odata_cfg = cfg.get("odata_cfg", {}) 
+    odata_cfg = cfg.get("odata_cfg", {})
 
     df: pd.DataFrame = get_acumatica_table(
         url=odata_cfg["url"], 
@@ -29,7 +30,9 @@ def main():
     # enforce column order
     df = df[odata_cfg["column_order"]]
 
-    branded = _add_brand_column(df=df)
+    cleaned = DataCleaner(**odata_cfg["data_cleaner_cfg"]).clean(df=df)
+
+    branded = _add_brand_column(df=cleaned)
 
     # hot loop
     _export_partitioned_csv(branded, out_map=cfg["out_map"])

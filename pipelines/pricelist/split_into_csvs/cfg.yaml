@@ -13,6 +13,7 @@ odata_cfg:
            ,ExpirationDate,Customer,CustomerName,Promotion,PriceGroup\
            ,CustomerPriceClass"
         "$format": "json"
+    
     # strict column order due to dependencies in VBA app
     column_order:
       - "PartNumber"
@@ -35,6 +36,12 @@ odata_cfg:
       - "Promotion"
       - "PriceGroup"
       - "CustomerPriceClass"
+
+    data_cleaner_cfg:
+        keep_cols: all
+        str_cols: PartNumber
+
+
 
         
         
