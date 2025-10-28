@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 
 @dataclass
 class CleanerCfg:
-    keep_cols: list[str] | str = 'all'
     str_cols: list[str] | str
+    keep_cols: list[str] | str = 'all'
     numeric_cols: list[str] = field(default_factory=list)
     float_cols: list[str] = field(default_factory=list)
     date_cols: list[str] = field(default_factory=list)
