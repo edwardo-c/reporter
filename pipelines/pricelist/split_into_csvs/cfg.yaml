@@ -39,7 +39,9 @@ odata_cfg:
 
     data_cleaner_cfg:
         keep_cols: all
-        str_cols: PartNumber
+        str_cols: 
+            - PartNumber
+            - Customer 
 
 
 
