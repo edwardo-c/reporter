@@ -3,32 +3,25 @@
 # standard imports
 from dotenv import load_dotenv
 import logging
-from os import getenv
 import time
+from pathlib import Path
 
 # third party imports
 import pandas as pd
 
 # internal imports
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
-from pipelines.pricelist.email.emailer import PriceListEmailer
+from pipelines.pricelist.email.emailer import Emailer
 from utils.yaml_loader import load_yaml
 from data_toolkit.clients.salesforce import SFClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
+from data_toolkit.attachment_mapper.acu_id import id_to_path_map
+from pipelines.pricelist.email.bodies import external_email, internal_email
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format= "%(asctime)s | %(message)s")
 
-
-def _boilerplate_email(brand: str) -> str:
-    return (
-        f"<html><body>"
-        f"<p><h3>Attached is your monthly <b>{brand}</b> price list.</h3></p>"
-        f"<p>If you would like to be removed from, or add someone to, our distribution list, please reply to this email.</p>"
-        f"<p>See the <b>Updates</b> tab for any changes from last month’s list.</p>"
-        f"<p>- {brand} Sales Team</p>"
-        f"</body></html>"
-    )
+PROD = False
 
 def main():
     
@@ -38,33 +31,98 @@ def main():
 
     cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
-    sf = SFClient(**cfg["salesforce"]["auth"], validate_at_init=True)
+    sf = SFClient(
+        **cfg["salesforce"]["auth"], validate_at_init=True
+    )
 
-    internal_contacts_df = sf.query(cfg["salesforce"]["data"]["internal"]["soql"])
+    pav_attachments = id_to_path_map(Path(cfg["attachments"]["Peerless-AV"]))
+    nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
+
+    # =========== External Emails ==============
+
+    external_contacts_df = sf.query(
+        cfg["salesforce"]["data"]["external"]["soql"]
+    )
+
+    cleaned_external_contacts = DataCleaner(
+        **cfg["salesforce"]["data"]["external"]["clean_plan"]
+    ).clean(external_contacts_df)
+
+    external_contacts_cache = extract_contacts_from_df(cleaned_external_contacts)
+
+    with Emailer(
+        contacts_cache=external_contacts_cache,
+        attachments_cache=pav_attachments,
+        email_body=external_email,
+        prod=PROD,
+        brand="Peerless-AV",
+        add_attachments=True
+    ) as pav:
+        pav_email_count = pav.email()
+
+    # email neptune lists
+    with Emailer(
+        contacts_cache=external_contacts_cache,
+        attachments_cache=nep_attachments,
+        email_body=external_email,
+        prod=PROD,
+        brand="Neptune",
+        add_attachments=True
+    ) as nep:
+        nep_email_count = nep.email()
+
+    # ============== Internal Emails ================
+
+    internal_contacts_df = sf.query(
+        cfg["salesforce"]["data"]["internal"]["soql"]
+    )
 
     cleaned_internal_contacts = DataCleaner(
         **cfg["salesforce"]["data"]["internal"]["clean_plan"]
     ).clean(internal_contacts_df)
 
-    external_contacts_df = sf.query(cfg["salesforce"]["data"]["external"]["soql"])
+    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
+
+    # email PAV lists
+    with Emailer(
+        contacts_cache=internal_contacts_cache,
+        attachments_cache=pav_attachments,
+        email_body=internal_email,
+        prod=PROD,
+        brand="Peerless-AV",
+        add_attachments=False
+    ) as pav:
+        internal_pav_email_count = pav.email()
     
-    cleaned_external_contacts = DataCleaner(
-        **cfg["salesforce"]["data"]["external"]["clean_plan"]
-    ).clean(external_contacts_df)
+    # email neptune lists
+    with Emailer(
+        contacts_cache=internal_contacts_cache,
+        attachments_cache=nep_attachments,
+        email_body=internal_email,
+        prod=PROD,
+        brand="Neptune",
+        add_attachments=False
+    ) as nep:
+        internal_nep_email_count = nep.email()
 
-    contacts_df = pd.concat([cleaned_internal_contacts, cleaned_external_contacts])
+    # log counts and time spend running
 
-    breakpoint()
+def extract_contacts_from_df(df: pd.DataFrame) -> dict[str, list[str]]:
+    """Return {account -> [contacts]} from df."""
+    return (
+        df.assign(
+            **{
+                "ACU Customer ID": df["ACU Customer ID"].astype(str).str.strip(),
+                "Email": df["Email"].astype(str).str.strip(),
+                }
+            )
+            .groupby("ACU Customer ID", sort=False)["Email"]
+            .agg(list)
+            .to_dict()
+    )
 
-    with PriceListEmailer(
-        contacts_df=contacts_df,
-        files_dir=cfg["attachments"],
-        email_body=_boilerplate_email,
-        prod=False,
-    ) as ple:
-        email_count = ple.email()
 
-    logger.info(f"sent {email_count} emails")
-    
+
 if __name__ == "__main__":
     main()
+
