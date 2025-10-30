@@ -1,4 +1,62 @@
-"sf_auth":
-  "username": ${SF_USER}
-  "password": ${SF_PW}
-  "security_token": ${SF_TOKEN}
+attachments:
+    "Peerless-AV": ${PAV_FINISHED_LISTS}
+    "Neptune": ${NEP_FINISHED_LISTS}
+
+"salesforce":
+    "task_params":
+        "Subject": "TEST - Hello From Python!"
+        "Status": "Completed"
+        "WhatId": "701PW0000107JqDYAU"
+        "WhoId": "0056A000000ewTWQAY"
+    "auth":
+        "username": ${SF_USER}
+        "password": ${SF_PW}
+        "security_token": ${SF_TOKEN}
+    "data":    
+        # EarlN excluded because it would clog his inbox if I sent that many
+        # distribution handled in seperate process
+        "internal":
+            "soql": |
+                SELECT 
+                    Id,
+                    ACU_Customer_ID__c,
+                    Price_List_Delivery_to_Salesperson__r.Email,
+                    Owner.Alias
+                FROM Account
+                WHERE 
+                    Price_List_Delivery_to_Salesperson__c != NULL
+                    AND ACU_Customer_ID__c != NULL
+            "clean_plan":
+                str_cols: 
+                    - "ACU_CUSTOMER_ID__c" 
+                    - "Price_List_Delivery_to_Salesperson__r.Email"
+                    - "Id"
+                    - "Owner.Alias"
+                rename_map: 
+                    "Owner.Alias": "Owner"
+                    "ACU_CUSTOMER_ID__c": "ACU Customer ID"
+                    "Price_List_Delivery_to_Salesperson__r.Email": "Email"
+
+        "external": 
+            "soql": |
+                SELECT 
+                    Id,
+                    Email,
+                    Account.ACU_CUSTOMER_ID__c
+                FROM Contact
+                WHERE (
+                    Account.Price_List_Delivery_to_Salesperson__c = NULL
+                    AND Receives_Pricing__c = true
+                    AND Account.ACU_CUSTOMER_ID__c != NULL
+                    AND Email != NULL
+                    AND (Contact_Status__c = 'Active' OR Contact_Status__c = NULL)
+                )
+            clean_plan:
+                str_cols: 
+                    - "Id" 
+                    - "Email"
+                    - "Account.ACU_CUSTOMER_ID__c"
+                rename_map:
+                    "Account.ACU_CUSTOMER_ID__c": "ACU Customer ID"
+
+            

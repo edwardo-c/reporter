@@ -13,41 +13,34 @@ from typing import Callable
 
 olMailItem = 0  # Outlook constant
 
-def send_emails(
-        contacts: Path | dict[str, list[str]],
-        files_dir: dict,
-        email_body: Callable,
-        prod: bool):
-    """
-    Send emails with price list attachment to contacts
-    using account number from file name as key
 
-    args:
-        - contacts_file_path: csv file path holding contacts; 
-          Required Columns: ["ACU Customer ID", "Email"]
-            
-        - files_dir: {'BrandName': Path/To/Dir/Holding/Attachments,}
-          File paths inside are expected to have 7-9 digit account number
+"""
+Send emails with price list attachment to contacts
+using account number from file name as key
+
+usage:
+with PriceListEmailer(...) as ple:
+    ...
+
+args:
+    - contacts_file_path: csv file path holding contacts; 
+        Required Columns: ["ACU Customer ID", "Email"]
+        
+    - files_dir: {'BrandName': Path/To/Dir/Holding/Attachments,}
+        File paths inside are expected to have 7-9 digit account number
 -
-        - email_body_map: callable function used for both brand emails,
-          expects f{brand} in function for brand callout in body
-    """
-    with PriceListEmailer(
-        contacts=contacts,
-        files_dir=files_dir,
-        email_body = email_body,
-        prod=prod
-    ) as e:
-        return e.email()
+    - email_body_map: callable function used for both brand emails,
+        expects f{brand} in function for brand callout in body
+"""
 
 class PriceListEmailer:
     def __init__(
             self, 
-            contacts: str | dict[str, list[str]], 
+            contacts_df: pd.DataFrame, 
             files_dir: Dict[str, Path], 
             email_body: Callable,
             prod: bool):
-        self.contacts = contacts
+        self.contacts_df = contacts_df
         self._files_dir = files_dir
         self._email_body = email_body
         self.prod: bool = prod
@@ -72,12 +65,11 @@ class PriceListEmailer:
         
         prod = self.prod
 
-        if isinstance(self.contacts, (Path, str)):
-            contacts_cache = self._extract_contacts_from_csv(str(self.contacts))
-        else:
-            contacts_cache = self.contacts
+        contacts_cache = self._extract_contacts_from_df(self.contacts_df)
+        breakpoint()
 
         files_cache = self._compile_file_cache()
+        breakpoint()
 
         sent_count = 0
         for brand, file_map in files_cache.items():
@@ -114,28 +106,25 @@ class PriceListEmailer:
             mail.Attachments.Add(str(attachment))
 
         mail.DeleteAfterSubmit = True  # don’t clog Sent Items
+        
         breakpoint()
         if prod:
-            # mail.Send()
+            # mail.Send() commented out for extra safe testing
             ...
         else:
             mail.Display()
+            breakpoint()
+
         time.sleep(0.05)  # light throttle
 
-    def _extract_contacts_from_csv(self) -> dict[str, list[str]]:
-        """Return {account -> [contacts]} from CSV."""
-        contacts_path: Path = valid_path(self._contacts_file_path)
-        if contacts_path.suffix != ".csv":
-            raise NotImplementedError(f"unable to read {contacts_path.suffix} file")
+    def _extract_contacts_from_df(self, df: pd.DataFrame) -> dict[str, list[str]]:
+        """Return {account -> [contacts]} from df."""
 
-        df = pd.read_csv(str(contacts_path))
         return (
-            df.dropna(subset=["Email"])
-              .query("Email != ''")
-              .assign(
-                  **{
-                      "ACU Customer ID": df["ACU Customer ID"].astype(str).str.strip(),
-                      "Email": df["Email"].astype(str).str.strip(),
+            df.assign(
+                **{
+                    "ACU Customer ID": df["ACU Customer ID"].astype(str).str.strip(),
+                    "Email": df["Email"].astype(str).str.strip(),
                   }
               )
               .groupby("ACU Customer ID", sort=False)["Email"]

@@ -1,10 +1,23 @@
-from pipelines.pricelist.email.emailer import send_emails
-from dotenv import load_dotenv
-from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
-from utils.yaml_loader import load_yaml
-from os import getenv
+"""Primary runner for emailing finished price lists to customers"""
 
-from pipelines.pricelist.email.contacts import get_contacts
+# standard imports
+from dotenv import load_dotenv
+import logging
+from os import getenv
+import time
+
+# third party imports
+import pandas as pd
+
+# internal imports
+from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
+from pipelines.pricelist.email.emailer import PriceListEmailer
+from utils.yaml_loader import load_yaml
+from data_toolkit.clients.salesforce import SFClient
+from data_toolkit.cleaners.data_cleaner import DataCleaner
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format= "%(asctime)s | %(message)s")
 
 
 def _boilerplate_email(brand: str) -> str:
@@ -19,20 +32,39 @@ def _boilerplate_email(brand: str) -> str:
 
 def main():
     
-    print("Running Emailer")
+    logger.info("Starting Emailer")
 
     load_dotenv(PRICE_LIST_ENV)
+
     cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
-    email_count: int = send_emails(
-        contacts=get_contacts(cfg["sf_auth"]),
-        files_dir= {'Peerless-AV': getenv("PAV_ATTACHMENTS"), 
-                    'Neptune': getenv("NEP_ATTACHMENTS")},
-        email_body=_boilerplate_email,
-        prod=False
-    )
+    sf = SFClient(**cfg["salesforce"]["auth"], validate_at_init=True)
 
-    print(f"sent {email_count} emails")
+    internal_contacts_df = sf.query(cfg["salesforce"]["data"]["internal"]["soql"])
+
+    cleaned_internal_contacts = DataCleaner(
+        **cfg["salesforce"]["data"]["internal"]["clean_plan"]
+    ).clean(internal_contacts_df)
+
+    external_contacts_df = sf.query(cfg["salesforce"]["data"]["external"]["soql"])
+    
+    cleaned_external_contacts = DataCleaner(
+        **cfg["salesforce"]["data"]["external"]["clean_plan"]
+    ).clean(external_contacts_df)
+
+    contacts_df = pd.concat([cleaned_internal_contacts, cleaned_external_contacts])
+
+    breakpoint()
+
+    with PriceListEmailer(
+        contacts_df=contacts_df,
+        files_dir=cfg["attachments"],
+        email_body=_boilerplate_email,
+        prod=False,
+    ) as ple:
+        email_count = ple.email()
+
+    logger.info(f"sent {email_count} emails")
     
 if __name__ == "__main__":
     main()
