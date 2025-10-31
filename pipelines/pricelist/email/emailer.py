@@ -3,11 +3,10 @@
 from pathlib import Path
 import time
 from typing import Callable, Any
+import re
 
 from win32com.client import gencache, GetActiveObject
 
-import logging
-logger = logging.getLogger(__name__)
 olMailItem = 0  # Outlook constant
 
 """
@@ -60,16 +59,20 @@ class Emailer:
     def email(self) -> int:
         """Main runner: matches contacts to files and sends mail."""
         sent_count = 0
+
         body = self.email_body(self.brand)
 
         for acct_num, contacts in self.contacts_cache.items():
-            
+
             attachment = self.attachments_cache.get(acct_num, None)
             
             if not attachment:
-                logger.info(f"{acct_num} has contacts but no file cached")
                 continue
             else:
+                if not self.add_attachments:
+                    body = self.email_body(extract_acct_name(Path(attachment).stem))
+                
+
                 self._send_email(
                     contacts=contacts,
                     subject=f"{self.brand} Monthly Price List: {acct_num}",
@@ -93,11 +96,12 @@ class Emailer:
         mail.SentOnBehalfOfName = "sales@peerless-av.com"
         mail.To = "; ".join(c.strip() for c in contacts if c)
         mail.Subject = subject
-        mail.HTMLBody = body
-        
+
         if attachment and self.add_attachments:
             mail.Attachments.Add(attachment)
+        
 
+        mail.HTMLBody = body
         mail.DeleteAfterSubmit = True
         
         if self.prod:
@@ -108,3 +112,14 @@ class Emailer:
             breakpoint()
 
         time.sleep(0.05)  # light throttle
+
+
+# ========== bad design due to time constraints, refactor after run ==========
+def extract_acct_name(s: str):
+    
+    acct_name_pattern = r"[A-Za-z0-9]{1,3}[0-9]{6}\s-\s(.*)"
+    
+    acct_name = re.search(acct_name_pattern, s)
+    
+    if acct_name:
+        return acct_name.group(1)

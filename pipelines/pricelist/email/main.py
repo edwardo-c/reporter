@@ -24,6 +24,8 @@ logging.basicConfig(level=logging.INFO, format= "%(asctime)s | %(message)s")
 PROD = False
 
 def main():
+
+    start_time = time.time()
     
     logger.info("Starting Emailer")
 
@@ -71,6 +73,13 @@ def main():
     ) as nep:
         nep_email_count = nep.email()
 
+    logger.info(
+        f"\nExternal Lists sent:\
+        \nPAV: {pav_email_count} out of {len(pav_attachments.keys())}\
+        \nNEP: {nep_email_count} out of {len(nep_attachments.keys())}\
+        \nTotal Sent: {pav_email_count + nep_email_count}"
+    )
+
     # ============== Internal Emails ================
 
     internal_contacts_df = sf.query(
@@ -81,7 +90,7 @@ def main():
         **cfg["salesforce"]["data"]["internal"]["clean_plan"]
     ).clean(internal_contacts_df)
 
-    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
+    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)   
 
     # email PAV lists
     with Emailer(
@@ -104,8 +113,19 @@ def main():
         add_attachments=False
     ) as nep:
         internal_nep_email_count = nep.email()
+    
+    end_time = time.time()
 
-    # log counts and time spend running
+    logger.info(
+        f"\nLists not sent due to Price List Delivery To Salesperson \
+        \nPAV: {internal_pav_email_count} \
+        \nNEP: {internal_nep_email_count} \
+        \nTotal Not Sent: {internal_pav_email_count + internal_nep_email_count}"
+    )
+
+    logger.info(f"Emailer Complete, elapsed time: {end_time - start_time}")
+
+# ========== bad design due to time constraints, refactor after run ==========
 
 def extract_contacts_from_df(df: pd.DataFrame) -> dict[str, list[str]]:
     """Return {account -> [contacts]} from df."""
@@ -120,8 +140,6 @@ def extract_contacts_from_df(df: pd.DataFrame) -> dict[str, list[str]]:
             .agg(list)
             .to_dict()
     )
-
-
 
 if __name__ == "__main__":
     main()
