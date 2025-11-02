@@ -18,6 +18,7 @@ with PriceListEmailer(...) as ple:
     ...
 """
 
+
 class Emailer:
     def __init__(
             self, 
@@ -93,7 +94,7 @@ class Emailer:
         """Compose & send one message."""
         mail = self._outlook.CreateItem(olMailItem)
         mail.SentOnBehalfOfName = "sales@peerless-av.com"
-        mail.To = "; ".join(c.strip() for c in contacts if c)
+        mail.To = breakpoint()
         mail.Subject = subject
 
         if attachment and self.add_attachments:
