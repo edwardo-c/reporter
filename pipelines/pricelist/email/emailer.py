@@ -72,7 +72,6 @@ class Emailer:
                 if not self.add_attachments:
                     body = self.email_body(extract_acct_name(Path(attachment).stem))
                 
-
                 self._send_email(
                     contacts=contacts,
                     subject=f"{self.brand} Monthly Price List: {acct_num}",
@@ -99,13 +98,11 @@ class Emailer:
 
         if attachment and self.add_attachments:
             mail.Attachments.Add(attachment)
-        
 
         mail.HTMLBody = body
         mail.DeleteAfterSubmit = True
         
         if self.prod:
-            breakpoint() # TODO: remove after testing
             mail.Send()
         else:
             mail.Display()

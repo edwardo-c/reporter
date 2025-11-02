@@ -12,9 +12,7 @@ attachments:
         "username": ${SF_USER}
         "password": ${SF_PW}
         "security_token": ${SF_TOKEN}
-    "data":    
-        # EarlN excluded because it would clog his inbox if I sent that many
-        # distribution handled in seperate process
+    "data":
         "internal":
             "soql": |
                 SELECT 

@@ -19,3 +19,15 @@ def internal_email(id: str) -> str:
         f"<p>- Sales Ops</p>"
         f"</body></html>"
     )
+
+
+def external_nep_email(brand: str) -> str:
+    return (
+        f"<html><body>"
+        f"<p><h3>Attached is your monthly <b>{brand}</b> price list.</h3></p>"
+        f"<p>Neptune 65in. Full Sun is <strong>OUT OF STOCK</strong>. Stay tuned for additional information on <strong>NEW</strong> High Bright Full Sun Models.</p>"
+        f"<p>If you would like to be removed from, or add someone to, our distribution list, please reply to this email.</p>"
+        f"<p>See the <b>Updates</b> tab for any changes from last month’s list.</p>"
+        f"<p>- {brand} Sales Team</p>"
+        f"</body></html>"
+    )

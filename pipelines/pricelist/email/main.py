@@ -16,12 +16,12 @@ from utils.yaml_loader import load_yaml
 from data_toolkit.clients.salesforce import SFClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
-from pipelines.pricelist.email.bodies import external_email, internal_email
+from pipelines.pricelist.email.bodies import external_email, internal_email, external_nep_email
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format= "%(asctime)s | %(message)s")
+logging.basicConfig(level=logging.INFO, format= "%(message)s")
 
-PROD = False
+PROD = True
 
 def main():
 
@@ -33,9 +33,7 @@ def main():
 
     cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
-    sf = SFClient(
-        **cfg["salesforce"]["auth"], validate_at_init=True
-    )
+    sf = SFClient(**cfg["salesforce"]["auth"], validate_at_init=True)
 
     pav_attachments = id_to_path_map(Path(cfg["attachments"]["Peerless-AV"]))
     nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
@@ -62,11 +60,12 @@ def main():
     ) as pav:
         pav_email_count = pav.email()
 
+
     # email neptune lists
     with Emailer(
         contacts_cache=external_contacts_cache,
         attachments_cache=nep_attachments,
-        email_body=external_email,
+        email_body=external_nep_email,
         prod=PROD,
         brand="Neptune",
         add_attachments=True
@@ -82,48 +81,51 @@ def main():
 
     # ============== Internal Emails ================
 
-    internal_contacts_df = sf.query(
-        cfg["salesforce"]["data"]["internal"]["soql"]
-    )
+    # not ran yet due to unimplemented namiing extraction in the email
 
-    cleaned_internal_contacts = DataCleaner(
-        **cfg["salesforce"]["data"]["internal"]["clean_plan"]
-    ).clean(internal_contacts_df)
+    # internal_contacts_df = sf.query(
+    #     cfg["salesforce"]["data"]["internal"]["soql"]
+    # )
 
-    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)   
+    # cleaned_internal_contacts = DataCleaner(
+    #     **cfg["salesforce"]["data"]["internal"]["clean_plan"]
+    # ).clean(internal_contacts_df)
 
-    # email PAV lists
-    with Emailer(
-        contacts_cache=internal_contacts_cache,
-        attachments_cache=pav_attachments,
-        email_body=internal_email,
-        prod=PROD,
-        brand="Peerless-AV",
-        add_attachments=False
-    ) as pav:
-        internal_pav_email_count = pav.email()
+    # internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)   
+
+    # # email PAV lists
+    # with Emailer(
+    #     contacts_cache=internal_contacts_cache,
+    #     attachments_cache=pav_attachments,
+    #     email_body=internal_email,
+    #     prod=PROD,
+    #     brand="Peerless-AV",
+    #     add_attachments=False
+    # ) as pav:
+    #     internal_pav_email_count = pav.email()
     
-    # email neptune lists
-    with Emailer(
-        contacts_cache=internal_contacts_cache,
-        attachments_cache=nep_attachments,
-        email_body=internal_email,
-        prod=PROD,
-        brand="Neptune",
-        add_attachments=False
-    ) as nep:
-        internal_nep_email_count = nep.email()
+    # # email neptune lists
+    # with Emailer(
+    #     contacts_cache=internal_contacts_cache,
+    #     attachments_cache=nep_attachments,
+    #     email_body=internal_email,
+    #     prod=PROD,
+    #     brand="Neptune",
+    #     add_attachments=False
+    # ) as nep:
+    #     internal_nep_email_count = nep.email()
     
     end_time = time.time()
 
-    logger.info(
-        f"\nLists not sent due to Price List Delivery To Salesperson \
-        \nPAV: {internal_pav_email_count} \
-        \nNEP: {internal_nep_email_count} \
-        \nTotal Not Sent: {internal_pav_email_count + internal_nep_email_count}"
-    )
+    # logger.info(
+    #     f"\nLists not sent due to Price List Delivery To Salesperson \
+    #     \nPAV: {internal_pav_email_count} \
+    #     \nNeptune: {internal_nep_email_count} \
+    #     \nTotal Not Sent: {internal_pav_email_count + internal_nep_email_count}"
+    # )
 
     logger.info(f"Emailer Complete, elapsed time: {end_time - start_time}")
+
 
 # ========== bad design due to time constraints, refactor after run ==========
 
