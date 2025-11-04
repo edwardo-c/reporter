@@ -18,7 +18,6 @@ with PriceListEmailer(...) as ple:
     ...
 """
 
-
 class Emailer:
     def __init__(
             self, 

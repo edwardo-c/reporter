@@ -15,7 +15,7 @@ from utils.yaml_loader import load_yaml
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
 from data_toolkit.clients.salesforce import SFClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
-from pipelines.pricelist.email.bodies import external_email, internal_email, external_nep_email
+from pipelines.pricelist.email.bodies import correction_email
 from pipelines.pricelist.email.pricelist_email import BaseEmail, OutlookSender
 from data_toolkit.clients.outlook import OLClient
 from utils.regex import extract_company_name
@@ -23,7 +23,7 @@ from utils.regex import extract_company_name
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format= "%(message)s")
 
-PROD = False
+PROD = True
 
 def main():
 
@@ -39,7 +39,7 @@ def main():
     # =========== External Resources ==============
 
     pav_attachments = id_to_path_map(Path(cfg["attachments"]["Peerless-AV"]))
-    nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
+    # nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
 
     external_contacts_df = sf.query(
         cfg["salesforce"]["data"]["external"]["soql"]
@@ -52,67 +52,65 @@ def main():
     external_contacts_cache = extract_contacts_from_df(cleaned_external_contacts)
 
     # ========= Internal Resources ============
-    internal_contacts_df = sf.query(
-        cfg["salesforce"]["data"]["internal"]["soql"]
-    )
+    # internal_contacts_df = sf.query(
+    #     cfg["salesforce"]["data"]["internal"]["soql"]
+    # )
 
-    cleaned_internal_contacts = DataCleaner(
-        **cfg["salesforce"]["data"]["internal"]["clean_plan"]
-    ).clean(internal_contacts_df)
+    # cleaned_internal_contacts = DataCleaner(
+    #     **cfg["salesforce"]["data"]["internal"]["clean_plan"]
+    # ).clean(internal_contacts_df)
 
-    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
+    # internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
 
     with OLClient() as ol_app:
-        breakpoint()
         pav_emails = [
             BaseEmail(
                 recipients=recipients,
-                subject="Peerless-AV Monthly Price List",
-                body=external_email("Peerless-AV"),
+                subject="Peerless-AV Monthly Price List - Correction",
+                body=correction_email(),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()
             if (attachments:= pav_attachments.get(acct, None))
         ]
         
-        nep_emails = [
-            BaseEmail(
-                recipients=recipients,
-                subject="Neptune Monthly Price List",
-                body=external_nep_email(),
-                attachments=attachments
-            )
-            for acct, recipients in external_contacts_cache.items()
-            if (attachments:= nep_attachments.get(acct, None))
-        ]
+        # nep_emails = [
+        #     BaseEmail(
+        #         recipients=recipients,
+        #         subject="Neptune Monthly Price List",
+        #         body=correction_email("Neptune"),
+        #         attachments=attachments
+        #     )
+        #     for acct, recipients in external_contacts_cache.items()
+        #     if (attachments:= nep_attachments.get(acct, None))
+        # ]
 
-        internal_pav_emails = [
-            BaseEmail(
-                recipients=recipient,
-                subject="",
-                body="",
-            )
-            for acct, recipient in internal_contacts_cache.items()
-            if pav_attachments.get(acct, None)
-        ]
+        # internal_pav_emails = [
+        #     BaseEmail(
+        #         recipients=recipient,
+        #         subject=f"Montly Price List - Not Distributed {...}",
+        #         body="",
+        #     )
+        #     for acct, recipient in internal_contacts_cache.items()
+        #     if pav_attachments.get(acct, None)
+        # ]
 
-        internal_nep_emails = [
-            BaseEmail(
-                recipients=recipient,
-                subject=f"Monthly Price List: {name}",
-                body=""
-            )
-            for acct, recipient in internal_contacts_cache.items()
-            if (name:= nep_attachments.get(acct, None))
-        ]
+        # internal_nep_emails = [
+        #     BaseEmail(
+        #         recipients=recipient,
+        #         subject=f"Monthly Price List: {name}",
+        #         body=""
+        #     )
+        #     for acct, recipient in internal_contacts_cache.items()
+        #     if (name:= nep_attachments.get(acct, None))
+        # ]
 
-        breakpoint()
-
-        OutlookSender(
-            ol_app=ol_app,
-            sent_on_behalf="sales@peerless-av.com",
-            prod=PROD
-        ).send()
+        for e in pav_emails:
+            OutlookSender(
+                ol_app=ol_app,
+                sent_on_behalf="sales@peerless-av.com",
+                prod=PROD
+            ).send(e)
 
     
     end_time = time.time()
