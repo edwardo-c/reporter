@@ -13,4 +13,6 @@ customer of how much they have to spend in order to receive rebates.
 Now we can notify them monthly of their progress.
 
 ## How To Run
+update cfg to latest sales data file
+refresh customer benefits as needed
 python -m pipelines.status_reports.main

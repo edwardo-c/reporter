@@ -11,7 +11,7 @@ from pipelines.status_reports.xlwriter import generate_reports
 
 import duckdb
 
-REPORT_TIMEFRAME = "September 2025"
+REPORT_TIMEFRAME = "October 2025"
 
 def main():
 
