@@ -10,7 +10,7 @@ class SFClient:
     username: str
     password: str = field(repr=False)
     security_token: str = field(repr=False)
-    domain: str = "login"      # or "test" for sandbox
+    domain: str = "login"
     validate_at_init: bool = True
 
     sf: Optional[Salesforce] = field(default=None, init=False, repr=False)
