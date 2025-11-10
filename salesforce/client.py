@@ -1,45 +1,49 @@
-from dataclasses import dataclass, field
-from typing import Optional
 from simple_salesforce import Salesforce
+from salesforce.objects.msrp_entry import MSRPEntry
 import pandas as pd
 
-@dataclass
-class Credentials:
-    username: str
-    password: str = field(repr=False)
-    security_token: str | None = field(repr=False)
-
-class SFClient_Refactor:
+class SFClient:
     def __init__(
             self, 
-            username: str | None = None, 
-            password: str  | None  = None, 
-            security_token: str  | None  = None,
-            credentials: Credentials | None  = None,
+            username: str | None = None,
+            password: str | None = None,
+            security_token: str | None = None,
+            sf: Salesforce | None = None
         ):
+        
+        self._sf = sf
+        self._login_args = (username, password, security_token)
 
-        if not credentials:
-            c = Credentials(
-                username=username,
-                password=password,
-                security_token=security_token)
+    def _connect(self):
+        if self._sf is None:
+            u, p, t = self._login_args
+            self._sf = Salesforce(username=u, password=p, security_token=t)
+            self._login_args = (None, None, None)
 
-        self.sf = Salesforce(username=credentials.username)
+    def __enter__(self):
+        self._connect()
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self._sf = None
 
     def upload_part(
             self, 
             part_params: dict,
-            msrp_params: dict | None = None,
+            msrp: float,
             price_lvl_params: dict | None = None
             ) -> bool:
-        
-        result = self.sf.Product2.create(part_params)
 
-        if not result["success"]:
+        part = self._sf.Product2.create(part_params)
+
+        if not part["success"]:
             return False
         
-        id = result["id"]
+        id = part["id"]
 
-        #TODO: upload msrp
-
+        self._sf.PricebookEntry.create(MSRPEntry(price=msrp, id=id).params)
+    
         #TODO: upload price levels
+
+    def _new_object(sf_obj: object, params: dict):
+        return sf_obj.create(params)

@@ -1,8 +1,4 @@
-
-
-"standard_price_book": "01s6A000001t7RtQAI" # used for list prices
-
-
+"standard_price_book": "01s6A000001t7RtQAI" # msrp
 "price_list": # used for price list entries
   "CORE|DEALER": "a1U2K000009nrmJUAQ"
   "CORE|PARTNER": "a1U2K000009nrmLUAQ"
