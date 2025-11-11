@@ -12,8 +12,12 @@ class NewPart:
     sf.Product2.create(NewPart.params)
     ```
     valid 
-      categories:   MOUNT, DVLED, TV, KIOSK
-      price_group:  "CORE", "ET", "DS", "DVLED", "KIOSK", "NEPTUNE", "HOSP", "E-TAIL", "RETAIL"
+      categories:
+          MOUNT, DVLED, TV, KIOSK
+      
+      price_group:  
+          "CORE", "ET", "DS", "DVLED", 
+          "KIOSK", "NEPTUNE", "HOSP", "E-TAIL", "RETAIL"
     """
     name: str
     category: str

@@ -1,5 +1,4 @@
 from simple_salesforce import Salesforce
-from salesforce.objects.msrp_entry import MSRPEntry
 import pandas as pd
 
 class SFClient:
@@ -27,23 +26,16 @@ class SFClient:
     def __exit__(self, exc_type, exc, tb):
         self._sf = None
 
-    def upload_part(
-            self, 
-            part_params: dict,
-            msrp: float,
-            price_lvl_params: dict | None = None
-            ) -> bool:
-
-        part = self._sf.Product2.create(part_params)
-
-        if not part["success"]:
-            return False
-        
-        id = part["id"]
-
-        self._sf.PricebookEntry.create(MSRPEntry(price=msrp, id=id).params)
+    def insert_record(self, obj_name: str, data: dict):
+        return getattr(self._sf, obj_name).create(data)
     
-        #TODO: upload price levels
+    def delete_record(self, obj_name: str, id: str):
+        return getattr(self._sf, obj_name).delete(id)
 
-    def _new_object(sf_obj: object, params: dict):
-        return sf_obj.create(params)
+    def query(self, soql: str, df: bool = True) -> pd.DataFrame | dict:
+        res = self._sf.query_all(soql)
+        records = res["records"]
+        if df:
+            return pd.DataFrame(records).drop(columns=["attributes"], errors="ignore")
+        else:
+            return records
