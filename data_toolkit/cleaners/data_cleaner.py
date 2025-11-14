@@ -6,44 +6,34 @@ from dataclasses import dataclass, field
 
 @dataclass
 class CleanerCfg:
-    str_cols: list[str] | str
-    keep_cols: list[str] | str = 'all'
-    numeric_cols: list[str] = field(default_factory=list)
+    str_cols: list[str] = field(default_factory=list)
+    keep_cols: list[str] = field(default_factory=list)
+    order: list[str] = field(default_factory=list)
     float_cols: list[str] = field(default_factory=list)
     date_cols: list[str] = field(default_factory=list)
-    rename_map: dict[str, str] = field(default_factory=dict)
     zipcode_cols: dict[str, str] = field(default_factory=dict)
-
-    def __post_init__(self):
-        kc = self.keep_cols
-        if not (kc == "all" or (isinstance(kc, list) and all(isinstance(c, str) for c in kc))):
-            raise TypeError("keep_cols must be 'all' or list[str]")
-        
-        sc = self.str_cols
-        if isinstance(sc, str):
-            self.str_cols = [sc]
-        elif sc is None:
-            self.str_cols = []
+    rename_map: dict[str, str] = field(default_factory=dict)
 
 class DataCleaner():
-    """
-    zipcode_cols: {'dst_col', 'src_col'} cleans us and ca zip codes, returning only first 5 for us and complete for ca
-    """
+    """clean data based off CleanerCfg"""
     def __init__(
         self,
         cfg: CleanerCfg | None = None,
         *,
-        keep_cols: list[str] | str | None = None,
+        keep_cols: list[str] | None = None,
         str_cols: list[str] | None = None,
+        order: list[str] | None = None,
         float_cols: list[str] | None = None,
         date_cols: list[str] | None = None,
         zipcode_cols: dict[str, str] | None = None,
         rename_map: dict[str, str] | None = None,
     ):
+
         if cfg is None:
             cfg = CleanerCfg(
-                keep_cols = keep_cols if keep_cols is not None else "all",
                 str_cols = str_cols or [],
+                keep_cols = keep_cols or [],
+                order = order or [],
                 float_cols = float_cols or [],
                 date_cols = date_cols or [],
                 zipcode_cols = zipcode_cols or {},
@@ -108,23 +98,27 @@ class DataCleaner():
             if missing: 
                 raise KeyError(f"column(s): {missing} missing from df - {existing_cols}")
 
-    def _column_manager(self, df: pd.DataFrame):
-        
+    def _column_rename(self, df: pd.DataFrame) -> pd.DataFrame:
         if self.cfg.rename_map:    
             df = df.rename(columns=self.cfg.rename_map)
-            
-        if isinstance(self.cfg.keep_cols, list):
-            return df[self.cfg.keep_cols]
-        elif isinstance(self.cfg.keep_cols, str) and self.cfg.keep_cols == 'all':
-            return df
-        else:
-            raise KeyError(f"invalid self.cfg.keep_cols; must be 'all' or list of ['cols', 'to', 'keep'] ")
-        
+        return df
+
+    def _keep_cols(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.cfg.keep_cols:
+            df = df[self.cfg.keep_cols]
+        return df
+
+    def _column_order(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.cfg.order:
+            df = df[self.cfg.order]
+        return df
 
     def clean(self, df: pd.DataFrame):
         self._columns_exist(set(df.columns))
         df = self._coerce_data_types(df)
         df = self.add_postal(df)
-        df = self._column_manager(df)
+        df = self._column_rename(df)
+        df = self._keep_cols(df)
+        df = self._column_order(df)
 
         return df
