@@ -13,7 +13,7 @@ class AcumaticaClient():
     ```
     """
     def __init__(self, username: str, password: str):
-        self._session: requests.Session = None
+        self._acu: requests.Session = None
         self.auth: tuple = (username, password)
 
         self._authenticate()
@@ -22,11 +22,17 @@ class AcumaticaClient():
         password = None
         self.auth = (None, None)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self._acu = None
+
     def _authenticate(self):
         s = requests.Session()
         u, p = self.auth
         s.auth = (u, p)
-        self._session = s
+        self._acu = s
 
     def odata(self, url: str, params: dict = {"$format": "json"}, df: bool = False) -> dict | pd.DataFrame:
         """Return odata url as df or dict"""
@@ -36,7 +42,7 @@ class AcumaticaClient():
             params["$format"] = j
             logging.debug("json not set in odata params, auto added")
 
-        resp = self._session.get(url, params=params)
+        resp = self._acu.get(url, params=params)
         data = resp.json().get("value", [])
 
         if not data:

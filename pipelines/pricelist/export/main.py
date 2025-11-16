@@ -1,6 +1,7 @@
 # standard library imports
 from dotenv import load_dotenv
 from pathlib import Path
+import logging
 
 # Third party imports
 import pandas as pd
@@ -10,33 +11,43 @@ from config.paths import PRICE_LIST_ENV, PRICE_LIST_CFG_YAML
 from utils.acumatica_odata import get_acumatica_table
 from utils.yaml_loader import load_yaml
 from data_toolkit.cleaners.data_cleaner import DataCleaner
+from data_toolkit.clients.acumatica import AcumaticaClient
+
+logger = logging.basicConfig(level=logging.INFO)
 
 def main():
 
-    print(f"Splitting CSVs")
+    print(f"Exporting data for Price List Process")
 
     load_dotenv(PRICE_LIST_ENV)
     cfg: dict = load_yaml(PRICE_LIST_CFG_YAML)
 
-    odata_cfg = cfg.get("odata_cfg", {})
-
-    df: pd.DataFrame = get_acumatica_table(
-        url=odata_cfg["url"], 
-        username=odata_cfg["username"], 
-        password=odata_cfg["password"], 
-        params=odata_cfg["params"]
-    )
+    data_cfg = cfg.get("data_cfg", {})
+    eol_cfg = data_cfg["eol"]
+    master_pricing_cfg = data_cfg["master_pricing"]
     
-    # enforce column order
-    df = df[odata_cfg["column_order"]]
+    with AcumaticaClient(**cfg["acu_auth"]) as ac:
+        
+        eol_df = ac.odata(url=eol_cfg["url"], params=eol_cfg["params"], df=True)
+        
+        master_pricing_df = ac.odata(
+            url=master_pricing_cfg["url"], 
+            params=master_pricing_cfg["params"], 
+            df=True
+        )
 
-    cleaned = DataCleaner(**odata_cfg["data_cleaner_cfg"]).clean(df=df)
+    cleaned_eol = DataCleaner(**eol_cfg["cleaner_cfg"]).clean(eol_df)
 
-    branded = _add_brand_column(df=cleaned)
+    cleaned_master_pricing_df = DataCleaner(
+        **master_pricing_cfg["cleaner_cfg"]
+        ).clean(master_pricing_df)
+
+    branded = _add_brand_column(df=cleaned_master_pricing_df)
 
     # hot loop
+    cleaned_eol.to_csv(eol_cfg["out"], index=False)
     _export_partitioned_csv(branded, out_map=cfg["out_map"])
-
+    
     print(f"Process Complete")
 
 def _add_brand_column(df: pd.DataFrame):

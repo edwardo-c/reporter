@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 class CleanerCfg:
     str_cols: list[str] = field(default_factory=list)
     keep_cols: list[str] = field(default_factory=list)
-    order: list[str] = field(default_factory=list)
+    col_order: list[str] = field(default_factory=list)
     float_cols: list[str] = field(default_factory=list)
     date_cols: list[str] = field(default_factory=list)
     zipcode_cols: dict[str, str] = field(default_factory=dict)
@@ -22,7 +22,7 @@ class DataCleaner():
         *,
         keep_cols: list[str] | None = None,
         str_cols: list[str] | None = None,
-        order: list[str] | None = None,
+        col_order: list[str] | None = None,
         float_cols: list[str] | None = None,
         date_cols: list[str] | None = None,
         zipcode_cols: dict[str, str] | None = None,
@@ -33,7 +33,7 @@ class DataCleaner():
             cfg = CleanerCfg(
                 str_cols = str_cols or [],
                 keep_cols = keep_cols or [],
-                order = order or [],
+                col_order = col_order or [],
                 float_cols = float_cols or [],
                 date_cols = date_cols or [],
                 zipcode_cols = zipcode_cols or {},
@@ -109,8 +109,8 @@ class DataCleaner():
         return df
 
     def _column_order(self, df: pd.DataFrame) -> pd.DataFrame:
-        if self.cfg.order:
-            df = df[self.cfg.order]
+        if self.cfg.col_order:
+            df = df[self.cfg.col_order]
         return df
 
     def clean(self, df: pd.DataFrame):
