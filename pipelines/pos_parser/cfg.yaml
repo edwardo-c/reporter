@@ -1,0 +1,140 @@
+dir: ${}
+
+files_cfg:
+
+    - file_id: "accu-tech"
+      reader: "invalid"
+      CanonicalSchema:
+        SoldToName: "CUST NAME"
+        SaleDate: ~
+        PiiPartNumber: "VENDOR ITEM ."
+        ShipQuantity: "EXTND QTY"
+        ExtendedSales: "ENTND AVG COST"
+        BillToCustomerZip: "BILLING ZIP"
+        BillToCustomerState: ~
+        ShipToState: "SHIP TO STATE"
+        ShipToZip: "SHIP TO ZIP"
+    - file_id: "adi"
+      reader: "standard"
+      reader_cfg:
+        sheet_name: "Full Month (All Data)"
+        header: 1
+      CanonicalSchema:
+        SoldToName: ~
+        SaleDate: "INVOICE DATE"
+        PiiPartNumber: "VENDOR PART NUMBER"
+        ShipQuantity: "UNITS"
+        ExtendedSales: "COST OF SALES"
+        BillToCustomerZip: ~
+        BillToCustomerState: ~
+        ShipToState: ~
+        ShipToZip: "SHIP TO ZIPCODE"
+
+    - file_id: "petra" 
+      reader: "invalid"
+      CanonicalSchema:
+        SoldToName: "CUSTOMER NAME"
+        SaleDate: "INVOICE DATE"
+        PiiPartNumber: "VENDOR SKU"
+        ShipQuantity: "QTY"
+        ExtendedSales: "STD COST"
+        BillToCustomerZip: ~
+        BillToCustomerState: ~
+        ShipToState: ~
+        ShipToZip: ~
+
+    - file_id: "almo"
+      reader: "standard"
+      reader_cfg: 
+        sheet_name: "POS Report"
+      CanonicalSchema:
+        SoldToName: "NAME"
+        SaleDate: "INVOICE DATE"
+        PiiPartNumber: "MFG PART"
+        ShipQuantity: "QUANTITY SHIPPED"
+        ExtendedSales: "EXTENDED COST"
+        BillToCustomerZip: "CUSTOMER ZIP"
+        BillToCustomerState: "CUSTOMER STATE"
+        ShipToState: "END USER SHIP TO STATE"
+        ShipToZip: "END USER SHIP TO ZIP"
+    
+    - file_id: "bluestar"
+      reader: "multiple"
+      reader_cfg:
+        - sheet_name: "Bluestar CA"
+        - sheet_name: "Bluestar US"
+      CanonicalSchema:
+        SoldToName: "Cust Name"
+        SaleDate: "Invoice Date"
+        PiiPartNumber: "Item Number"
+        ShipQuantity: "Quantity Invoiced"
+        ExtendedSales: "Extend Cost"
+        BillToCustomerZip: "Bill To Postal Code"
+        BillToCustomerState: "Bill To State"
+        ShipToState: "Ship To State"
+        ShipToZip: "Ship To Postal Code"
+    
+    - file_id: "dhd"
+      reader: "standard"
+      CanonicalSchema:
+        SoldToName: "BILL TO NAME"
+        SaleDate: "INVOICE DATE"
+        PiiPartNumber: "PEERLESS PART NO"
+        ShipQuantity: "QUANTITY"
+        ExtendedSales: "LINE ITEM TOTAL"
+        BillToCustomerZip: "BILL TO ZIPCODE"
+        BillToCustomerState: "BILL TO STATE"
+        ShipToState: "SHIP TO STATE"
+        ShipToZip: "SHIP TO ZIPCODE"
+        
+    - file_id: "ingram micro"
+      reader: "standard"
+      CanonicalSchema:
+        SoldToName: "Customer Name"
+        SaleDate: "Invoice date"
+        PiiPartNumber: "Vendor Part Nbr"
+        ShipQuantity: "Qty Shipped"
+        ExtendedSales: "Extended Cost"
+        BillToCustomerZip: "Reseller Zip"
+        BillToCustomerState: "Reseller State"
+        ShipToState: "Ship To State"
+        ShipToZip: "Ship to Zip"
+
+    - file_id: "td synnex ca"
+      reader: "invalid"
+      CanonicalSchema:
+        SoldToName: "bill_to_cust_name"
+        SaleDate: "ship_date"
+        PiiPartNumber: "vend_part_no"
+        ShipQuantity: "Ship_Qty"
+        ExtendedSales: "Extend_Base_Cost"
+        BillToCustomerZip: "bill_to_cust_zip"
+        BillToCustomerState: "bill_to_cust_state"
+        ShipToState: "ship_to_state"
+        ShipToZip: "ship_to_zip"
+    
+    - file_id: "td synnex us"
+      reader: "invalid"
+      CanonicalSchema:
+        SoldToName: "bill_to_cust_name"
+        SaleDate: "ship_date"
+        PiiPartNumber: "vend_part_no"
+        ShipQuantity: "Ship_Qty"
+        ExtendedSales: "Extend_Base_Cost"
+        BillToCustomerZip: "bill_to_cust_zip"
+        BillToCustomerState: "bill_to_cust_state"
+        ShipToState: "ship_to_state"
+        ShipToZip: "ship_to_zip"
+
+
+# for copying and pasting: 
+      # CanonicalSchema:
+      #   SoldToName: ~
+      #   SaleDate: ~
+      #   PiiPartNumber: ~
+      #   ShipQuantity: ~
+      #   ExtendedSales: ~
+      #   BillToCustomerZip: ~
+      #   BillToCustomerState: ~
+      #   ShipToState: ~
+      #   ShipToZip: ~

@@ -11,7 +11,7 @@ class CleanerCfg:
     col_order: list[str] = field(default_factory=list)
     float_cols: list[str] = field(default_factory=list)
     date_cols: list[str] = field(default_factory=list)
-    zipcode_cols: dict[str, str] = field(default_factory=dict)
+    zipcode_cols: list[str] = field(default_factory=list)
     rename_map: dict[str, str] = field(default_factory=dict)
 
 class DataCleaner():
@@ -25,7 +25,7 @@ class DataCleaner():
         col_order: list[str] | None = None,
         float_cols: list[str] | None = None,
         date_cols: list[str] | None = None,
-        zipcode_cols: dict[str, str] | None = None,
+        zipcode_cols: list[str] | None = None,
         rename_map: dict[str, str] | None = None,
     ):
 
@@ -64,10 +64,9 @@ class DataCleaner():
         CA_RE = r'^\s*([ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z])(\d[ABCEGHJ-NPRSTV-Z]\d)\s*$'
 
         assigns: dict[str, pd.Series] = {}
-        drops: list[str] = []
 
-        for dst_col, src_col in self.cfg.zipcode_cols.items():
-            s = df[src_col].astype("string").str.upper().str.strip()
+        for col in self.cfg.zipcode_cols:
+            s = df[col].astype("string").str.upper().str.strip()
 
             us = s.str.extract(US_RE)
             ca = s.str.replace(" ", "", regex=False).str.extract(CA_RE)
@@ -78,25 +77,31 @@ class DataCleaner():
                     np.where(ca[0].notna(), ca[0].str.cat(ca[1], sep=" "), pd.NA)
                 ),
                 index=df.index,
-                name=dst_col,
+                name=col,
             )
 
-            assigns[dst_col] = primary
-            drops.append(src_col)
+            assigns[col] = primary
 
-        return (
-            df.assign(**assigns)
-            .drop(columns=[c for c in drops if c in df.columns], errors="ignore")
-        )
+        return df.assign(**assigns)
+
 
     def _columns_exist(self, existing_cols: set) -> None:
-        cols_to_check = (self.cfg.str_cols, self.cfg.float_cols, self.cfg.date_cols, self.cfg.zipcode_cols.values())
-        for grp in cols_to_check:
+        cols_to_check_groups = (
+            self.cfg.str_cols,
+            self.cfg.float_cols,
+            self.cfg.date_cols,
+            self.cfg.zipcode_cols,
+            self.cfg.keep_cols,
+            self.cfg.col_order,
+        )
+
+        for grp in cols_to_check_groups:
             if not grp:
                 continue
             missing = [c for c in grp if c not in existing_cols]
-            if missing: 
+            if missing:
                 raise KeyError(f"column(s): {missing} missing from df - {existing_cols}")
+
 
     def _column_rename(self, df: pd.DataFrame) -> pd.DataFrame:
         if self.cfg.rename_map:    
@@ -113,11 +118,12 @@ class DataCleaner():
             df = df[self.cfg.col_order]
         return df
 
-    def clean(self, df: pd.DataFrame):
+    def clean(self, df: pd.DataFrame) -> pd.DataFrame:
+        
+        df = self._column_rename(df)
         self._columns_exist(set(df.columns))
         df = self._coerce_data_types(df)
         df = self.add_postal(df)
-        df = self._column_rename(df)
         df = self._keep_cols(df)
         df = self._column_order(df)
 
