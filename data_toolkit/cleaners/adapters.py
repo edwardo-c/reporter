@@ -36,10 +36,4 @@ def build_cleaner_cfg(schema_def: CanonicalSchemaDef, mapping) -> CleanerCfg:
     cfg.date_cols = [canon for canon in schema_def.date_fields if canon in available]
     cfg.zipcode_cols = [canon for canon in schema_def.zipcode_fields if canon in available]
 
-    cfg.zipcode_cols = {
-        canon: available[canon]
-        for canon in schema_def.zipcode_fields
-        if canon in available
-    }
-
     return cfg

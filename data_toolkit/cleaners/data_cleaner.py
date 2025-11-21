@@ -13,6 +13,8 @@ class CleanerCfg:
     date_cols: list[str] = field(default_factory=list)
     zipcode_cols: list[str] = field(default_factory=list)
     rename_map: dict[str, str] = field(default_factory=dict)
+    src_id: str | None = field(default=None)
+    src_col_name: str | None = field(default=None)
 
 class DataCleaner():
     """clean data based off CleanerCfg"""
@@ -27,6 +29,8 @@ class DataCleaner():
         date_cols: list[str] | None = None,
         zipcode_cols: list[str] | None = None,
         rename_map: dict[str, str] | None = None,
+        src_id: str | None = None,
+        src_col_name: str | None = None,
     ):
 
         if cfg is None:
@@ -38,6 +42,8 @@ class DataCleaner():
                 date_cols = date_cols or [],
                 zipcode_cols = zipcode_cols or {},
                 rename_map = rename_map or {},
+                src_id = src_id or None,
+                src_col_name = src_col_name or "src_id",
             )
         self.cfg = cfg
     
@@ -98,9 +104,13 @@ class DataCleaner():
         for grp in cols_to_check_groups:
             if not grp:
                 continue
-            missing = [c for c in grp if c not in existing_cols]
+            missing = [
+                c for c in grp
+                if c not in existing_cols and c != self.cfg.src_col_name 
+            ]
             if missing:
                 raise KeyError(f"column(s): {missing} missing from df - {existing_cols}")
+
 
 
     def _column_rename(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -118,6 +128,12 @@ class DataCleaner():
             df = df[self.cfg.col_order]
         return df
 
+    def _add_src(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.cfg.src_id is not None:
+            df = df.assign(**{self.cfg.src_col_name: self.cfg.src_id})
+        return df
+
+
     def clean(self, df: pd.DataFrame) -> pd.DataFrame:
         
         df = self._column_rename(df)
@@ -125,6 +141,7 @@ class DataCleaner():
         df = self._coerce_data_types(df)
         df = self.add_postal(df)
         df = self._keep_cols(df)
+        df = self._add_src(df)
         df = self._column_order(df)
 
         return df

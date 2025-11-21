@@ -18,6 +18,7 @@ class PosSchemaMapping:
     BillToCustomerState: Optional[str] = None
     ShipToState: Optional[str] = None
     ShipToZip: Optional[str] = None
+    BuyerName: Optional[str] = None
 
     def as_dict(self) -> Dict[str, Optional[str]]:
         return self.__dict__.copy()
@@ -30,6 +31,7 @@ POS_SCHEMA_DEF = CanonicalSchemaDef(
         "BillToCustomerState",
         "ShipToState",
         "ShipToZip",
+        "BuyerName"
     ),
     float_fields=("ShipQuantity", "ExtendedSales"),
     date_fields=("SaleDate",),
