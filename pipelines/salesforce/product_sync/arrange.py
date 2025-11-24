@@ -75,7 +75,7 @@ def _upload_new_parts(sf: Salesforce, parts_to_upload: pd.DataFrame) -> dict[str
             out[r.PartNumber] = result['id']
         
         # TODO: remove after testing
-        break
+        # break
 
     return out
 
@@ -111,7 +111,7 @@ def _upload_price_list_entries(
                 "Price_List_Price__c": r.Price,
                 "Product__c": id
             })
-            breakpoint()
+            
 
 def _standardize_join_col(df: pd.DataFrame, col_name: str):
     """Used for cleaning join column"""

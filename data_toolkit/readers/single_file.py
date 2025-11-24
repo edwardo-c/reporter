@@ -1,9 +1,9 @@
-"""Reads and stacks multiple tables from a single file"""
 import pandas as pd
 from pathlib import Path
 from contextlib import contextmanager
 import shutil
 import tempfile
+
 
 def read_data(cfg: dict):
     """Iterate over params in cfg, read from same file"""    

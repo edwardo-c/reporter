@@ -6,48 +6,44 @@ from dataclasses import dataclass, field
 
 @dataclass
 class CleanerCfg:
-    str_cols: list[str] | str
-    keep_cols: list[str] | str = 'all'
-    numeric_cols: list[str] = field(default_factory=list)
+    str_cols: list[str] = field(default_factory=list)
+    keep_cols: list[str] = field(default_factory=list)
+    col_order: list[str] = field(default_factory=list)
     float_cols: list[str] = field(default_factory=list)
     date_cols: list[str] = field(default_factory=list)
+    zipcode_cols: list[str] = field(default_factory=list)
     rename_map: dict[str, str] = field(default_factory=dict)
-    zipcode_cols: dict[str, str] = field(default_factory=dict)
-
-    def __post_init__(self):
-        kc = self.keep_cols
-        if not (kc == "all" or (isinstance(kc, list) and all(isinstance(c, str) for c in kc))):
-            raise TypeError("keep_cols must be 'all' or list[str]")
-        
-        sc = self.str_cols
-        if isinstance(sc, str):
-            self.str_cols = [sc]
-        elif sc is None:
-            self.str_cols = []
+    src_id: str | None = field(default=None)
+    src_col_name: str | None = field(default=None)
 
 class DataCleaner():
-    """
-    zipcode_cols: {'dst_col', 'src_col'} cleans us and ca zip codes, returning only first 5 for us and complete for ca
-    """
+    """clean data based off CleanerCfg"""
     def __init__(
         self,
         cfg: CleanerCfg | None = None,
         *,
-        keep_cols: list[str] | str | None = None,
+        keep_cols: list[str] | None = None,
         str_cols: list[str] | None = None,
+        col_order: list[str] | None = None,
         float_cols: list[str] | None = None,
         date_cols: list[str] | None = None,
-        zipcode_cols: dict[str, str] | None = None,
+        zipcode_cols: list[str] | None = None,
         rename_map: dict[str, str] | None = None,
+        src_id: str | None = None,
+        src_col_name: str | None = None,
     ):
+
         if cfg is None:
             cfg = CleanerCfg(
-                keep_cols = keep_cols if keep_cols is not None else "all",
                 str_cols = str_cols or [],
+                keep_cols = keep_cols or [],
+                col_order = col_order or [],
                 float_cols = float_cols or [],
                 date_cols = date_cols or [],
                 zipcode_cols = zipcode_cols or {},
                 rename_map = rename_map or {},
+                src_id = src_id or None,
+                src_col_name = src_col_name or "src_id",
             )
         self.cfg = cfg
     
@@ -74,10 +70,9 @@ class DataCleaner():
         CA_RE = r'^\s*([ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z])(\d[ABCEGHJ-NPRSTV-Z]\d)\s*$'
 
         assigns: dict[str, pd.Series] = {}
-        drops: list[str] = []
 
-        for dst_col, src_col in self.cfg.zipcode_cols.items():
-            s = df[src_col].astype("string").str.upper().str.strip()
+        for col in self.cfg.zipcode_cols:
+            s = df[col].astype("string").str.upper().str.strip()
 
             us = s.str.extract(US_RE)
             ca = s.str.replace(" ", "", regex=False).str.extract(CA_RE)
@@ -88,43 +83,65 @@ class DataCleaner():
                     np.where(ca[0].notna(), ca[0].str.cat(ca[1], sep=" "), pd.NA)
                 ),
                 index=df.index,
-                name=dst_col,
+                name=col,
             )
 
-            assigns[dst_col] = primary
-            drops.append(src_col)
+            assigns[col] = primary
 
-        return (
-            df.assign(**assigns)
-            .drop(columns=[c for c in drops if c in df.columns], errors="ignore")
-        )
+        return df.assign(**assigns)
+
 
     def _columns_exist(self, existing_cols: set) -> None:
-        cols_to_check = (self.cfg.str_cols, self.cfg.float_cols, self.cfg.date_cols, self.cfg.zipcode_cols.values())
-        for grp in cols_to_check:
+        cols_to_check_groups = (
+            self.cfg.str_cols,
+            self.cfg.float_cols,
+            self.cfg.date_cols,
+            self.cfg.zipcode_cols,
+            self.cfg.keep_cols,
+            self.cfg.col_order,
+        )
+
+        for grp in cols_to_check_groups:
             if not grp:
                 continue
-            missing = [c for c in grp if c not in existing_cols]
-            if missing: 
+            missing = [
+                c for c in grp
+                if c not in existing_cols and c != self.cfg.src_col_name 
+            ]
+            if missing:
                 raise KeyError(f"column(s): {missing} missing from df - {existing_cols}")
 
-    def _column_manager(self, df: pd.DataFrame):
-        
+
+
+    def _column_rename(self, df: pd.DataFrame) -> pd.DataFrame:
         if self.cfg.rename_map:    
             df = df.rename(columns=self.cfg.rename_map)
-            
-        if isinstance(self.cfg.keep_cols, list):
-            return df[self.cfg.keep_cols]
-        elif isinstance(self.cfg.keep_cols, str) and self.cfg.keep_cols == 'all':
-            return df
-        else:
-            raise KeyError(f"invalid self.cfg.keep_cols; must be 'all' or list of ['cols', 'to', 'keep'] ")
-        
+        return df
 
-    def clean(self, df: pd.DataFrame):
+    def _keep_cols(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.cfg.keep_cols:
+            df = df[self.cfg.keep_cols]
+        return df
+
+    def _column_order(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.cfg.col_order:
+            df = df[self.cfg.col_order]
+        return df
+
+    def _add_src(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.cfg.src_id is not None:
+            df = df.assign(**{self.cfg.src_col_name: self.cfg.src_id})
+        return df
+
+
+    def clean(self, df: pd.DataFrame) -> pd.DataFrame:
+        
+        df = self._column_rename(df)
         self._columns_exist(set(df.columns))
         df = self._coerce_data_types(df)
         df = self.add_postal(df)
-        df = self._column_manager(df)
+        df = self._keep_cols(df)
+        df = self._add_src(df)
+        df = self._column_order(df)
 
         return df
