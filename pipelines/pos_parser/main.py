@@ -101,9 +101,7 @@ def main():
 phase two:
     description if available?
     cross references
-    salesperson name to cleaner_cfg
 """
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
