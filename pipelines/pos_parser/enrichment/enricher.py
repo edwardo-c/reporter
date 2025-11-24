@@ -26,7 +26,7 @@ class Enricher:
         if not all([left, right, cat_mapping]):
             raise ValueError(f"invalid categories config")
         
-        cfg["mapping"] = {k.strip().upper(): v for k, v in cat_mapping.items()}
+        cfg["mapping"] = {k.strip().upper(): v.strip().upper() for k, v in cat_mapping.items()}
 
         return cfg
 
