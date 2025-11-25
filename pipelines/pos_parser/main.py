@@ -1,17 +1,17 @@
+from dotenv import load_dotenv
 from pathlib import Path
+import logging
+
 import pandas as pd
-from utils.yaml_loader import load_yaml
+
 from config.paths import POS_PARSER_CFG, POS_PARSER_ENV
-from pipelines.pos_parser.readers.factory import get_reader
+from data_toolkit.clients.acumatica import AcumaticaClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
 from data_toolkit.cleaners.adapters import build_cleaner_cfg
-from schemas.pos_schema import PosSchemaMapping, POS_SCHEMA_DEF
-from data_toolkit.clients.acumatica import AcumaticaClient
-import os
-from dotenv import load_dotenv
 from pipelines.pos_parser.enrichment.enricher import Enricher
-
-import logging
+from pipelines.pos_parser.readers.factory import get_reader
+from schemas.pos_schema import PosSchemaMapping, POS_SCHEMA_DEF
+from utils.yaml_loader import load_yaml
 
 logging.basicConfig(level=logging.INFO)
 
@@ -22,7 +22,6 @@ what if a sheet name or index changes?
 
 PERIOD_DATE = "10/31/2025"
 
-
 def main():
     
     # ================ Resources =================
@@ -30,8 +29,7 @@ def main():
 
     global_cfg = load_yaml(POS_PARSER_CFG)
     enricher_cfg = global_cfg["enricher"]
-
-    files = list(Path(r"H:\Pro AV and Sales Operations\Sales Reports\POS Reports\Monthly POS Loads to Dan\October 2025").glob("*"))
+    files = list(Path(global_cfg["pos_dir"]).glob("*"))
 
     dfs = []
 
@@ -85,17 +83,20 @@ def main():
     clean_cats = {r["InventoryID"] : r["Category"] for r in raw_cats}
     
     category_cfg = enricher_cfg["categories"]["cfg"]
-    category_cfg["mapping"] = clean_cats
 
-    # TODO: create credit_cfg and function in Enricher
+    category_cfg["mapping"] = clean_cats
 
     enriched_df = Enricher(
         period_date=PERIOD_DATE,
         category_cfg=category_cfg,
-        credit_cfg=None
+        credit_cfg=enricher_cfg["credit_rules"]
     ).apply(stacked)
 
     enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\pos.csv", index=False)
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
 
 """
 phase two:
@@ -103,5 +104,15 @@ phase two:
     cross references
 """
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+"""
+Bluestar and bluestar canada need a different identifier
+this works because I needed to split column selection anyway
+
+petra needs to be a calculation for extended total
+
+dhd needs to redo for returns (convert to negative)
+
+thinking of converting the file parsing into a class. 
+
+
+"""

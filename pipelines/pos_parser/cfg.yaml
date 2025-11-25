@@ -1,173 +1,160 @@
-dir: ${}
+pos_dir: ${DIR_TO_PARSE}
 
 files_cfg:
+  - file_id: "accu-tech"
+    reader: "invalid"
+    src_id: "ACCUTECH"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "CUST NAME"
+      SaleDate: ~
+      PiiPartNumber: "VENDOR ITEM ."
+      ShipQuantity: "EXTND QTY"
+      ExtendedSales: "ENTND AVG COST"
+      BillToCustomerZip: "BILLING ZIP"
+      BillToCustomerState: ~
+      ShipToState: "SHIP TO STATE"
+      ShipToZip: "SHIP TO ZIP"
+      BuyerName: ~
 
-    - file_id: "accu-tech"
-      reader: "invalid"
-      src_id: "ACCUTECH"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "CUST NAME"
-        SaleDate: ~
-        PiiPartNumber: "VENDOR ITEM ."
-        ShipQuantity: "EXTND QTY"
-        ExtendedSales: "ENTND AVG COST"
-        BillToCustomerZip: "BILLING ZIP"
-        BillToCustomerState: ~
-        ShipToState: "SHIP TO STATE"
-        ShipToZip: "SHIP TO ZIP"
-        BuyerName: ~
+  - file_id: "adi"
+    reader: "standard"
+    src_id: "ADI"
+    src_col_name: "Customer"
+    reader_cfg:
+      sheet_name: "Full Month (All Data)"
+      header: 1
+    CanonicalSchema:
+      SoldToName: ~
+      SaleDate: "INVOICE DATE"
+      PiiPartNumber: "VENDOR PART NUMBER"
+      ShipQuantity: "UNITS"
+      ExtendedSales: "COST OF SALES"
+      BillToCustomerZip: ~
+      BillToCustomerState: ~
+      ShipToState: ~
+      ShipToZip: "SHIP TO ZIPCODE"
+      BuyerName: ~
 
-    - file_id: "adi"
-      reader: "standard"
-      src_id: "ADI"
-      src_col_name: "Customer"
-      reader_cfg:
-        sheet_name: "Full Month (All Data)"
-        header: 1
-      CanonicalSchema:
-        SoldToName: ~
-        SaleDate: "INVOICE DATE"
-        PiiPartNumber: "VENDOR PART NUMBER"
-        ShipQuantity: "UNITS"
-        ExtendedSales: "COST OF SALES"
-        BillToCustomerZip: ~
-        BillToCustomerState: ~
-        ShipToState: ~
-        ShipToZip: "SHIP TO ZIPCODE"
-        BuyerName: ~
+  - file_id: "petra" 
+    reader: "invalid"
+    src_id: "PETRA"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "CUSTOMER NAME"
+      SaleDate: "INVOICE DATE"
+      PiiPartNumber: "VENDOR SKU"
+      ShipQuantity: "QTY"
+      ExtendedSales: "STD COST"
+      BillToCustomerZip: ~
+      BillToCustomerState: ~
+      ShipToState: ~
+      ShipToZip: ~
+      BuyerName: ~
 
-    - file_id: "petra" 
-      reader: "invalid"
-      src_id: "PETRA"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "CUSTOMER NAME"
-        SaleDate: "INVOICE DATE"
-        PiiPartNumber: "VENDOR SKU"
-        ShipQuantity: "QTY"
-        ExtendedSales: "STD COST"
-        BillToCustomerZip: ~
-        BillToCustomerState: ~
-        ShipToState: ~
-        ShipToZip: ~
-        BuyerName: ~
+  - file_id: "almo"
+    reader: "standard"
+    reader_cfg: 
+      sheet_name: "POS Report"
+    src_id: "EXERTIS ALMO"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "NAME"
+      SaleDate: "INVOICE DATE"
+      PiiPartNumber: "MFG PART"
+      ShipQuantity: "QUANTITY SHIPPED"
+      ExtendedSales: "EXTENDED COST"
+      BillToCustomerZip: "CUSTOMER"
+      BillToCustomerState: "CUSTOMER STATE"
+      ShipToState: "END USER SHIP TO STATE"
+      ShipToZip: "END USER SHIP TO ZIP"
+      BuyerName: "SLS NAME"
+  
+  - file_id: "bluestar"
+    reader: "multiple"
+    reader_cfg:
+      - sheet_name: "Bluestar CA"
+      - sheet_name: "Bluestar US"
+    src_id: "BLUESTAR"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "Cust Name"
+      SaleDate: "Invoice Date"
+      PiiPartNumber: "Item Number"
+      ShipQuantity: "Quantity Invoiced"
+      ExtendedSales: "Extend Cost"
+      BillToCustomerZip: "Bill To Postal Code"
+      BillToCustomerState: "Bill To State"
+      ShipToState: "Ship To State"
+      ShipToZip: "Ship To Postal Code"
+      BuyerName: ~
+  
+  - file_id: "dhd"
+    reader: "standard"
+    src_id: "DHD"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "BILL TO NAME"
+      SaleDate: "INVOICE DATE"
+      PiiPartNumber: "PEERLESS PART NO"
+      ShipQuantity: "QUANTITY"
+      ExtendedSales: "LINE ITEM TOTAL"
+      BillToCustomerZip: "BILL TO ZIPCODE"
+      BillToCustomerState: "BILL TO STATE"
+      ShipToState: "SHIP TO STATE"
+      ShipToZip: "SHIP TO ZIPCODE"
+      BuyerName: ~
+      
+  - file_id: "ingram micro"
+    reader: "standard"
+    src_id: "INGRAM"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "Customer Name"
+      SaleDate: "Invoice date"
+      PiiPartNumber: "Vendor Part Nbr"
+      ShipQuantity: "Qty Shipped"
+      ExtendedSales: "Extended Cost"
+      BillToCustomerZip: "Reseller Zip"
+      BillToCustomerState: "Reseller State"
+      ShipToState: "Ship To State"
+      ShipToZip: "Ship to Zip"
+      BuyerName: ~
 
-    - file_id: "almo"
-      reader: "standard"
-      reader_cfg: 
-        sheet_name: "POS Report"
-      src_id: "ALMO"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "NAME"
-        SaleDate: "INVOICE DATE"
-        PiiPartNumber: "MFG PART"
-        ShipQuantity: "QUANTITY SHIPPED"
-        ExtendedSales: "EXTENDED COST"
-        BillToCustomerZip: "CUSTOMER ZIP"
-        BillToCustomerState: "CUSTOMER STATE"
-        ShipToState: "END USER SHIP TO STATE"
-        ShipToZip: "END USER SHIP TO ZIP"
-        BuyerName: "SLS NAME"
-    
-    - file_id: "bluestar"
-      reader: "multiple"
-      reader_cfg:
-        - sheet_name: "Bluestar CA"
-        - sheet_name: "Bluestar US"
-      src_id: "BLUESTAR"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "Cust Name"
-        SaleDate: "Invoice Date"
-        PiiPartNumber: "Item Number"
-        ShipQuantity: "Quantity Invoiced"
-        ExtendedSales: "Extend Cost"
-        BillToCustomerZip: "Bill To Postal Code"
-        BillToCustomerState: "Bill To State"
-        ShipToState: "Ship To State"
-        ShipToZip: "Ship To Postal Code"
-        BuyerName: ~
-    
-    - file_id: "dhd"
-      reader: "standard"
-      src_id: "DHD"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "BILL TO NAME"
-        SaleDate: "INVOICE DATE"
-        PiiPartNumber: "PEERLESS PART NO"
-        ShipQuantity: "QUANTITY"
-        ExtendedSales: "LINE ITEM TOTAL"
-        BillToCustomerZip: "BILL TO ZIPCODE"
-        BillToCustomerState: "BILL TO STATE"
-        ShipToState: "SHIP TO STATE"
-        ShipToZip: "SHIP TO ZIPCODE"
-        BuyerName: ~
-        
-    - file_id: "ingram micro"
-      reader: "standard"
-      src_id: "INGRAM"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "Customer Name"
-        SaleDate: "Invoice date"
-        PiiPartNumber: "Vendor Part Nbr"
-        ShipQuantity: "Qty Shipped"
-        ExtendedSales: "Extended Cost"
-        BillToCustomerZip: "Reseller Zip"
-        BillToCustomerState: "Reseller State"
-        ShipToState: "Ship To State"
-        ShipToZip: "Ship to Zip"
-        BuyerName: ~
-
-    - file_id: "td synnex ca"
-      reader: "invalid"
-      src_id: "SYNNEX CA"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "bill_to_cust_name"
-        SaleDate: "ship_date"
-        PiiPartNumber: "vend_part_no"
-        ShipQuantity: "Ship_Qty"
-        ExtendedSales: "Extend_Base_Cost"
-        BillToCustomerZip: "bill_to_cust_zip"
-        BillToCustomerState: "bill_to_cust_state"
-        ShipToState: "ship_to_state"
-        ShipToZip: "ship_to_zip"
-        BuyerName: ~
-    
-    - file_id: "td synnex us"
-      reader: "invalid"
-      src_id: "SYNNEX"
-      src_col_name: "Customer"
-      CanonicalSchema:
-        SoldToName: "bill_to_cust_name"
-        SaleDate: "ship_date"
-        PiiPartNumber: "vend_part_no"
-        ShipQuantity: "Ship_Qty"
-        ExtendedSales: "Extend_Base_Cost"
-        BillToCustomerZip: "bill_to_cust_zip"
-        BillToCustomerState: "bill_to_cust_state"
-        ShipToState: "ship_to_state"
-        ShipToZip: "ship_to_zip"
-        BuyerName: ~
-
-    # for copying and pasting: 
-          # CanonicalSchema:
-          #   SoldToName: ~
-          #   SaleDate: ~
-          #   PiiPartNumber: ~
-          #   ShipQuantity: ~
-          #   ExtendedSales: ~
-          #   BillToCustomerZip: ~
-          #   BillToCustomerState: ~
-          #   ShipToState: ~
-          #   ShipToZip: ~
-          #   BuyerName: ~
+  - file_id: "td synnex ca"
+    reader: "invalid"
+    src_id: "SYNNEX CA"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "bill_to_cust_name"
+      SaleDate: "ship_date"
+      PiiPartNumber: "vend_part_no"
+      ShipQuantity: "Ship_Qty"
+      ExtendedSales: "Extend_Base_Cost"
+      BillToCustomerZip: "bill_to_cust_zip"
+      BillToCustomerState: "bill_to_cust_state"
+      ShipToState: "ship_to_state"
+      ShipToZip: "ship_to_zip"
+      BuyerName: ~
+  
+  - file_id: "td synnex us"
+    reader: "invalid"
+    src_id: "SYNNEX"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "bill_to_cust_name"
+      SaleDate: "ship_date"
+      PiiPartNumber: "vend_part_no"
+      ShipQuantity: "Ship_Qty"
+      ExtendedSales: "Extend_Base_Cost"
+      BillToCustomerZip: "bill_to_cust_zip"
+      BillToCustomerState: "bill_to_cust_state"
+      ShipToState: "ship_to_state"
+      ShipToZip: "ship_to_zip"
+      BuyerName: ~
 
 enricher:
+
   categories:
     auth:
       username: ${ACU_USERNAME}
@@ -179,8 +166,66 @@ enricher:
     cfg:
       "left": "PiiPartNumber"
       "right": "PiiCategory"
-  credit: 
-    #column to search, value to find, logic
-    - 
-    -
-    -
+
+  credit_rules:
+    
+    - kind: "mapping"
+      left: "Customer"
+      mapping: 
+        "PETRA": "NAEGELE"
+        "ADI": "NAEGELE"
+    
+    - kind: "mapping"
+      left: "BuyerName"
+      map_args: 
+        path: ${POS_EXCEPTIONS}
+        sheet: "Exceptions Eff 5-1-25"
+        usecols: [6, 8]
+        skiprows: 2
+    
+    - kind: "mapping"
+      left: "SoldToName"
+      map_args: 
+        path: ${POS_EXCEPTIONS}
+        sheet: "Exceptions Eff 5-1-25"
+        usecols: [0, 3]
+        skiprows: 2
+
+    - kind: "zip_range"
+      state_col: BillToCustomerState
+      zip_col: BillToCustomerZip
+      range_args:
+        path: ${STATE_ASSIGNMENTS}
+        sheet: "As of 1-1-25"
+        usecols: [1, 3, 4, 7]
+        skiprows: 1
+    
+    - kind: "mapping"
+      left: "BillToCustomerState"
+      map_args:
+        path: ${STATE_ASSIGNMENTS}
+        sheet: "As of 1-1-25"
+        usecols: [1, 7]
+        skiprows: 1
+
+    - kind: "zip_range"
+      state_col: ShipToState
+      zip_col: ShipToZip
+      range_args:
+        path: ${STATE_ASSIGNMENTS}
+        sheet: "As of 1-1-25"
+        usecols: [1, 3, 4, 7]
+        skiprows: 1
+    
+    - kind: "mapping"
+      left: "ShipToState"
+      map_args:
+        path: ${STATE_ASSIGNMENTS}
+        sheet: "As of 1-1-25"
+        usecols: [1, 7]
+        skiprows: 1
+    
+
+      
+      
+      
