@@ -16,8 +16,7 @@ data_cfg:
                 - "InventoryID" 
                 - "ProductLifeCycleManagement"
                 - "ItemStatus"
-        "out": ${EOL_OUT}
-            
+        "out": ${EOL_OUT}        
             
     "master_pricing":
         url: ${PRICE_LOOKUP_ALL}

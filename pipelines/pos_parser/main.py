@@ -9,15 +9,31 @@ from data_toolkit.clients.acumatica import AcumaticaClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
 from data_toolkit.cleaners.adapters import build_cleaner_cfg
 from pipelines.pos_parser.enrichment.enricher import Enricher
+from pipelines.pos_parser.normalizer.sales_normalizer import normalize_sales
 from pipelines.pos_parser.readers.factory import get_reader
 from schemas.pos_schema import PosSchemaMapping, POS_SCHEMA_DEF
 from utils.yaml_loader import load_yaml
+
+
+
 
 logging.basicConfig(level=logging.INFO)
 
 """
 SMELLS:
 what if a sheet name or index changes?
+"""
+
+
+"""
+Read the files
+clean the files
+apply sales rules 
+    (
+        convert returns to negative, 
+        calculate totals
+    )
+
 """
 
 PERIOD_DATE = "10/31/2025"
@@ -55,7 +71,6 @@ def main():
         # ================ Data Cleaning =================
 
         schema_mapping = PosSchemaMapping(**file_cfg["CanonicalSchema"])
-        
         cleaner_cfg = build_cleaner_cfg(POS_SCHEMA_DEF, schema_mapping)
         cleaner_cfg.src_id = file_cfg["src_id"]
         cleaner_cfg.src_col_name = file_cfg["src_col_name"]
@@ -65,7 +80,9 @@ def main():
 
         df_clean = cleaner.clean(df)
 
-        dfs.append(df_clean)
+        df_norm = normalize_sales(df_clean, return_id=file_cfg["return_id"])
+
+        dfs.append(df_norm)
 
     stacked = pd.concat(dfs)
 
@@ -112,7 +129,6 @@ petra needs to be a calculation for extended total
 
 dhd needs to redo for returns (convert to negative)
 
-thinking of converting the file parsing into a class. 
-
+thinking of converting the file parsing into a class in data toolkit
 
 """

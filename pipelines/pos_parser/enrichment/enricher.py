@@ -232,6 +232,24 @@ class Enricher:
             mask = df[out].isna() & candidates
             df.loc[mask, out] = rep
 
+    # === HELPERS: CALCULATED COLUMNS =====================================
+    def _apply_return_calc(self, df: pd.DataFrame):
+        """
+        if 
+            return column identifier exists 
+            and extended cost is not negative
+        then convert extended to negative
+        """
+        ...
+    def _apply_extended_cost():
+        """
+        if ExtendedCost exists, do nothing
+        if Qty, UnitCost exists and Extended does not, Calculate Extended
+        
+        """
+        
+        ...
+
     # === PIPELINE ENTRYPOINT =============================================
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:

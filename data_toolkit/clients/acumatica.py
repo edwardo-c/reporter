@@ -34,21 +34,21 @@ class AcumaticaClient():
         s.auth = (u, p)
         self._acu = s
 
-    def odata(self, url: str, params: dict = {"$format": "json"}, df: bool = False) -> dict | pd.DataFrame:
-        """Return odata url as df or dict"""
-        fmt = params.get("$format", None)
-        j = "json"
-        if not fmt or fmt != j:
-            params["$format"] = j
-            logging.debug("json not set in odata params, auto added")
+    def odata(self, url: str, params: dict | None = None, df: bool = False):
+        params = params or {}
+        params.setdefault("$format", "json")
 
         resp = self._acu.get(url, params=params)
-        data = resp.json().get("value", [])
+
+        try:
+            payload = resp.json()
+        except ValueError:
+            logging.error(f"Non-JSON response from Acumatica: {resp.text[:200]}")
+            raise
+
+        data = payload.get("value", [])
 
         if not data:
             logging.warning(f"Odata url returned nothing! -- {url}")
 
-        if df:
-            return pd.json_normalize(data)
-        else:
-            return data
+        return pd.json_normalize(data) if df else data

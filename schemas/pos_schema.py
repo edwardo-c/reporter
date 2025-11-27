@@ -9,11 +9,13 @@ class PosSchemaMapping:
     Per-source mapping: canonical_field -> source column name or None.
     This matches cfg["CanonicalSchema"] from YAML.
     """
-    PiiPartNumber: Optional[str] = None
-    ShipQuantity: Optional[str] = None
-    ExtendedSales: Optional[str] = None
     SoldToName: Optional[str] = None
     SaleDate: Optional[str] = None
+    PiiPartNumber: Optional[str] = None
+    IsReturn: Optional[str] = None
+    SrcShipQuantity: Optional[str] = None
+    UnitCost: Optional[str] = None
+    SrcExtendedSales: Optional[str] = None
     BillToCustomerZip: Optional[str] = None
     BillToCustomerState: Optional[str] = None
     ShipToState: Optional[str] = None
@@ -31,9 +33,10 @@ POS_SCHEMA_DEF = CanonicalSchemaDef(
         "BillToCustomerState",
         "ShipToState",
         "ShipToZip",
-        "BuyerName"
+        "BuyerName",
+        "IsReturn",
     ),
-    float_fields=("ShipQuantity", "ExtendedSales"),
+    float_fields=("SrcShipQuantity", "SrcExtendedSales", "UnitCost"),
     date_fields=("SaleDate",),
     zipcode_fields=("ShipToZip", "BillToCustomerZip"),
 )

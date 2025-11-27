@@ -11,7 +11,9 @@ class CanonicalSchemaMapping:
     SoldToName: Optional[str] = None
     SaleDate: Optional[str] = None
     PiiPartNumber: Optional[str] = None
+    IsReturn: Optional[str] = None
     ShipQuantity: Optional[str] = None
+    UnitCost: Optional[str] = None
     ExtendedSales: Optional[str] = None
     BillToCustomerZip: Optional[str] = None
     BillToCustomerState: Optional[str] = None
