@@ -10,6 +10,7 @@ class CanonicalSchemaDef:
     float_fields: Tuple[str, ...]
     date_fields: Tuple[str, ...]
     zipcode_fields: Tuple[str, ...]
+    null_subset_fields: Tuple[str, ...]
 
 
 def build_cleaner_cfg(schema_def: CanonicalSchemaDef, mapping) -> CleanerCfg:
@@ -35,5 +36,6 @@ def build_cleaner_cfg(schema_def: CanonicalSchemaDef, mapping) -> CleanerCfg:
     cfg.float_cols = [canon for canon in schema_def.float_fields if canon in available]
     cfg.date_cols = [canon for canon in schema_def.date_fields if canon in available]
     cfg.zipcode_cols = [canon for canon in schema_def.zipcode_fields if canon in available]
+    cfg.null_subset = [canon for canon in schema_def.null_subset_fields if canon in available]
 
     return cfg

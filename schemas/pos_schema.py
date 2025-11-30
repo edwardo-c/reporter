@@ -13,9 +13,9 @@ class PosSchemaMapping:
     SaleDate: Optional[str] = None
     PiiPartNumber: Optional[str] = None
     IsReturn: Optional[str] = None
-    SrcShipQuantity: Optional[str] = None
+    ShipQuantity: Optional[str] = None
     UnitCost: Optional[str] = None
-    SrcExtendedSales: Optional[str] = None
+    ExtendedSales: Optional[str] = None
     BillToCustomerZip: Optional[str] = None
     BillToCustomerState: Optional[str] = None
     ShipToState: Optional[str] = None
@@ -36,8 +36,16 @@ POS_SCHEMA_DEF = CanonicalSchemaDef(
         "BuyerName",
         "IsReturn",
     ),
-    float_fields=("SrcShipQuantity", "SrcExtendedSales", "UnitCost"),
+    float_fields=("ShipQuantity", "ExtendedSales", "UnitCost"),
     date_fields=("SaleDate",),
     zipcode_fields=("ShipToZip", "BillToCustomerZip"),
+    null_subset_fields=(
+        "SoldToName", 
+        "PiiPartNumber", 
+        "BillToCustomerZip", 
+        "BillToCustomerState", 
+        "ShipToState",
+        "ShipToZip"
+    ),
 )
 

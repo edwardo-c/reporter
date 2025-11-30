@@ -10,9 +10,9 @@ files_cfg:
       SaleDate: ~
       PiiPartNumber: "VENDOR ITEM ."
       IsReturn: ~
-      SrcShipQuantity: "EXTND QTY"
+      ShipQuantity: "EXTND QTY"
       UnitCost: ~
-      SrcExtendedSales: "ENTND AVG COST"
+      ExtendedSales: "ENTND AVG COST"
       BillToCustomerZip: "BILLING ZIP"
       BillToCustomerState: ~
       ShipToState: "SHIP TO STATE"
@@ -32,9 +32,9 @@ files_cfg:
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "VENDOR PART NUMBER"
       IsReturn: ~
-      SrcShipQuantity: "UNITS"
+      ShipQuantity: "UNITS"
       UnitCost: ~
-      SrcExtendedSales: "COST OF SALES"
+      ExtendedSales: "COST OF SALES"
       BillToCustomerZip: ~
       BillToCustomerState: ~
       ShipToState: ~
@@ -51,9 +51,9 @@ files_cfg:
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "VENDOR SKU"
       IsReturn: ~
-      SrcShipQuantity: "QTY"
+      ShipQuantity: "QTY"
       UnitCost: "STD COST"
-      SrcExtendedSales: ~
+      ExtendedSales: ~
       BillToCustomerZip: ~
       BillToCustomerState: ~
       ShipToState: ~
@@ -72,9 +72,9 @@ files_cfg:
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "MFG PART"
       IsReturn: ~
-      SrcShipQuantity: "QUANTITY SHIPPED"
+      ShipQuantity: "QUANTITY SHIPPED"
       UnitCost: "UNIT COST"
-      SrcExtendedSales: "EXTENDED COST"
+      ExtendedSales: "EXTENDED COST"
       BillToCustomerZip: "CUSTOMER"
       BillToCustomerState: "CUSTOMER STATE"
       ShipToState: "END USER SHIP TO STATE"
@@ -83,10 +83,30 @@ files_cfg:
     return_id: ~
   
   - file_id: "bluestar"
-    reader: "multiple"
+    reader: "standard"
     reader_cfg:
-      - sheet_name: "Bluestar CA"
-      - sheet_name: "Bluestar US"
+      sheet_name: "Bluestar CA"
+    src_id: "BLUESTAR CA"
+    src_col_name: "Customer"
+    CanonicalSchema:
+      SoldToName: "Cust Name"
+      SaleDate: "Invoice Date"
+      PiiPartNumber: "Item Number"
+      IsReturn: ~
+      ShipQuantity: "Quantity Invoiced"
+      UnitCost: "Std Unit Cost"
+      ExtendedSales: "Extend Cost"
+      BillToCustomerZip: "Bill To Postal Code"
+      BillToCustomerState: "Bill To State"
+      ShipToState: "Ship To State"
+      ShipToZip: "Ship To Postal Code"
+      BuyerName: ~
+    return_id: ~
+
+  - file_id: "bluestar"
+    reader: "standard"
+    reader_cfg:
+      sheet_name: "Bluestar US"
     src_id: "BLUESTAR"
     src_col_name: "Customer"
     CanonicalSchema:
@@ -94,9 +114,9 @@ files_cfg:
       SaleDate: "Invoice Date"
       PiiPartNumber: "Item Number"
       IsReturn: ~
-      SrcShipQuantity: "Quantity Invoiced"
+      ShipQuantity: "Quantity Invoiced"
       UnitCost: "Std Unit Cost"
-      SrcExtendedSales: "Extend Cost"
+      ExtendedSales: "Extend Cost"
       BillToCustomerZip: "Bill To Postal Code"
       BillToCustomerState: "Bill To State"
       ShipToState: "Ship To State"
@@ -113,9 +133,9 @@ files_cfg:
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "PEERLESS PART NO"
       IsReturn: "QUANTITY TYPE"
-      SrcShipQuantity: "QUANTITY"
+      ShipQuantity: "QUANTITY"
       UnitCost: "ITEM PRICE"
-      SrcExtendedSales: "LINE ITEM TOTAL"
+      ExtendedSales: "LINE ITEM TOTAL"
       BillToCustomerZip: "BILL TO ZIPCODE"
       BillToCustomerState: "BILL TO STATE"
       ShipToState: "SHIP TO STATE"
@@ -132,9 +152,9 @@ files_cfg:
       SaleDate: "Invoice date"
       PiiPartNumber: "Vendor Part Nbr"
       IsReturn: "Order Type"
-      SrcShipQuantity: "Qty Shipped"
+      ShipQuantity: "Qty Shipped"
       UnitCost: "Unit Cost"
-      SrcExtendedSales: "Extended Cost"
+      ExtendedSales: "Extended Cost"
       BillToCustomerZip: "Reseller Zip"
       BillToCustomerState: "Reseller State"
       ShipToState: "Ship To State"
@@ -151,15 +171,15 @@ files_cfg:
       SaleDate: "ship_date"
       PiiPartNumber: "vend_part_no"
       IsReturn: "order_type"
-      SrcShipQuantity: "Ship_Qty"
+      ShipQuantity: "Ship_Qty"
       UnitCost: "Base_Cost"
-      SrcExtendedSales: "Extend_Base_Cost"
+      ExtendedSales: "Extend_Base_Cost"
       BillToCustomerZip: "bill_to_cust_zip"
       BillToCustomerState: "bill_to_cust_state"
       ShipToState: "ship_to_state"
       ShipToZip: "ship_to_zip"
       BuyerName: ~
-    return_id: "16"
+    return_id: ["16", "14"]
   
   - file_id: "td synnex us"
     reader: "invalid"
@@ -170,15 +190,15 @@ files_cfg:
       SaleDate: "ship_date"
       PiiPartNumber: "vend_part_no"
       IsReturn: "order_type"
-      SrcShipQuantity: "Ship_Qty"
+      ShipQuantity: "Ship_Qty"
       UnitCost: "Base_Cost"
-      SrcExtendedSales: "Extend_Base_Cost"
+      ExtendedSales: "Extend_Base_Cost"
       BillToCustomerZip: "bill_to_cust_zip"
       BillToCustomerState: "bill_to_cust_state"
       ShipToState: "ship_to_state"
       ShipToZip: "ship_to_zip"
       BuyerName: ~
-    return_id: "16"
+    return_id: ["16", "14"]
 
 enricher:
 

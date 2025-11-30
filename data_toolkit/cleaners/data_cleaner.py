@@ -12,6 +12,7 @@ class CleanerCfg:
     float_cols: list[str] = field(default_factory=list)
     date_cols: list[str] = field(default_factory=list)
     zipcode_cols: list[str] = field(default_factory=list)
+    null_subset: list[str] = field(default_factory=list)
     rename_map: dict[str, str] = field(default_factory=dict)
     src_id: str | None = field(default=None)
     src_col_name: str | None = field(default=None)
@@ -28,6 +29,7 @@ class DataCleaner():
         float_cols: list[str] | None = None,
         date_cols: list[str] | None = None,
         zipcode_cols: list[str] | None = None,
+        null_subset: list[str] | None = None,
         rename_map: dict[str, str] | None = None,
         src_id: str | None = None,
         src_col_name: str | None = None,
@@ -41,6 +43,7 @@ class DataCleaner():
                 float_cols = float_cols or [],
                 date_cols = date_cols or [],
                 zipcode_cols = zipcode_cols or {},
+                null_subset = null_subset or [],
                 rename_map = rename_map or {},
                 src_id = src_id or None,
                 src_col_name = src_col_name or "src_id",
@@ -90,7 +93,6 @@ class DataCleaner():
 
         return df.assign(**assigns)
 
-
     def _columns_exist(self, existing_cols: set) -> None:
         cols_to_check_groups = (
             self.cfg.str_cols,
@@ -110,8 +112,6 @@ class DataCleaner():
             ]
             if missing:
                 raise KeyError(f"column(s): {missing} missing from df - {existing_cols}")
-
-
 
     def _column_rename(self, df: pd.DataFrame) -> pd.DataFrame:
         if self.cfg.rename_map:    
@@ -133,10 +133,17 @@ class DataCleaner():
             df = df.assign(**{self.cfg.src_col_name: self.cfg.src_id})
         return df
 
+    def _drop_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
+        
+        
+        if self.cfg.null_subset is not None:
+            df = df.dropna(subset=self.cfg.null_subset, how="all")
+        return df
 
     def clean(self, df: pd.DataFrame) -> pd.DataFrame:
         
         df = self._column_rename(df)
+        df = self._drop_nulls(df)
         self._columns_exist(set(df.columns))
         df = self._coerce_data_types(df)
         df = self.add_postal(df)
