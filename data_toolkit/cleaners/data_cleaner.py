@@ -129,19 +129,16 @@ class DataCleaner():
         return df
 
     def _add_src(self, df: pd.DataFrame) -> pd.DataFrame:
-        if self.cfg.src_id is not None:
+        if self.cfg.src_id:
             df = df.assign(**{self.cfg.src_col_name: self.cfg.src_id})
         return df
 
     def _drop_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
-        
-        
-        if self.cfg.null_subset is not None:
+        if self.cfg.null_subset:
             df = df.dropna(subset=self.cfg.null_subset, how="all")
         return df
 
     def clean(self, df: pd.DataFrame) -> pd.DataFrame:
-        
         df = self._column_rename(df)
         df = self._drop_nulls(df)
         self._columns_exist(set(df.columns))
