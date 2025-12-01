@@ -14,26 +14,11 @@ from pipelines.pos_parser.readers.factory import get_reader
 from schemas.pos_schema import PosSchemaMapping, POS_SCHEMA_DEF
 from utils.yaml_loader import load_yaml
 
-
-
-
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 """
 SMELLS:
 what if a sheet name or index changes?
-"""
-
-
-"""
-Read the files
-clean the files
-apply sales rules 
-    (
-        convert returns to negative, 
-        calculate totals
-    )
-
 """
 
 PERIOD_DATE = "10/31/2025"
@@ -53,7 +38,7 @@ def main():
 
         file_id = file_cfg["file_id"].casefold()
 
-        logging.debug(f"parsing {file_id}")
+        logging.debug(f"parsing {file_cfg['src_id']}")
 
         path = next((file for file in files if file_id in file.stem.casefold()), None)
 
@@ -69,10 +54,6 @@ def main():
             df = reader.df(file_path=path, cfg=reader_cfg)           
 
         # ================ Data Cleaning =================
-        
-        if file_id == "td synnex us":
-            breakpoint() 
-
 
         schema_mapping = PosSchemaMapping(**file_cfg["CanonicalSchema"])
         cleaner_cfg = build_cleaner_cfg(POS_SCHEMA_DEF, schema_mapping)
@@ -80,9 +61,10 @@ def main():
         cleaner_cfg.src_col_name = file_cfg["src_col_name"]
         cleaner_cfg.col_order = [cleaner_cfg.src_col_name] + cleaner_cfg.col_order
 
-        cleaner = DataCleaner(cleaner_cfg)
+        df_clean = DataCleaner(cleaner_cfg).clean(df)
 
-        df_clean = cleaner.clean(df)
+        if file_id == 'dhd':
+            breakpoint()
 
         df_norm = normalize_sales(df_clean, return_id=file_cfg["return_id"])
 

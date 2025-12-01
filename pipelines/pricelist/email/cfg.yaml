@@ -2,6 +2,16 @@ attachments:
     "Peerless-AV": ${PAV_FINISHED_LISTS}
     "Neptune": ${NEP_FINISHED_LISTS}
 
+acumatica:
+    auth:
+      username: ${ACU_USERNAME}
+      password: ${ACU_PW}
+    customers:
+      url: ${CUSTOMERS_FEED}
+      params: 
+        $select: "CustomerID,CustomerName"
+        $format: "json"
+
 "salesforce":
     "task_params":
         "Subject": "TEST - Hello From Python!"
@@ -25,8 +35,8 @@ attachments:
                     AND ACU_Customer_ID__c != NULL
             "clean_plan":
                 str_cols: 
-                    - "ACU_CUSTOMER_ID__c" 
-                    - "Price_List_Delivery_to_Salesperson__r.Email"
+                    - "ACU Customer ID" 
+                    - "Email"
                     - "Id"
                 rename_map: 
                     "ACU_CUSTOMER_ID__c": "ACU Customer ID"
@@ -49,7 +59,7 @@ attachments:
                 str_cols: 
                     - "Id" 
                     - "Email"
-                    - "Account.ACU_CUSTOMER_ID__c"
+                    - "ACU Customer ID"
                 rename_map:
                     "Account.ACU_CUSTOMER_ID__c": "ACU Customer ID"
 

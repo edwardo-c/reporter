@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import logging
 import time
 from pathlib import Path
+import re
 
 # third party imports
 import pandas as pd
@@ -15,10 +16,10 @@ from utils.yaml_loader import load_yaml
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
 from data_toolkit.clients.salesforce import SFClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
-from pipelines.pricelist.email.bodies import correction_email
+from pipelines.pricelist.email.bodies import external_email, internal_email
 from pipelines.pricelist.email.pricelist_email import BaseEmail, OutlookSender
 from data_toolkit.clients.outlook import OLClient
-from utils.regex import extract_company_name
+from data_toolkit.clients.acumatica import AcumaticaClient
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format= "%(message)s")
@@ -27,7 +28,6 @@ PROD = True
 
 def main():
 
-    start_time = time.time()
     logger.info("Starting Emailer")
 
     load_dotenv(PRICE_LIST_ENV)
@@ -39,7 +39,7 @@ def main():
     # =========== External Resources ==============
 
     pav_attachments = id_to_path_map(Path(cfg["attachments"]["Peerless-AV"]))
-    # nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
+    nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
 
     external_contacts_df = sf.query(
         cfg["salesforce"]["data"]["external"]["soql"]
@@ -52,82 +52,88 @@ def main():
     external_contacts_cache = extract_contacts_from_df(cleaned_external_contacts)
 
     # ========= Internal Resources ============
-    # internal_contacts_df = sf.query(
-    #     cfg["salesforce"]["data"]["internal"]["soql"]
-    # )
 
-    # cleaned_internal_contacts = DataCleaner(
-    #     **cfg["salesforce"]["data"]["internal"]["clean_plan"]
-    # ).clean(internal_contacts_df)
+    internal_contacts_df = sf.query(
+        cfg["salesforce"]["data"]["internal"]["soql"]
+    )
 
-    # internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
+    cleaned_internal_contacts = DataCleaner(
+        **cfg["salesforce"]["data"]["internal"]["clean_plan"]
+    ).clean(internal_contacts_df)
+
+    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
+
+    customer_names = AcumaticaClient(
+        **cfg["acumatica"]["auth"]
+        ).odata(**cfg["acumatica"]["customers"], df=True)
+
+    customer_names.columns = ["key", "value"]
+
+    # Drop empty key rows (avoids {nan: nan})
+    customer_names = customer_names.dropna(subset=["key"])
+    customer_names = customer_names.set_index("key")["value"].to_dict()
+
+    # used for placing customer name in internal emails
+    cust_name_map = {k.strip(): v.strip().title() for k, v in customer_names.items()}
+
+    # ============== Build Emails ========================
 
     with OLClient() as ol_app:
         pav_emails = [
             BaseEmail(
                 recipients=recipients,
-                subject="Peerless-AV Monthly Price List - Correction",
-                body=correction_email(),
+                subject=f"Peerless-AV Monthly Price List - {acct}",
+                body=external_email("Peerless-AV"),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()
             if (attachments:= pav_attachments.get(acct, None))
         ]
         
-        # nep_emails = [
-        #     BaseEmail(
-        #         recipients=recipients,
-        #         subject="Neptune Monthly Price List",
-        #         body=correction_email("Neptune"),
-        #         attachments=attachments
-        #     )
-        #     for acct, recipients in external_contacts_cache.items()
-        #     if (attachments:= nep_attachments.get(acct, None))
-        # ]
+        nep_emails = [
+            BaseEmail(
+                recipients=recipients,
+                subject=f"Neptune Monthly Price List - {acct}",
+                body=external_email("Neptune"),
+                attachments=attachments
+            )
+            for acct, recipients in external_contacts_cache.items()
+            if (attachments:= nep_attachments.get(acct, None))
+        ]
 
-        # internal_pav_emails = [
-        #     BaseEmail(
-        #         recipients=recipient,
-        #         subject=f"Montly Price List - Not Distributed {...}",
-        #         body="",
-        #     )
-        #     for acct, recipient in internal_contacts_cache.items()
-        #     if pav_attachments.get(acct, None)
-        # ]
+        internal_pav_emails = [
+            BaseEmail(
+                recipients=recipient,
+                subject=f"Peerless-AV Monthly Price List - Not Distributed: {acct} - {name}",
+                body=internal_email(name),
+            )
+            for acct, recipient in internal_contacts_cache.items()
+            if (name:= cust_name_map.get(acct, None))
+        ]
 
-        # internal_nep_emails = [
-        #     BaseEmail(
-        #         recipients=recipient,
-        #         subject=f"Monthly Price List: {name}",
-        #         body=""
-        #     )
-        #     for acct, recipient in internal_contacts_cache.items()
-        #     if (name:= nep_attachments.get(acct, None))
-        # ]
+        internal_nep_emails = [
+            BaseEmail(
+                recipients=recipient,
+                subject=f"Neptune Monthly Price List - Not Distributed: {acct} - {name}",
+                body=internal_email(name)
+            )
+            for acct, recipient in internal_contacts_cache.items()
+            if (name:= cust_name_map.get(acct, None))
+        ]
 
-        for e in pav_emails:
+        # ============ HOT LOOP! =======================
+
+        for e in [*pav_emails, *nep_emails, *internal_pav_emails, *internal_nep_emails]:
             OutlookSender(
                 ol_app=ol_app,
                 sent_on_behalf="sales@peerless-av.com",
                 prod=PROD
             ).send(e)
 
-    
-    end_time = time.time()
-
-    # logger.info(
-    #     f"\nLists not sent due to Price List Delivery To Salesperson \
-    #     \nPAV: {internal_pav_email_count} \
-    #     \nNeptune: {internal_nep_email_count} \
-    #     \nTotal Not Sent: {internal_pav_email_count + internal_nep_email_count}"
-    # )
-
-    logger.info(f"Emailer Complete, elapsed time: {end_time - start_time}")
-
-
-
-
-
+        logger.info(f"\nPAV External Emails: {len(pav_emails)}")
+        logger.info(f"\nNEP External Emails: {len(nep_emails)}")
+        logger.info(f"\nPAV Internal Emails: {len(internal_pav_emails)}")
+        logger.info(f"\nNEP Internal Emails: {len(internal_nep_emails)}")
 
 # ========== bad design due to time constraints, refactor after run ==========
 

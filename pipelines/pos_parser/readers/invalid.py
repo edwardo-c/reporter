@@ -10,12 +10,19 @@ import pandas as pd
 class InvalidExt:
     def __init__(self):
         self.xl = None
+        self._owns_xl: bool
         self.temp_dir: Path | None = None
 
     def __enter__(self):
-        xl = win32.gencache.EnsureDispatch("Excel.Application")
+        try:
+            xl = win32.GetActiveObject("Excel.Application")
+            self._owns_xl = False
+        except:
+            xl = win32.gencache.EnsureDispatch("Excel.Application")
+            self._owns_xl = False
+
         xl.DisplayAlerts = False
-        xl.Visible = False
+        xl.Visible = True
         xl.AutomationSecurity = 3  # force disable macros
         self.xl = xl
 
@@ -23,7 +30,7 @@ class InvalidExt:
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        if self.xl is not None:
+        if self.xl is not None and self._owns_xl:
             self.xl.Quit()
             self.xl = None
 

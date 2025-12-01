@@ -12,6 +12,8 @@ def normalize_sales(
 ) -> pd.DataFrame:
     df = df.copy()
 
+    breakpoint()
+
     if isinstance(return_id, str):
         return_id = [return_id]
 
