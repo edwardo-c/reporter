@@ -196,7 +196,9 @@ class Enricher:
         Simple 1:1 mapping: if df[left] == key → mapping[key] into df[out],
         but only where df[out] is still NaN (earlier rules win).
         """
-        mapped = df[left].map(mapping)
+        normalized_map = {k.casefold(): v for k, v in mapping.items()}
+
+        mapped = df[left].str.casefold().map(normalized_map)
         mask = df[out].isna() & mapped.notna()
         df.loc[mask, out] = mapped[mask]
 
@@ -231,24 +233,6 @@ class Enricher:
 
             mask = df[out].isna() & candidates
             df.loc[mask, out] = rep
-
-    # === HELPERS: CALCULATED COLUMNS =====================================
-    def _apply_return_calc(self, df: pd.DataFrame):
-        """
-        if 
-            return column identifier exists 
-            and extended cost is not negative
-        then convert extended to negative
-        """
-        ...
-    def _apply_extended_cost():
-        """
-        if ExtendedCost exists, do nothing
-        if Qty, UnitCost exists and Extended does not, Calculate Extended
-        
-        """
-        
-        ...
 
     # === PIPELINE ENTRYPOINT =============================================
 

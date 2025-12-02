@@ -12,8 +12,6 @@ def normalize_sales(
 ) -> pd.DataFrame:
     df = df.copy()
 
-    breakpoint()
-
     if isinstance(return_id, str):
         return_id = [return_id]
 
@@ -25,7 +23,7 @@ def normalize_sales(
         and return_id is not None
         and is_return_col in df.columns
     ):
-        mask_return = df[is_return_col] == return_id
+        mask_return = df[is_return_col].isin(return_id)
         qty = qty.abs()
         qty.loc[mask_return] *= -1
 

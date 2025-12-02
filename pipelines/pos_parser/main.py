@@ -14,7 +14,7 @@ from pipelines.pos_parser.readers.factory import get_reader
 from schemas.pos_schema import PosSchemaMapping, POS_SCHEMA_DEF
 from utils.yaml_loader import load_yaml
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 """
 SMELLS:
@@ -63,9 +63,6 @@ def main():
 
         df_clean = DataCleaner(cleaner_cfg).clean(df)
 
-        if file_id == 'dhd':
-            breakpoint()
-
         df_norm = normalize_sales(df_clean, return_id=file_cfg["return_id"])
 
         dfs.append(df_norm)
@@ -105,16 +102,4 @@ if __name__ == "__main__":
 phase two:
     description if available?
     cross references
-"""
-
-"""
-Bluestar and bluestar canada need a different identifier
-this works because I needed to split column selection anyway
-
-petra needs to be a calculation for extended total
-
-dhd needs to redo for returns (convert to negative)
-
-thinking of converting the file parsing into a class in data toolkit
-
 """
