@@ -14,7 +14,7 @@ import pandas as pd
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
 from utils.yaml_loader import load_yaml
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
-from data_toolkit.clients.salesforce import SFClient
+from data_toolkit.clients.deprecated_salesforce import SFClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
 from pipelines.pricelist.email.bodies import external_email, internal_email
 from pipelines.pricelist.email.pricelist_email import BaseEmail, OutlookSender

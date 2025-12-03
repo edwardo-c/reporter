@@ -1,52 +1,46 @@
-"""simple_salesforce wrapper to validate authentication early (fail-fast)"""
-
-from dataclasses import dataclass, field
-from typing import Optional
 from simple_salesforce import Salesforce
 import pandas as pd
 
-@dataclass
 class SFClient:
-    username: str
-    password: str = field(repr=False)
-    security_token: str = field(repr=False)
-    domain: str = "login"
-    validate_at_init: bool = True
+    def __init__(
+            self, 
+            username: str | None = None,
+            password: str | None = None,
+            security_token: str | None = None,
+            sf: Salesforce | None = None
+        ):
+        
+        self._login_args = (username, password, security_token)
+        self._sf = sf
 
-    sf: Optional[Salesforce] = field(default=None, init=False, repr=False)
+        if self._sf is None:
+            self._connect()
+        else:
+            self._sf = sf
 
-    def __post_init__(self):
-        if self.validate_at_init:
-            self.connect()
+    def _connect(self):
+        if self._sf is None:
+            u, p, t = self._login_args
+            self._sf = Salesforce(username=u, password=p, security_token=t)
+            self._login_args = (None, None, None)
 
-    def connect(self) -> None:
-        try:
-            self.sf = Salesforce(
-                username=self.username,
-                password=self.password,
-                security_token=self.security_token,
-                domain=self.domain
-            )
-        except Exception as exc:
-            raise ConnectionError(
-                "Unable to connect to Salesforce — check credentials, token, domain, or IP allowlist."
-            ) from exc
+    def __enter__(self):
+        self._connect()
+        return self
 
-    def _ensure_connected(self) -> Salesforce:
-        if self.sf is None:
-            self.connect()
-        return self.sf
+    def __exit__(self, exc_type, exc, tb):
+        self._sf = None
 
-    def query(self, soql: str) -> pd.DataFrame:
-        sf = self._ensure_connected()
-        result = sf.query_all(soql)
-        records = result.get("records", [])
-        if not records:
-            return pd.DataFrame()
+    def insert_record(self, obj_name: str, data: dict):
+        return getattr(self._sf, obj_name).create(data)
+    
+    def delete_record(self, obj_name: str, id: str):
+        return getattr(self._sf, obj_name).delete(id)
 
-        df = pd.json_normalize(records)
-
-        return df.drop(columns=[c for c in list(df.columns) if 'attributes.' in c], errors="ignore")
-
-    def log_task(self, params: dict):
-        result = self.sf.Task.create(params)
+    def query(self, soql: str, df: bool = True) -> pd.DataFrame | dict:
+        res = self._sf.query_all(soql)
+        records = res["records"]
+        if df:
+            return pd.DataFrame(records).drop(columns=["attributes"], errors="ignore")
+        else:
+            return records

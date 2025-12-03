@@ -2,6 +2,57 @@ from dataclasses import dataclass, field
 
 from salesforce.ids.registry import price_grp_id
 
+def bulk_arrange(
+        parts_to_organize: set[str], 
+        data_dict: dict[str, dict], 
+        *,
+        category_key: str = "Category",
+        status_key: str = "ItemStatus",
+        pmplcm_key: str = "ProductLifeCycleManagement",
+        map_price_key: str = "USDMAPPrice",
+        description_key: str = "Description",
+        price_group_key: str = "PriceGroup"
+        ) -> list:
+
+    """organizes parts as NewPart (dataclass) using data_dict"""
+
+    auth_req_options = set((None, 0, "0", ""))
+
+    new_parts = []
+
+    for part in parts_to_organize:
+
+        part_data_dict = data_dict[part]
+
+        if part_data_dict:
+            
+            
+            name = part
+            category = part_data_dict.get(category_key, None)
+            status = part_data_dict.get(status_key, None)
+            pmplcm = part_data_dict.get(pmplcm_key, None)
+            map_price = part_data_dict.get(map_price_key, None)
+            auth_req = (False if map_price in auth_req_options else True)
+            desc = part_data_dict.get(description_key, None)
+            pg = part_data_dict.get(price_group_key, None)
+
+            new_parts.append(
+                NewPart(
+                    name=name,
+                    category=category,
+                    acu_status=status,
+                    acu_pmplcm=pmplcm,
+                    acu_auth_required=auth_req,
+                    description=desc,
+                    price_group=pg
+            ))
+
+        else:
+            # intentional skip
+            continue
+    
+    return new_parts
+
 @dataclass
 class NewPart:
     """
