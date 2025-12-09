@@ -70,18 +70,23 @@ def main():
     stacked = pd.concat(dfs)
 
     # ================ Enrichment =================
-
     # Period date, credits, drop columns, category
-    raw_cats = AcumaticaClient(
-        username = enricher_cfg["categories"]["auth"]["username"], 
-        password = enricher_cfg["categories"]["auth"]["password"]
-        ).odata(
-            enricher_cfg["categories"]["url"], 
-            params=enricher_cfg["categories"]["params"]
+
+    client = AcumaticaClient(**enricher_cfg["categories"]["auth"])
+
+    raw_cats = client.odata(
+        url=enricher_cfg["categories"]["url"], 
+        params=enricher_cfg["categories"]["params"]
     )
 
-    clean_cats = {r["InventoryID"] : r["Category"] for r in raw_cats}
+    clean_cats = {r["InventoryID"].strip() : r["Category"].strip() for r in raw_cats}
+
+    additional_cats_df = pd.read_csv(enricher_cfg["categories"]["additional"]["file_path"])
     
+    add_cats = additional_cats_df.set_index("InventoryID").to_dict()['Category']
+
+    clean_cats.update(add_cats)
+
     category_cfg = enricher_cfg["categories"]["cfg"]
 
     category_cfg["mapping"] = clean_cats

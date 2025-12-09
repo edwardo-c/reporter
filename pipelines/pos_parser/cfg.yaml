@@ -86,7 +86,7 @@ files_cfg:
     reader: "standard"
     reader_cfg:
       sheet_name: "Bluestar CA"
-    src_id: "BLUESTAR CA"
+    src_id: "BLUESTAR CN"
     src_col_name: "Customer"
     CanonicalSchema:
       SoldToName: "Cust Name"
@@ -215,6 +215,9 @@ enricher:
     cfg:
       "left": "PiiPartNumber"
       "right": "PiiCategory"
+    additional:
+      file_path: ${ADDITIONAL_CATEGORIES}
+      
 
   credit_rules:
     
