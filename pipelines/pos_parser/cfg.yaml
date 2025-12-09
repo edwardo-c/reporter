@@ -75,7 +75,7 @@ files_cfg:
       ShipQuantity: "QUANTITY SHIPPED"
       UnitCost: "UNIT COST"
       ExtendedSales: "EXTENDED COST"
-      BillToCustomerZip: "CUSTOMER"
+      BillToCustomerZip: "CUSTOMER ZIP"
       BillToCustomerState: "CUSTOMER STATE"
       ShipToState: "END USER SHIP TO STATE"
       ShipToZip: "END USER SHIP TO ZIP"
@@ -145,6 +145,8 @@ files_cfg:
       
   - file_id: "ingram micro"
     reader: "standard"
+    reader_cfg:
+      dtype: {"Reseller Zip": 'str', "Ship to Zip": 'str'}
     src_id: "INGRAM"
     src_col_name: "Customer"
     CanonicalSchema:
@@ -245,7 +247,7 @@ enricher:
         path: ${STATE_ASSIGNMENTS}
         sheet: "As of 1-1-25"
         usecols: [1, 3, 4, 7]
-        skiprows: 1
+        skiprows: 2
     
     - kind: "mapping"
       left: "BillToCustomerState"
@@ -262,7 +264,7 @@ enricher:
         path: ${STATE_ASSIGNMENTS}
         sheet: "As of 1-1-25"
         usecols: [1, 3, 4, 7]
-        skiprows: 1
+        skiprows: 2
     
     - kind: "mapping"
       left: "ShipToState"

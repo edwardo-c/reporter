@@ -28,6 +28,7 @@ class StandardAdapter:
         if cfg is not None:
             sheet_name = cfg.get("sheet_name", 0)
             header = cfg.get("header", 0)
-            return reader(str(file_path), sheet_name=sheet_name, header=header)
+            dtype = cfg.get("dtype", None)
+            return reader(str(file_path), sheet_name=sheet_name, header=header, dtype=dtype)
         else:
             return reader(str(file_path))

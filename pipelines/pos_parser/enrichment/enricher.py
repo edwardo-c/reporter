@@ -217,6 +217,7 @@ class Enricher:
 
         Only fills rows where df[out] is still NaN (earlier rules win).
         """
+
         # ensure Zip is numeric
         df[zip_col] = pd.to_numeric(df[zip_col], errors="coerce")
 
@@ -233,6 +234,8 @@ class Enricher:
 
             mask = df[out].isna() & candidates
             df.loc[mask, out] = rep
+        
+        return df
 
     # === PIPELINE ENTRYPOINT =============================================
 

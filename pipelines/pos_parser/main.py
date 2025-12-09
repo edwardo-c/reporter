@@ -51,7 +51,7 @@ def main():
         if reader_cfg is None:
             df = reader.df(path)
         else:
-            df = reader.df(file_path=path, cfg=reader_cfg)           
+            df = reader.df(file_path=path, cfg=reader_cfg)
 
         # ================ Data Cleaning =================
 
