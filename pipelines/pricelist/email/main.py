@@ -14,17 +14,19 @@ import pandas as pd
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
 from utils.yaml_loader import load_yaml
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
-from data_toolkit.clients.deprecated_salesforce import SFClient
+from data_toolkit.clients.salesforce import SFClient
 from data_toolkit.cleaners.data_cleaner import DataCleaner
-from pipelines.pricelist.email.bodies import external_email, internal_email
+from pipelines.pricelist.email.bodies import external_email, internal_email, test_span_elements
 from pipelines.pricelist.email.pricelist_email import BaseEmail, OutlookSender
 from data_toolkit.clients.outlook import OLClient
 from data_toolkit.clients.acumatica import AcumaticaClient
 
+from collections import defaultdict
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format= "%(message)s")
 
-PROD = True
+PROD = False
 
 def main():
 
@@ -34,22 +36,25 @@ def main():
 
     cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
-    sf = SFClient(**cfg["salesforce"]["auth"], validate_at_init=True)
+    sf = SFClient(**cfg["salesforce"]["auth"])
 
     # =========== External Resources ==============
 
     pav_attachments = id_to_path_map(Path(cfg["attachments"]["Peerless-AV"]))
     nep_attachments = id_to_path_map(Path(cfg["attachments"]["Neptune"]))
 
-    external_contacts_df = sf.query(
-        cfg["salesforce"]["data"]["external"]["soql"]
-    )
+    raw_external_contacts = sf.query(cfg["salesforce"]["data"]["external"]["soql"], df=False)
 
-    cleaned_external_contacts = DataCleaner(
-        **cfg["salesforce"]["data"]["external"]["clean_plan"]
-    ).clean(external_contacts_df)
+    external_contacts_cache = defaultdict(list)
 
-    external_contacts_cache = extract_contacts_from_df(cleaned_external_contacts)
+    for r in raw_external_contacts:
+        external_contacts_cache[r['Account']['ACU_CUSTOMER_ID__c'].strip()].append(r['Email'].strip())
+
+    # cleaned_external_contacts = DataCleaner(
+    #     **cfg["salesforce"]["data"]["external"]["clean_plan"]
+    # ).clean(external_contacts_df)
+
+    # external_contacts_cache = extract_contacts_from_df(cleaned_external_contacts)
 
     # ========= Internal Resources ============
 
@@ -83,7 +88,7 @@ def main():
             BaseEmail(
                 recipients=recipients,
                 subject=f"Peerless-AV Monthly Price List - {acct}",
-                body=external_email("Peerless-AV"),
+                body=test_span_elements(),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()
@@ -123,7 +128,11 @@ def main():
 
         # ============ HOT LOOP! =======================
 
-        for e in [*pav_emails, *nep_emails, *internal_pav_emails, *internal_nep_emails]:
+        emails = [*pav_emails, *nep_emails, *internal_pav_emails, *internal_nep_emails]
+
+        breakpoint()
+
+        for e in emails: #, *nep_emails, *internal_pav_emails, *internal_nep_emails]:
             OutlookSender(
                 ol_app=ol_app,
                 sent_on_behalf="sales@peerless-av.com",

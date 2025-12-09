@@ -68,7 +68,8 @@ class OutlookSender:
             mail.Attachments.Add(path)
 
         if self._prod:
-            mail.Send()
+            # mail.Send()
+            ...
         else:
             mail.Display()  # preview in dev
             breakpoint()

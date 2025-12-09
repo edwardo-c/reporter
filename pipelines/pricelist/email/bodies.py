@@ -21,3 +21,11 @@ def internal_email(id: str) -> str:
         f"</body></html>"
     )
 
+def test_span_elements():
+    return (
+        f"<html><body>"
+        f"<p><span style='background-color: yellow;'>highlight this yellow </span></p>"
+        f"<p><span style='background-color: green;'>highlight this green </span></p>"
+        f"<p><span style='background-color: red;'>highlight this red </span></p>"
+        f"</body></html>"
+    )
