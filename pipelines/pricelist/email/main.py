@@ -50,23 +50,23 @@ def main():
     for r in raw_external_contacts:
         external_contacts_cache[r['Account']['ACU_CUSTOMER_ID__c'].strip()].append(r['Email'].strip())
 
-    # cleaned_external_contacts = DataCleaner(
-    #     **cfg["salesforce"]["data"]["external"]["clean_plan"]
-    # ).clean(external_contacts_df)
-
-    # external_contacts_cache = extract_contacts_from_df(cleaned_external_contacts)
-
     # ========= Internal Resources ============
 
-    internal_contacts_df = sf.query(
-        cfg["salesforce"]["data"]["internal"]["soql"]
-    )
+    raw_internal_contacts = sf.query(cfg["salesforce"]["data"]["internal"]["soql"], df=False)
 
-    cleaned_internal_contacts = DataCleaner(
-        **cfg["salesforce"]["data"]["internal"]["clean_plan"]
-    ).clean(internal_contacts_df)
+    internal_contacts_cache = defaultdict(list)
 
-    internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
+    for r in raw_internal_contacts:
+        customer_id = r["ACU_CUSTOMER_ID__c"].strip()
+        email = r["Price_List_Delivery_to_Salesperson__r"]["Email"].strip()
+
+        internal_contacts_cache[customer_id].append(email)
+
+    # cleaned_internal_contacts = DataCleaner(
+    #     **cfg["salesforce"]["data"]["internal"]["clean_plan"]
+    # ).clean(internal_contacts_df)
+
+    # internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
 
     customer_names = AcumaticaClient(
         **cfg["acumatica"]["auth"]

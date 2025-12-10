@@ -64,7 +64,7 @@ class DataCleaner():
         
         if self.cfg.date_cols:
             for date_col in self.cfg.date_cols:
-                assign[date_col] = pd.to_datetime(df[date_col], errors="coerce", format="%Y-%m-%d")
+                assign[date_col] = pd.to_datetime(df[date_col], errors="coerce", format=None)
 
         return df.assign(**assign)
     

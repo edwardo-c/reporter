@@ -85,7 +85,7 @@ files_cfg:
   - file_id: "bluestar"
     reader: "standard"
     reader_cfg:
-      sheet_name: "Bluestar CA"
+      sheet_name: "CA"
     src_id: "BLUESTAR CN"
     src_col_name: "Customer"
     CanonicalSchema:
@@ -106,7 +106,7 @@ files_cfg:
   - file_id: "bluestar"
     reader: "standard"
     reader_cfg:
-      sheet_name: "Bluestar US"
+      sheet_name: "US"
     src_id: "BLUESTAR"
     src_col_name: "Customer"
     CanonicalSchema:

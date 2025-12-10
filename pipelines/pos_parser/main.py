@@ -21,7 +21,7 @@ SMELLS:
 what if a sheet name or index changes?
 """
 
-PERIOD_DATE = "10/31/2025"
+PERIOD_DATE = "11/30/2025"
 
 def main():
     
@@ -97,14 +97,32 @@ def main():
         credit_cfg=enricher_cfg["credit_rules"]
     ).apply(stacked)
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\pos.csv", index=False)
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\pos_november_2.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())
 
 
 """
-phase two:
-    description if available?
+Phase two; post CM audit:
+
+try to fill empty bill to states
+- using bill to zip
+- using soldtoname where bill to state is not blank ONLY if it is a 1:1
+
+audit columns: 
+- if zip was filled by system
+- credit rule applied
+
+dtype coerce for zips at read
+=====
+
+
+phase three:
     cross references
+    sales person
+    apply rules to files recursively
+
+
+
 """
