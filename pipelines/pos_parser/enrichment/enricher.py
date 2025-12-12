@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-
+import numpy as np
 
 class Enricher:
     def __init__(
@@ -237,11 +237,130 @@ class Enricher:
         
         return df
 
+    # === HELPERs: State ENRICHMENT =========================================
+
+    def enrich_zips(
+        self,
+        df: pd.DataFrame,
+        state_col_name: str = "BillToCustomerState",
+        zip_col_name: str = "BillToCustomerZip",
+    ) -> pd.DataFrame:
+
+        _df = df.copy()
+        _df["_orig_zip"] = _df[zip_col_name]
+
+        # numeric zip for interval lookup (Canadian postal codes -> NaN)
+        _df[zip_col_name] = pd.to_numeric(_df[zip_col_name], errors="coerce")
+
+        candidates = _df[state_col_name].isna() & _df[zip_col_name].notna()
+        if not candidates.any():
+            _df[zip_col_name] = _df["_orig_zip"]
+            return _df.drop(columns=["_orig_zip"])
+
+        labels, zip_intervals = self._state_zip_interval_index()
+        labels = np.asarray(labels, dtype=object)
+
+        # --- LOOKUP ONLY ON CANDIDATES ---
+        z = _df.loc[candidates, zip_col_name].astype("int64").to_numpy()
+        idx_positions = zip_intervals.get_indexer(z)  # length == candidates.sum()
+
+        valid = idx_positions != -1
+
+        mapped = np.full(idx_positions.shape[0], pd.NA, dtype=object)
+        mapped[valid] = labels[idx_positions[valid]]
+
+        # assign back only to candidate rows (lengths now match by construction)
+        _df.loc[candidates, state_col_name] = mapped
+
+        # restore original zip codes (re-introduce Canadian codes)
+        _df[zip_col_name] = _df["_orig_zip"]
+
+        return _df.drop(columns=["_orig_zip"])
+        
+
+    @staticmethod
+    def _state_zip_interval_index():
+        """
+        returns state keys (array) and interval index of zip codes.
+        State -> (range_start, range_end)
+        used for vectorized lookup of state with valid zip within range
+        """
+
+        zip_states_df = pd.DataFrame(
+            [
+                ("AL", 35000, 36999),
+                ("AK", 99500, 99999),
+                ("AZ", 85000, 86999),
+                ("AR", 71600, 72999),
+                ("CA", 90000, 96699),
+                ("CO", 80000, 81699),
+                ("CT",  6000,  6999),  # 06000–06999
+                ("DE", 19700, 19999),
+                ("FL", 32000, 34999),
+                ("GA", 30000, 31999),
+                ("HI", 96700, 96999),
+                ("ID", 83200, 83899),
+                ("IL", 60000, 62999),
+                ("IN", 46000, 47999),
+                ("IA", 50000, 52899),
+                ("KS", 66000, 67999),
+                ("KY", 40000, 42799),
+                ("LA", 70000, 71499),
+                ("ME",  3900,  4999),  # 03900–04999
+                ("MD", 20600, 21999),
+                ("MA",  1000,  2799),  # 01000–02799
+                ("MI", 48000, 49999),
+                ("MN", 55000, 56799),
+                ("MS", 38600, 39799),
+                ("MO", 63000, 65899),
+                ("MT", 59000, 59999),
+                ("NE", 68000, 69399),
+                ("NV", 88900, 89899),
+                ("NH",  3000,  3899),  # 03000–03899
+                ("NJ",  7000,  8999),  # 07000–08999
+                ("NM", 87000, 88499),
+                ("NY", 10000, 14999),
+                ("NC", 27000, 28999),
+                ("ND", 58000, 58899),
+                ("OH", 43000, 45899),
+                ("OK", 73000, 74999),
+                ("OR", 97000, 97999),
+                ("PA", 15000, 19699),
+                ("RI",  2800,  2999),  # 02800–02999
+                ("SC", 29000, 29999),
+                ("SD", 57000, 57799),
+                ("TN", 37000, 38599),
+                ("TX", 75000, 79999),
+                ("TX", 88500, 88599),
+                ("UT", 84000, 84799),
+                ("VT",  5000,  5999),  # 05000–05999
+                ("WA", 98000, 99499),
+                ("WV", 24700, 26899),
+                ("WI", 53000, 54999),
+                ("WY", 82000, 83199),
+                ("VA", 20100, 20199),
+                ("VA", 22000, 24699),
+                ("DC", 20000, 20099),
+                ("DC", 20200, 20599),             
+                ("PR",   600,   999),  # 00600–00999
+            ],
+            columns=["state", "range_start", "range_end"],
+        )
+
+        key = zip_states_df["state"].to_numpy()
+        left = zip_states_df["range_start"]
+        right = zip_states_df["range_end"]
+        ii = pd.IntervalIndex.from_arrays(left, right, "both")
+
+        return key, ii
+
+
     # === PIPELINE ENTRYPOINT =============================================
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         df = self.add_period_date(df)
         df = self.add_category(df)
+        df = self.enrich_zips(df)
         df = self.apply_credit(df)
         df = self.drop_columns(df)
         return df

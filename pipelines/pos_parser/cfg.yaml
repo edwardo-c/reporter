@@ -217,7 +217,13 @@ enricher:
       "right": "PiiCategory"
     additional:
       file_path: ${ADDITIONAL_CATEGORIES}
-      
+  zip_map:
+    file_path: ${STATE_ASSIGNMENTS}
+    sheet: "As of 1-1-25"
+    usecols: [1, 3, 4, 7]
+    skiprows: 2
+
+
 
   credit_rules:
     

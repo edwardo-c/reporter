@@ -97,7 +97,7 @@ def main():
         credit_cfg=enricher_cfg["credit_rules"]
     ).apply(stacked)
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\pos_november_2.csv", index=False)
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\test.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())
@@ -115,6 +115,10 @@ audit columns:
 - credit rule applied
 
 dtype coerce for zips at read
+
+add part number description
+
+
 =====
 
 
