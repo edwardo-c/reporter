@@ -64,14 +64,17 @@ class Enricher:
         - Earlier rules have precedence: once `out` is filled, later rules
           only fill remaining NaNs.
         """
-        out = "SalesRep"
+        rep_out = "SalesRep"
+        rule_out = "SalesRepAssignedRule"
+
         df = df.copy()
 
-        # Ensure output column exists and can hold strings
-        if out not in df.columns:
-            df[out] = pd.Series([None] * len(df), dtype="object")
-        else:
-            df[out] = df[out].astype("object")
+        # Ensure output columns exists and can hold strings
+        for c in (rep_out, rule_out):
+            if c not in df.columns:
+                df[c] = pd.Series([None] * len(df), dtype="object")
+            else:
+                df[c] = df[c].astype("object")
 
         for rule in self.credit_cfg:
             kind = rule.get("kind", "mapping")
@@ -84,7 +87,7 @@ class Enricher:
 
                 self._apply_mapping_rule(
                     df=df,
-                    out=out,
+                    out=rep_out,
                     left=rule["left"],
                     mapping=mapping,
                 )
@@ -93,13 +96,12 @@ class Enricher:
                 
                 rules_df = pd.DataFrame.from_dict(rule["data_dict"])
 
-                breakpoint()
-
+                # deprecated since the table's objective was changed
                 # rules_df = self._load_zip_rules(**rule["range_args"])
 
                 self._apply_zip_range_rule(
                     df=df,
-                    out=out,
+                    out=rep_out,
                     rules_df=rules_df,
                     state_col=rule.get("state_col", "State"),
                     zip_col=rule.get("zip_col", "Zip"),
@@ -123,23 +125,37 @@ class Enricher:
         usecols,
         skiprows: int = 0,
         nrows: int | None = None,
+        filter_col = None,
+        filter_val = None,
+        key_col_name = None,
+        val_col_name = None,
     ) -> dict:
         """
         Read a 2-column mapping table from an Excel sheet and return {key: value}.
 
         - path: Excel file path
         - sheet: sheet name (e.g. "Config")
-        - usecols: list of integer column positions, e.g. [0, 1] or [3, 4]
+        - usecols: list of integer column positions, e.g. [3, 4] or range of columns, e.g "A:E"
         - skiprows: number of rows to skip before the header (Excel row 3 -> skiprows=2)
         - nrows: optional row limit
+        - filter_col: filter table by this column
+        - filter_val: filter filter_col by this val
+        - key_col_name: specify a key col when loading an entire table
+        - val_col_name: specify a val col when loading an entire table
         """
+
         df = pd.read_excel(
-            path,
-            sheet_name=sheet,
-            usecols=usecols,
-            skiprows=skiprows,
-            nrows=nrows,
-        )
+                path,
+                sheet_name=sheet,
+                usecols=usecols,
+                skiprows=skiprows,
+                nrows=nrows,
+            )
+
+        # if filtering and k: v designation exists
+        if all([filter_col, filter_val, key_col_name, val_col_name]):
+            df = df[df[filter_col] == filter_val]
+            df = df[[key_col_name, val_col_name]]
 
         # We know this is a 2-column mapping table — normalize names
         if df.shape[1] != 2:
@@ -242,7 +258,7 @@ class Enricher:
         
         return df
 
-    # === HELPERs: State ENRICHMENT =========================================
+    # === HELPERs: STATE ENRICHMENT =========================================
 
     def enrich_zips(
         self,
