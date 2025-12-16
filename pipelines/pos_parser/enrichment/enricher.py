@@ -90,7 +90,12 @@ class Enricher:
                 )
 
             elif kind == "zip_range":
-                rules_df = self._load_zip_rules(**rule["range_args"])
+                
+                rules_df = pd.DataFrame.from_dict(rule["data_dict"])
+
+                breakpoint()
+
+                # rules_df = self._load_zip_rules(**rule["range_args"])
 
                 self._apply_zip_range_rule(
                     df=df,

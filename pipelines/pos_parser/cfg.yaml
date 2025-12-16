@@ -252,6 +252,17 @@ enricher:
     - kind: "zip_range"
       state_col: BillToCustomerState
       zip_col: BillToCustomerZip
+      data_dict: {"State": ["IL", "IL"], "ZipMin": [60000, 61200], "ZipMax": [61199, 62999], "SalesRep": ["SCHNEIDER", "WOLFE"]}
+      # range_args:
+      #   path: ${STATE_ASSIGNMENTS}
+      #   sheet: "As of 1-1-25"
+      #   usecols: [1, 3, 4, 7]
+      #   skiprows: 2
+
+
+    - kind: "zip_range"
+      state_col: BillToCustomerState
+      zip_col: BillToCustomerZip
       range_args:
         path: ${STATE_ASSIGNMENTS}
         sheet: "As of 1-1-25"
