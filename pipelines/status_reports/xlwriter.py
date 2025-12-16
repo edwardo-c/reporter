@@ -17,7 +17,7 @@ def generate_reports(
                 {
                     'meta': {
                         'out_file_name': base name of file to be created, 
-                        'signed': bool value, used to dertime which template to use, 
+                        'signed': bool value, used to determine which template to use, 
                         'acct_num': 'abc123' - not used, only for reference
                         },
                     'value_map: {A1: 123, B2: 456}

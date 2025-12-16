@@ -15,4 +15,5 @@ Now we can notify them monthly of their progress.
 ## How To Run
 update cfg to latest sales data file
 refresh customer benefits as needed
+update report_timeframe const in main
 python -m pipelines.status_reports.main

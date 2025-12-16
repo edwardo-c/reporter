@@ -104,20 +104,22 @@ if __name__ == "__main__":
 
 
 """
-Phase two; post CM audit:
 
-try to fill empty bill to states
-- using bill to zip
-- using soldtoname where bill to state is not blank ONLY if it is a 1:1
+1. add part number description to CananicalSchema
 
-audit columns: 
-- if zip was filled by system
-- credit rule applied
+2.
+dtype specification for zips at reader
 
-dtype coerce for zips at read
+3. 
+zip rules are probably wrong now since the state assignment 
+sheet has a bunch of uncesseary zips - hardcode IL and CA rules
 
-add part number description
+4.
+add credit rule columns
 
+5. 
+using soldtoname where bill to state is not blank ONLY if it is a 1:1
+or return blank? this might be better and just let cm make the call
 
 =====
 
