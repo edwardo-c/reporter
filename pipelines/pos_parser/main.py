@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import logging
+import sys
 
 import pandas as pd
 
@@ -22,6 +23,7 @@ what if a sheet name or index changes?
 """
 
 PERIOD_DATE = "11/30/2025"
+STRICT_CATEGORIES = True
 
 def main():
     
@@ -87,6 +89,23 @@ def main():
 
     clean_cats.update(add_cats)
 
+    # check if which parts do not have a category yet
+
+    curr_parts = set(s for s in stacked['PiiPartNumber'] if s)
+
+    non_categorized_parts = curr_parts.difference(clean_cats.keys())
+
+    if non_categorized_parts:
+        # update categories worksheet - stop process
+        missing_parts_df = pd.DataFrame(data=non_categorized_parts, columns=["InventoryID"])
+        add_cats_file_path = enricher_cfg['categories']['additional']['file_path']
+        temp_cats_df = pd.read_csv(add_cats_file_path)
+        cats_out = pd.concat([temp_cats_df, missing_parts_df])
+        cats_out.to_csv(add_cats_file_path, index=False)
+        
+        if STRICT_CATEGORIES:
+            raise LookupError(f"missing parts in additional_categories.csv: {len(missing_parts_df)} added")
+
     category_cfg = enricher_cfg["categories"]["cfg"]
 
     category_cfg["mapping"] = clean_cats
@@ -97,7 +116,9 @@ def main():
         credit_cfg=enricher_cfg["credit_rules"]
     ).apply(stacked)
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\test_121625.csv", index=False)
+    
+
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\test_121725.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())
