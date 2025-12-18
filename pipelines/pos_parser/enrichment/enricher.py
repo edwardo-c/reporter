@@ -297,7 +297,6 @@ class Enricher:
         _df[zip_col_name] = _df["_orig_zip"]
 
         return _df.drop(columns=["_orig_zip"])
-        
 
     @staticmethod
     def _state_zip_interval_index():
@@ -374,7 +373,6 @@ class Enricher:
         ii = pd.IntervalIndex.from_arrays(left, right, "both")
 
         return key, ii
-
 
     # === PIPELINE ENTRYPOINT =============================================
 

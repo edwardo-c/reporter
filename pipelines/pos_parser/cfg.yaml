@@ -9,6 +9,7 @@ files_cfg:
       SoldToName: "CUST NAME"
       SaleDate: ~
       PiiPartNumber: "VENDOR ITEM ."
+      PartDescription: ~
       IsReturn: ~
       ShipQuantity: "EXTND QTY"
       UnitCost: ~
@@ -31,6 +32,7 @@ files_cfg:
       SoldToName: ~
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "VENDOR PART NUMBER"
+      PartDescription: "ITEM DESCRIPTION"
       IsReturn: ~
       ShipQuantity: "UNITS"
       UnitCost: ~
@@ -50,6 +52,7 @@ files_cfg:
       SoldToName: "CUSTOMER NAME"
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "VENDOR SKU"
+      PartDescription: "DESCRIPTION"
       IsReturn: ~
       ShipQuantity: "QTY"
       UnitCost: "STD COST"
@@ -71,6 +74,7 @@ files_cfg:
       SoldToName: "NAME"
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "MFG PART"
+      PartDescription: ~
       IsReturn: ~
       ShipQuantity: "QUANTITY SHIPPED"
       UnitCost: "UNIT COST"
@@ -92,6 +96,7 @@ files_cfg:
       SoldToName: "Cust Name"
       SaleDate: "Invoice Date"
       PiiPartNumber: "Item Number"
+      PartDescription: "Description"
       IsReturn: ~
       ShipQuantity: "Quantity Invoiced"
       UnitCost: "Std Unit Cost"
@@ -113,6 +118,7 @@ files_cfg:
       SoldToName: "Cust Name"
       SaleDate: "Invoice Date"
       PiiPartNumber: "Item Number"
+      PartDescription: "Description"
       IsReturn: ~
       ShipQuantity: "Quantity Invoiced"
       UnitCost: "Std Unit Cost"
@@ -132,6 +138,7 @@ files_cfg:
       SoldToName: "BILL TO NAME"
       SaleDate: "INVOICE DATE"
       PiiPartNumber: "PEERLESS PART NO"
+      PartDescription: "PART DESCRIPTION"
       IsReturn: "QUANTITY TYPE"
       ShipQuantity: "QUANTITY"
       UnitCost: "ITEM PRICE"
@@ -153,6 +160,7 @@ files_cfg:
       SoldToName: "Customer Name"
       SaleDate: "Invoice date"
       PiiPartNumber: "Vendor Part Nbr"
+      PartDescription: "Product Description"
       IsReturn: "Order Type"
       ShipQuantity: "Qty Shipped"
       UnitCost: "Unit Cost"
@@ -172,6 +180,7 @@ files_cfg:
       SoldToName: "bill_to_cust_name"
       SaleDate: "ship_date"
       PiiPartNumber: "vend_part_no"
+      PartDescription: "part_desc"
       IsReturn: "order_type"
       ShipQuantity: "Ship_Qty"
       UnitCost: "Base_Cost"
@@ -191,6 +200,7 @@ files_cfg:
       SoldToName: "bill_to_cust_name"
       SaleDate: "ship_date"
       PiiPartNumber: "vend_part_no"
+      PartDescription: "part_desc"
       IsReturn: "order_type"
       ShipQuantity: "Ship_Qty"
       UnitCost: "Base_Cost"

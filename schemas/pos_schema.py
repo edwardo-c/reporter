@@ -12,6 +12,7 @@ class PosSchemaMapping:
     SoldToName: Optional[str] = None
     SaleDate: Optional[str] = None
     PiiPartNumber: Optional[str] = None
+    PartDescription: Optional[str] = None
     IsReturn: Optional[str] = None
     ShipQuantity: Optional[str] = None
     UnitCost: Optional[str] = None
@@ -29,6 +30,7 @@ POS_SCHEMA_DEF = CanonicalSchemaDef(
     str_fields=(
         "SoldToName",
         "PiiPartNumber",
+        "PartDescription",
         "BillToCustomerZip",
         "BillToCustomerState",
         "ShipToState",
