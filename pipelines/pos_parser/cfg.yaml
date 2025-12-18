@@ -174,7 +174,7 @@ files_cfg:
 
   - file_id: "td synnex ca"
     reader: "invalid"
-    src_id: "SYNNEX CA"
+    src_id: "SYNNEX CN"
     src_col_name: "Customer"
     CanonicalSchema:
       SoldToName: "bill_to_cust_name"
