@@ -116,40 +116,25 @@ def main():
         credit_cfg=enricher_cfg["credit_rules"]
     ).apply(stacked)
 
-    
-
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\test_121725.csv", index=False)
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\test_121825.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())
 
 
 """
+- dtype specification for zips at reader (yagni?)
 
-1. add part number description to CananicalSchema
-
-2.
-dtype specification for zips at reader
-
-3. 
-zip rules are probably wrong now since the state assignment 
-sheet has a bunch of uncesseary zips - hardcode IL and CA rules
-
-4.
-add credit rule columns
+- check credit outputs
 
 5. 
 using soldtoname where bill to state is not blank ONLY if it is a 1:1
 or return blank? this might be better and just let cm make the call
 
 =====
-
-
 phase three:
     cross references
     sales person
     apply rules to files recursively
-
-
-
+====
 """

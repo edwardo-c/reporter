@@ -87,9 +87,11 @@ class Enricher:
 
                 self._apply_mapping_rule(
                     df=df,
-                    out=rep_out,
+                    credit_rep_out=rep_out,
                     left=rule["left"],
                     mapping=mapping,
+                    credit_rule_out=rule_out,
+                    credit_rule_id=rule["rule_id"]
                 )
 
             elif kind == "zip_range":
@@ -101,10 +103,12 @@ class Enricher:
 
                 self._apply_zip_range_rule(
                     df=df,
-                    out=rep_out,
+                    credit_rep_out=rep_out,
                     rules_df=rules_df,
                     state_col=rule.get("state_col", "State"),
                     zip_col=rule.get("zip_col", "Zip"),
+                    credit_rule_out=rule_out,
+                    credit_rule_id=rule["rule_id"]
                 )
 
             else:
@@ -209,9 +213,11 @@ class Enricher:
     def _apply_mapping_rule(
         self,
         df: pd.DataFrame,
-        out: str,
+        credit_rep_out: str,
         left: str,
         mapping: dict,
+        credit_rule_id: str,
+        credit_rule_out: str = "SalesRepAssignedRule",
     ) -> None:
         """
         Simple 1:1 mapping: if df[left] == key → mapping[key] into df[out],
@@ -220,16 +226,20 @@ class Enricher:
         normalized_map = {k.casefold(): v for k, v in mapping.items()}
 
         mapped = df[left].str.casefold().map(normalized_map)
-        mask = df[out].isna() & mapped.notna()
-        df.loc[mask, out] = mapped[mask]
+        mask = df[credit_rep_out].isna() & mapped.notna()
+        df.loc[mask, credit_rep_out] = mapped[mask]
+        df.loc[mask, credit_rule_out] = credit_rule_id
+
 
     def _apply_zip_range_rule(
         self,
         df: pd.DataFrame,
-        out: str,
+        credit_rep_out: str,
         rules_df: pd.DataFrame,
+        credit_rule_id: str,
         state_col: str = "State",
         zip_col: str = "Zip",
+        credit_rule_out: str = "SalesRepAssignedRule"
     ) -> None:
         """
         Zip-based credit:
@@ -253,8 +263,9 @@ class Enricher:
                 df[zip_col].between(zmin, zmax, inclusive="both")
             )
 
-            mask = df[out].isna() & candidates
-            df.loc[mask, out] = rep
+            mask = df[credit_rep_out].isna() & candidates
+            df.loc[mask, credit_rep_out] = rep
+            df.loc[mask, credit_rule_out] = credit_rule_id
         
         return df
 
