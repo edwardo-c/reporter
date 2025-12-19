@@ -3,9 +3,8 @@
 # standard imports
 from dotenv import load_dotenv
 import logging
-import time
 from pathlib import Path
-import re
+import sys
 
 # third party imports
 import pandas as pd
@@ -15,9 +14,11 @@ from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
 from utils.yaml_loader import load_yaml
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
 from data_toolkit.clients.salesforce import SFClient
-from data_toolkit.cleaners.data_cleaner import DataCleaner
 from pipelines.pricelist.email.bodies import external_email, internal_email, test_span_elements
 from pipelines.pricelist.email.pricelist_email import BaseEmail, OutlookSender
+from pipelines.pricelist.email.recipient_log_enums import RecipientLogSchema as RLS
+from pipelines.pricelist.email.recipient_log_enums import RecipientLogSentToVals as RLS_SentToVals
+from pipelines.pricelist.email.recipient_log_enums import RecipientLogNone as RLS_NA
 from data_toolkit.clients.outlook import OLClient
 from data_toolkit.clients.acumatica import AcumaticaClient
 
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format= "%(message)s")
 
 PROD = False
+DRY_RUN = False
 
 def main():
 
@@ -62,12 +64,6 @@ def main():
 
         internal_contacts_cache[customer_id].append(email)
 
-    # cleaned_internal_contacts = DataCleaner(
-    #     **cfg["salesforce"]["data"]["internal"]["clean_plan"]
-    # ).clean(internal_contacts_df)
-
-    # internal_contacts_cache = extract_contacts_from_df(cleaned_internal_contacts)
-
     customer_names = AcumaticaClient(
         **cfg["acumatica"]["auth"]
         ).odata(**cfg["acumatica"]["customers"], df=True)
@@ -81,8 +77,56 @@ def main():
     # used for placing customer name in internal emails
     cust_name_map = {k.strip(): v.strip().title() for k, v in customer_names.items()}
 
-    # ============== Build Emails ========================
+    # ============== Build Email Log ======================
 
+    pav_accts = set(pav_attachments.keys())
+    nep_accts = set(nep_attachments.keys())
+    all_accts = sorted(pav_accts.union(nep_accts))
+
+    has_pav = []
+    has_nep = []
+    ext_contacts = []
+    int_contacts = []
+    sent_to = []
+
+    for a in all_accts:
+        
+        has_pav.append(a in pav_accts)
+        has_nep.append(a in nep_accts)
+        
+        ec = external_contacts_cache.get(a, RLS_NA.NA.value)
+        ic = internal_contacts_cache.get(a, RLS_NA.NA.value)
+
+        if ic != RLS_NA.NA.value:
+            to = RLS_SentToVals.INT.value
+
+        elif ec != RLS_NA.NA.value:
+            to = RLS_SentToVals.EXT.value
+
+        else:
+            to = RLS_SentToVals.NA.value
+
+        ext_contacts.append(ec)
+        int_contacts.append(ic)
+        sent_to.append(to)
+
+    recipient_log = pd.DataFrame(
+        {
+            RLS.ACCT.value   : all_accts,
+            RLS.PAV.value    : has_pav,
+            RLS.NEP.value    : has_nep,
+            RLS.EXT.value    : ext_contacts,
+            RLS.INT.value    : int_contacts,
+            RLS.SENT_TO.value: sent_to
+        }
+    )
+    
+    recipient_log.to_csv(True, index=False)
+
+    if DRY_RUN:
+        sys.exit()
+
+    # ============== Build Emails ======================
     with OLClient() as ol_app:
         pav_emails = [
             BaseEmail(
@@ -126,13 +170,11 @@ def main():
             if (name:= cust_name_map.get(acct, None))
         ]
 
-        # ============ HOT LOOP! =======================
+        # ============ HOT LOOP! Send Emails =======================
 
         emails = [*pav_emails, *nep_emails, *internal_pav_emails, *internal_nep_emails]
 
-        breakpoint()
-
-        for e in emails: #, *nep_emails, *internal_pav_emails, *internal_nep_emails]:
+        for e in emails:
             OutlookSender(
                 ol_app=ol_app,
                 sent_on_behalf="sales@peerless-av.com",

@@ -17,5 +17,7 @@ Enables us to react to price changes faster by automating the distribution of cu
 []
 
 [UNRELEASED]
-Send price lists to sales reps
-pull contacts directly from salesforce (queries complete, integration needed)
+
+
+[RELEASED]
+12/19/2025 - Output log of recipients (Answers: which contacts recieved which price list for account 'x')
