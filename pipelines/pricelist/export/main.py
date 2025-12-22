@@ -8,12 +8,13 @@ import pandas as pd
 
 # Internal Imports
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_CFG_YAML
-from utils.acumatica_odata import get_acumatica_table
 from utils.yaml_loader import load_yaml
 from data_toolkit.cleaners.data_cleaner import DataCleaner
 from data_toolkit.clients.acumatica import AcumaticaClient
 
 logger = logging.basicConfig(level=logging.INFO)
+
+RUN_ID = "December_2025"
 
 def main():
 
@@ -44,8 +45,11 @@ def main():
 
     branded = _add_brand_column(df=cleaned_master_pricing_df)
 
+    eol_out_dir = Path(eol_cfg["out"])
+    eol_out = eol_out_dir/ f"EOL_{RUN_ID}.csv"
+    cleaned_eol.to_csv(eol_out, index=False)
+
     # hot loop
-    cleaned_eol.to_csv(eol_cfg["out"], index=False)
     _export_partitioned_csv(branded, out_map=cfg["out_map"])
     
     print(f"Process Complete")
