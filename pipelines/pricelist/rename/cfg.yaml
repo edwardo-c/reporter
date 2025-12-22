@@ -1,0 +1,11 @@
+args:
+  io: ${EARLS_RENAME_MAP}
+  sheet_name: "Rename Map"
+  header: 6
+  usecols: [0, 3]
+
+brand_dir_map:
+  "Peerless-AV": ${PAV_FINISHED_LISTS}
+  "Neptune": ${NEP_FINISHED_LISTS}
+
+dst_dir: ${EN_DST}
