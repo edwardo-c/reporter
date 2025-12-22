@@ -42,10 +42,13 @@ def main():
                 
                 file_name = Path(src_path).stem
                 
+                acct_name = id_newname_map.get(acct_id)
+
                 dst_name = _gen_dst_name(
                     extract_from_str=file_name,
                     brand=brand,
                     acct_id=acct_id,
+                    acct_name=acct_name
                 )
                 
                 dst_path = dst_dir / dst_name
