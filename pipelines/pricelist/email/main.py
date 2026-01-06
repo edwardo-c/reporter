@@ -14,7 +14,7 @@ from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
 from utils.yaml_loader import load_yaml
 from data_toolkit.attachment_mapper.acu_id import id_to_path_map
 from data_toolkit.clients.salesforce import SFClient
-from pipelines.pricelist.email.bodies import external_email, internal_email, test_span_elements
+from pipelines.pricelist.email.bodies import external_email, internal_email, external_boilerplate_email
 from pipelines.pricelist.email.pricelist_email import BaseEmail, OutlookSender
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSchema as RLS
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSentToVals as RLS_SentToVals
@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO, format= "%(message)s")
 Send Emails = (DRY_RUN = False) and (PROD = True)
 """
 
-DRY_RUN = True # True = exit after send log creation, no emails sent
+DRY_RUN = False # True = exit after send log creation, no emails sent
 PROD = False # False = breakpoint at send email to inspect email
 RUN_ID = "January_2026"
 
@@ -140,18 +140,18 @@ def main():
             BaseEmail(
                 recipients=recipients,
                 subject=f"Peerless-AV Monthly Price List - {acct}",
-                body=test_span_elements(),
+                body=external_boilerplate_email(brand="Peerless-AV"),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()
             if (attachments:= pav_attachments.get(acct, None))
         ]
-        
+
         nep_emails = [
             BaseEmail(
                 recipients=recipients,
                 subject=f"Neptune Monthly Price List - {acct}",
-                body=external_email("Neptune"),
+                body=external_boilerplate_email("Neptune"),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()
@@ -181,6 +181,8 @@ def main():
         # ============ HOT LOOP! Send Emails =======================
 
         emails = [*pav_emails, *nep_emails, *internal_pav_emails, *internal_nep_emails]
+        # used in testing specific emails
+        # emails = [*pav_emails]
 
         for e in emails:
             OutlookSender(
@@ -189,11 +191,7 @@ def main():
                 prod=PROD
             ).send(e)
 
-        logger.info(f"\nPAV External Emails: {len(pav_emails)}")
-        logger.info(f"\nNEP External Emails: {len(nep_emails)}")
-        logger.info(f"\nPAV Internal Emails: {len(internal_pav_emails)}")
-        logger.info(f"\nNEP Internal Emails: {len(internal_nep_emails)}")
-
+    logger.info("All emails sent to outlook client - see outlook")
 # ========== bad design due to time constraints, refactor after run ==========
 
 def extract_contacts_from_df(df: pd.DataFrame) -> dict[str, list[str]]:

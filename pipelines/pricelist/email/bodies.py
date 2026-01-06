@@ -21,11 +21,16 @@ def internal_email(id: str) -> str:
         f"</body></html>"
     )
 
-def test_span_elements():
+def external_boilerplate_email(brand: str):
     return (
         f"<html><body>"
-        f"<p><span style='background-color: yellow;'>highlight this yellow </span></p>"
-        f"<p><span style='background-color: green;'>highlight this green </span></p>"
-        f"<p><span style='background-color: red;'>highlight this red </span></p>"
+        f"<p><strong>Attached is your monthly {brand} price list.</strong></p>"
+        f"<p>Each month, regardless if there are any price changes, these will be distributed at or near the 1st business day of the month.</p>"
+        f"<p>See the Updates tab for any changes from last month’s list.</p>"
+        f"<p>All End of Life, New Products or Pricing Changes will be called out each month. Here is a legend on how you will find each.</p>"
+        f"<p><span style='background-color: red; color: white'>End Of Life (EOL)</span> are on the <span style='background-color: red; color: white'>Red</span> tab.</p>"
+        f"<p><span style='background-color: #31FF21;'>New Products</span> will be highlighted on the price list tab in <span style='background-color: #31FF21;'>Green.</span> tab.</p>"
+        f"<p><span style='background-color: yellow;'>Price Changes</span> will be highlighted on the price list tab in <span style='background-color: yellow;'>Yellow.</span> tab.</p>"
+        f"<p><i><span style='color: #0070C0;'>If you would like to be removed from, or add another recipient to, our distribution list, please reply to this email.</span></i></p>"
         f"</body></html>"
     )
