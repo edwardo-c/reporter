@@ -14,7 +14,8 @@ from data_toolkit.clients.acumatica import AcumaticaClient
 
 logger = logging.basicConfig(level=logging.INFO)
 
-RUN_ID = "December_2025"
+
+RUN_ID = "January_2026"
 
 def main():
 

@@ -27,8 +27,13 @@ from collections import defaultdict
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format= "%(message)s")
 
-PROD = False
-DRY_RUN = False
+"""
+Send Emails = (DRY_RUN = False) and (PROD = True)
+"""
+
+DRY_RUN = True # True = exit after send log creation, no emails sent
+PROD = False # False = breakpoint at send email to inspect email
+RUN_ID = "January_2026"
 
 def main():
 
@@ -121,9 +126,12 @@ def main():
         }
     )
     
-    recipient_log.to_csv(True, index=False)
+    recipient_log_out_dir = Path(cfg["recipient_log_out_dir"])
+    recipient_log_out_path = recipient_log_out_dir /f"Recipient_Log_{RUN_ID}.csv" 
+    recipient_log.to_csv(recipient_log_out_path, index=False)
 
     if DRY_RUN:
+        logger.info(f"Dry run complete, results: {recipient_log_out_path}")
         sys.exit()
 
     # ============== Build Emails ======================

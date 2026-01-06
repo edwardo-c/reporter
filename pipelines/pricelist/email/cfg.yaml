@@ -2,7 +2,7 @@ attachments:
     "Peerless-AV": ${PAV_FINISHED_LISTS}
     "Neptune": ${NEP_FINISHED_LISTS}
 
-recipient_log_out_path: ${RECIPIENT_LOG_OUT_PATH}
+recipient_log_out_dir: ${RECIPIENT_LOG_DIR}
 
 acumatica:
     auth:
