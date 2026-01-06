@@ -9,7 +9,7 @@ import pandas as pd
 from utils.yaml_loader import load_yaml
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_RENAME_CFG
 
-PROD = False
+PROD = True
 
 def main():
 
@@ -26,11 +26,11 @@ def main():
 
     ids_to_move = set(id_newname_map.keys())
 
-    brand_dir_map: dict = cfg["brand_dir_map"]
+    src_dir_map: dict = cfg["src_dir_map"]
     
     dst_dir = Path(cfg["dst_dir"])
     
-    for brand, files_dir in brand_dir_map.items():
+    for brand, files_dir in src_dir_map.items():
         
         brand_files = Path(files_dir).glob("*.xlsx")
         
@@ -42,13 +42,13 @@ def main():
                 
                 file_name = Path(src_path).stem
                 
-                acct_name = id_newname_map.get(acct_id)
+                new_name = id_newname_map.get(acct_id)
 
                 dst_name = _gen_dst_name(
                     extract_from_str=file_name,
                     brand=brand,
                     acct_id=acct_id,
-                    acct_name=acct_name
+                    acct_name=new_name
                 )
                 
                 dst_path = dst_dir / dst_name

@@ -32,7 +32,7 @@ Send Emails = (DRY_RUN = False) and (PROD = True)
 """
 
 DRY_RUN = False # True = exit after send log creation, no emails sent
-PROD = False # False = breakpoint at send email to inspect email
+PROD = True # False = breakpoint at send email to inspect email
 RUN_ID = "January_2026"
 
 def main():

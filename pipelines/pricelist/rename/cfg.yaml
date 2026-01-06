@@ -4,7 +4,7 @@ args:
   header: 7
   usecols: [0, 3]
 
-brand_dir_map:
+src_dir_map:
   "Peerless-AV": ${PAV_FINISHED_LISTS}
   "Neptune": ${NEP_FINISHED_LISTS}
 
