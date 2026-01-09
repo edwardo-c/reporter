@@ -4,13 +4,13 @@ compare:
     usecols: ['SoldToName', 'BillToCustomerZip', 'BillToCustomerState']
 
 compare_against:
-  read:
-    filepath_or_buffer: ${EXISTING}
-    usecols: ['Child']
-
-to_be_reviewed:
-  read:
-    filepath_or_buffer: ${TO_BE_REVIEWED}
+  - read:
+      filepath_or_buffer: ${EXISTING}
+      usecols: ['SoldToName']
+      
+  - read:
+      filepath_or_buffer: ${TO_BE_REVIEWED}
+      usecols: ['SoldToName']
 
 
 
