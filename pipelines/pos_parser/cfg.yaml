@@ -1,4 +1,5 @@
 pos_dir: ${DIR_TO_PARSE}
+pos_sales_db: ${POS_DB}
 
 files_cfg:
   - file_id: "accu-tech"
@@ -89,7 +90,7 @@ files_cfg:
   - file_id: "bluestar"
     reader: "standard"
     reader_cfg:
-      sheet_name: "CA"
+      sheet_name: "CAN"
     src_id: "BLUESTAR CN"
     src_col_name: "Customer"
     CanonicalSchema:

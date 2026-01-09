@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import logging
-import sys
 
+import duckdb
 import pandas as pd
 
 from config.paths import POS_PARSER_CFG, POS_PARSER_ENV
@@ -22,7 +22,7 @@ SMELLS:
 what if a sheet name or index changes?
 """
 
-PERIOD_DATE = "11/30/2025"
+PERIOD_DATE = "12/31/2025"
 STRICT_CATEGORIES = True
 
 def main():
@@ -89,14 +89,11 @@ def main():
 
     clean_cats.update(add_cats)
 
-    # check if which parts do not have a category yet
-
     curr_parts = set(s for s in stacked['PiiPartNumber'] if s)
 
     non_categorized_parts = curr_parts.difference(clean_cats.keys())
 
     if non_categorized_parts:
-        # update categories worksheet - stop process
         missing_parts_df = pd.DataFrame(data=non_categorized_parts, columns=["InventoryID"])
         add_cats_file_path = enricher_cfg['categories']['additional']['file_path']
         temp_cats_df = pd.read_csv(add_cats_file_path)
@@ -116,7 +113,12 @@ def main():
         credit_cfg=enricher_cfg["credit_rules"]
     ).apply(stacked)
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\test_121825.csv", index=False)
+    # store to persistent table
+
+    db = duckdb.connect(global_cfg["pos_sales_db"])
+    db.sql("CREATE OR REPLACE TABLE pos_sales AS SELECT * FROM enriched_df")
+
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\December_2025_POS.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())
