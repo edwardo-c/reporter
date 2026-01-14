@@ -1,16 +1,7 @@
-compare: 
-  read:
-    filepath_or_buffer: ${INCOMING}
-    usecols: ['SoldToName', 'BillToCustomerZip', 'BillToCustomerState']
-
-compare_against:
-  - read:
-      filepath_or_buffer: ${EXISTING}
-      usecols: ['SoldToName']
-      
-  - read:
-      filepath_or_buffer: ${TO_BE_REVIEWED}
-      usecols: ['SoldToName']
-
+pos_sales: ${POS_SALES}
+xref_db: ${XREF_DB}
+sql_load_raw_pos: ${INGEST_QUERY}
+sql_candidates: ${CANDIDATES_QUERY}
+candidates_out: ${CANDIDATES_OUT}
 
 
