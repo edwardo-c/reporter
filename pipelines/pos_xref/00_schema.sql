@@ -12,6 +12,7 @@ CREATE TABLE cross_reference (
   FOREIGN KEY (ParentName) REFERENCES customers(ParentName)
 );
 
+-- names to be reviewed manually
 CREATE TABLE candidates (
   ChildName VARCHAR NOT NULL,
   BillToState VARCHAR,
@@ -38,3 +39,4 @@ CREATE TABLE raw_pos_sales (
   BatchId               VARCHAR NOT NULL,
   LoadedAt              TIMESTAMP NOT NULL
 );
+
