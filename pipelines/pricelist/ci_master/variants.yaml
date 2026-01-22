@@ -1,0 +1,21 @@
+- meta:
+    brand: Peerless-AV
+
+  copier_args:
+    template_path: ${PEERLESS_TMPLT}
+    dst_dir: ${PEERLESS_DST_DIR}
+    
+  variants:
+    - variant_id: dealer
+      out_name: "dealer.xlsx"
+      steps:
+        - obj_target: master_table
+          op: table.drop_columns
+          kwargs:
+            columns: ['UPC']
+            keep_widths: True
+
+        - obj_target: master_table
+          op: table.rename_columns
+          kwargs:
+            rename_map: {'Dealer': 'RENAMED!'}
