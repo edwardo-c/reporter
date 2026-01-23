@@ -4,7 +4,7 @@ import xlwings as xw
 
 from config.paths import CI_PRICELIST_CFG, CI_PRICELIST_ENV_VARS
 from data_toolkit.template_copier import TemplateCopier
-from pipelines.pricelist.template_meta.pricelist_meta import MasterPriceListTemplateMeta
+from pipelines.pricelist.template_meta.pav_master_pricelist import MasterPriceListTemplateMeta
 from utils.yaml_loader import load_yaml
 
 from data_toolkit.xl_modifier.ops_resolver import resolve_op
