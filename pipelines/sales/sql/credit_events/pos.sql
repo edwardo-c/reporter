@@ -1,0 +1,27 @@
+CREATE OR REPLACE TEMP VIEW pos AS 
+SELECT
+  Customer AS Distributor,
+  NULL AS AccountNumber,
+  SoldToName AS CustomerName,
+  BillToCustomerState AS BillToState,
+  NULL AS BillToCity,
+  BillToCustomerZip AS BillToZip,
+  NULL AS AccountGroup,
+  'POS' AS CreditType, 
+  Credit AS SalesRep,
+  PiiPartNumber AS PartNumber,
+  PiiCategory AS ProductCategory,
+  NULL AS ProductDescription,
+  ShipQuantity AS Quantity,
+  ExtendedSales AS ExtendedSaleAmount,
+  NULL AS OrderNumber,
+  NULL AS PoNumber,
+  SaleDate AS InvoiceDate,
+  NULL AS ShipToLineOne,
+  NULL AS ShipToCity,
+  ShipToState,
+  ShipToZip,
+  EXTRACT(MONTH FROM PeriodDate) AS CreditMonth,
+  EXTRACT(YEAR FROM PeriodDate) AS CreditYear,
+  MONTHNAME(PeriodDate) AS CreditMonthName
+FROM raw_pos;

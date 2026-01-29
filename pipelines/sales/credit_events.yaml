@@ -1,0 +1,68 @@
+database: ${DATABASE}
+
+
+credit_events_pipeline:
+  year: 2025
+
+  sources:
+    sales_people:
+      kind: excel_sheet
+      path: ${CREDIT_EVENTS_PATH}
+      sheet: "State Assignments"
+      header: 2
+      register_as: raw_sales_people
+
+    bill_to:
+      kind: excel_sheet
+      path: ${CREDIT_EVENTS_PATH}
+      sheet: "Bill To"
+      header: 5
+      register_as: raw_bill_to
+
+    ship_to:
+      kind: excel_sheet
+      path: ${CREDIT_EVENTS_PATH}
+      sheet: "Ship To"
+      header: 5
+      register_as: raw_ship_to
+    
+    all_direct:
+      kind: excel_sheet
+      path: ${CREDIT_EVENTS_PATH}
+      sheet: "All Direct"
+      header: 5
+      register_as: raw_all_direct
+
+    pos:
+      kind: excel_sheet
+      path: ${CREDIT_EVENTS_PATH}
+      sheet: "POS"
+      header: 5
+      register_as: raw_pos
+
+    reclass_pos:
+      kind: excel_sheet
+      path: ${RECLASS_EVENTS_PATH}
+      sheet: "reclass_pos"
+      header: 0
+      register_as: raw_reclass_pos
+
+    reclass_non_pos:
+      kind: excel_sheet
+      path: ${RECLASS_EVENTS_PATH}
+      sheet: "reclass_non_pos"
+      header: 0
+      register_as: raw_reclass_non_pos
+
+  sql:
+    base_dir: ${CREDIT_EVENTS_DIR}
+    steps:
+      - sales_people.sql
+      - bill_to.sql
+      - ship_to.sql
+      - all_direct.sql
+      - pos.sql
+      - reclass_non_pos.sql
+      - reclass_pos.sql
+      - stg_credit_events.sql
+

@@ -1,0 +1,12 @@
+CREATE OR REPLACE TEMP VIEW stg_credit_events AS 
+SELECT * FROM bill_to
+UNION ALL
+SELECT * FROM ship_to
+UNION ALL
+SELECT * FROM all_direct
+UNION ALL
+SELECT * FROM pos
+UNION ALL
+SELECT * FROM reclass_pos
+UNION ALL
+SELECT * FROM reclass_non_pos
