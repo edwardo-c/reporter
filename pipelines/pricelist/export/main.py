@@ -12,10 +12,10 @@ from utils.yaml_loader import load_yaml
 from data_toolkit.cleaners.data_cleaner import DataCleaner
 from data_toolkit.clients.acumatica import AcumaticaClient
 
-logger = logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 
-RUN_ID = "January_2026"
+RUN_ID = "February_2026"
 
 def main():
 
@@ -27,16 +27,22 @@ def main():
     data_cfg = cfg.get("data_cfg", {})
     eol_cfg = data_cfg["eol"]
     master_pricing_cfg = data_cfg["master_pricing"]
-    
+
     with AcumaticaClient(**cfg["acu_auth"]) as ac:
         
+        logging.info("Downloading EOL")
+
         eol_df = ac.odata(url=eol_cfg["url"], params=eol_cfg["params"], df=True)
         
+        logging.info("Downloading Price Lookup All")
+
         master_pricing_df = ac.odata(
             url=master_pricing_cfg["url"], 
             params=master_pricing_cfg["params"], 
             df=True
         )
+        
+        logging.info("Price Lookup All download complete")
 
     cleaned_eol = DataCleaner(**eol_cfg["cleaner_cfg"]).clean(eol_df)
 
@@ -50,6 +56,11 @@ def main():
     eol_out = eol_out_dir/ f"EOL_{RUN_ID}.csv"
     cleaned_eol.to_csv(eol_out, index=False)
 
+    master_out = Path(data_cfg["price_lookup_all_dir"]) / f"PriceLookupAll_{RUN_ID}.csv"
+
+    cleaned_master_pricing_df.to_csv(master_out, index=False, encoding="utf-8-sig")
+
+    logging.info("Splitting into CSVs")
     # hot loop
     _export_partitioned_csv(branded, out_map=cfg["out_map"])
     
@@ -58,7 +69,7 @@ def main():
 def _add_brand_column(df: pd.DataFrame):
     
     df_copy = df.copy()
-    df_copy["brand"] = (df_copy["PriceGroup"] == "NEPTUNE")
+    df_copy["brand"] = (df_copy["PriceGroup"].str.contains("NEPTUNE"))
     df_copy["brand"] = df_copy["brand"].replace({False: "Peerless-AV", True: "Neptune"})
 
     return df_copy
@@ -79,7 +90,7 @@ def _export_partitioned_csv(
             
             export_path = root_dir / f"{cust}.csv"
             
-            part.to_csv(export_path, index=False)
+            part.to_csv(export_path, index=False, encoding="utf-8-sig")
 
 
 if __name__ == "__main__":

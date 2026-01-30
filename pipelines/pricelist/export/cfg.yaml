@@ -17,6 +17,8 @@ data_cfg:
                 - "ProductLifeCycleManagement"
                 - "ItemStatus"
         "out": ${EOL_DIR}
+
+    price_lookup_all_dir: ${PRICE_LOOKUP_ALL_DIR}
             
     "master_pricing":
         url: ${PRICE_LOOKUP_ALL}
