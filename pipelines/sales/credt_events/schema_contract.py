@@ -1,0 +1,36 @@
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Col():
+    name: str
+    dtype: str
+    default_sql: str
+
+FINAL_SCHEMA = [
+    Col("Distributor",         "VARCHAR",    "NULL"),
+    Col("AccountNumber",       "VARCHAR",    "NULL"),
+    Col("CustomerName",        "VARCHAR",    "NULL"),
+    Col("BillToState",         "VARCHAR",    "NULL"),
+    Col("BillToCity",          "VARCHAR",    "NULL"),
+    Col("BillToZip",           "VARCHAR",    "NULL"),
+    Col("AccountGroup",        "VARCHAR",    "NULL"),
+    Col("PayStructure",        "VARCHAR",    "NULL"),
+    Col("AppliesToQuota",      "VARCHAR",    "NULL"),
+    Col("SalesRep",            "VARCHAR",    "NULL"),
+    Col("Director",            "VARCHAR",    "NULL"),
+    Col("PartNumber",          "VARCHAR",    "NULL"),
+    Col("ProductCategory",     "VARCHAR",    "NULL"),
+    Col("ProductDescription",  "VARCHAR",    "NULL"),
+    Col("Quantity",            "BIGINT",     "NULL"),
+    Col("ExtendedSaleAmount",  "DOUBLE",     "NULL"),
+    Col("OrderNumber",         "VARCHAR",    "NULL"),
+    Col("PoNumber",            "VARCHAR",    "NULL"),
+    Col("InvoiceDate",         "DATE",       "NULL"),
+    Col("ShipToLineOne",       "VARCHAR",    "NULL"),
+    Col("ShipToCity",          "VARCHAR",    "NULL"),
+    Col("ShipToState",         "VARCHAR",    "NULL"),
+    Col("ShipToZip",           "VARCHAR",    "NULL"),
+    Col("CreditMonth",         "INTEGER",    "NULL"),
+    Col("CreditYear",          "INTEGER",    "NULL"),
+    Col("CreditMonthName",     "VARCHAR",    "NULL"),
+]

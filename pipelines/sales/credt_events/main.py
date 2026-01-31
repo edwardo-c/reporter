@@ -46,9 +46,11 @@ def load_credit_events():
 
             sql = Path(sql_base_dir / step).read_text()
             conn.execute(sql)
+
+        
         
         df = conn.execute("select * from stg_credit_events").df()
-        df.to_csv(r"my_test_csv", index=False)
+        df.to_csv(r"C:\Users\eddiec11us\Documents\credit_events.csv", index=False)
 
 
 """

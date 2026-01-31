@@ -7,9 +7,9 @@ credit_events_pipeline:
   sources:
     sales_people:
       kind: excel_sheet
-      path: ${CREDIT_EVENTS_PATH}
-      sheet: "State Assignments"
-      header: 2
+      path: ${RECLASS_EVENTS_PATH}
+      sheet: "sales_people"
+      header: 0
       register_as: raw_sales_people
 
     bill_to:

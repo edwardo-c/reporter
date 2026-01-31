@@ -1,5 +1,10 @@
 -- selects available columns for Canonical Schema from raw_bill_to --
 
+-- TODO: CTE sales reps with a director, drop null rows, left join with base 
+-- to add in a layer for JB and TY. make a mini view for it so you do not have to do the same where clause
+-- three times, this keeps it consistent accross all joins. 
+
+
 CREATE OR REPLACE TEMP VIEW bill_to AS 
 SELECT
   'PavDirect' AS Distributor,
@@ -9,7 +14,8 @@ SELECT
   NULL AS BillToCity,
   NULL AS BillToZip,
   "Account Group" AS AccountGroup,
-  'BillTo' AS CreditType,
+  Type AS PayStructure,
+  'SalesPerson' AS AppliesToQuota,
   Credit AS SalesRep,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
