@@ -1,10 +1,4 @@
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class Col():
-    name: str
-    dtype: str
-    default_sql: str
+from data_toolkit.duckdb.pipeline_finalize import Col
 
 FINAL_SCHEMA = [
     Col("Distributor",         "VARCHAR",    "NULL"),

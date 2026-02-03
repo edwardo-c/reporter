@@ -1,4 +1,4 @@
-CREATE OR REPLACE TEMP VIEW all_direct AS 
+CREATE OR REPLACE TEMP VIEW all_direct_logic AS 
 WITH base AS (
 SELECT
   'PavDirect' AS Distributor,

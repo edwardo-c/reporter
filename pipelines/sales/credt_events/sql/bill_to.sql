@@ -5,14 +5,21 @@
 -- three times, this keeps it consistent accross all joins. 
 
 
-CREATE OR REPLACE TEMP VIEW bill_to AS 
+
+
+CREATE OR REPLACE TEMP VIEW bill_to_logic AS 
+WITH directors AS (
+  SELECT
+    AcuID,
+    Director
+  FROM sales_people
+  WHERE Director IS NOT NULL
+) 
 SELECT
   'PavDirect' AS Distributor,
   Account AS AccountNumber,
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
-  NULL AS BillToCity,
-  NULL AS BillToZip,
   "Account Group" AS AccountGroup,
   Type AS PayStructure,
   'SalesPerson' AS AppliesToQuota,

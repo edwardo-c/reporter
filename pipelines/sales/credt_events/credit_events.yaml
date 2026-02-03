@@ -65,4 +65,18 @@ credit_events_pipeline:
       - reclass_non_pos.sql
       - reclass_pos.sql
       - stg_credit_events.sql
+  
+  finalize:
+    contract: 
+      schema_module: schema_contract
+      mode: defaults
+    
+    unions:
+      - name: credit_events_all
+        branches:
+          - logic_view: bill_to_logic
+            final_view: bill_to_final
+
+          - logic_view:
+            final_view: 
 

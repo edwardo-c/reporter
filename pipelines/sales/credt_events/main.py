@@ -46,7 +46,13 @@ def load_credit_events():
 
             sql = Path(sql_base_dir / step).read_text()
             conn.execute(sql)
+        
+        """
+        
+        
+        """
 
+        
         
         
         df = conn.execute("select * from stg_credit_events").df()
