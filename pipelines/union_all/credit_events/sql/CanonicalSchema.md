@@ -7,8 +7,10 @@ BillToState
 BillToCity
 BillToZip
 AccountGroup -- (Cross Reference)
-CreditType -- (POS | Bill To | Ship To | Reclass | Key Manager | Inside Sales | Key Director)
+PayStructure -- (POS | BillTo | ShipTo | Reclass )
+AppliesToQuota -- (SalesPerson | KeyManager | InsideSales | KeyDirector | SalesOperations)
 SalesRep -- (Full Names)
+Director -- (Aligns with a Director's quota for their direct reports, only applies to bill to, ship to, and pos)
 PartNumber
 ProductCategory 
 ProductDescription

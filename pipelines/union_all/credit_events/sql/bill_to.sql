@@ -1,17 +1,32 @@
-CREATE OR REPLACE TEMP VIEW ship_to AS 
+-- selects available columns for Canonical Schema from raw_bill_to --
+
+-- TODO: CTE sales reps with a director, drop null rows, left join with base 
+-- to add in a layer for JB and TY. make a mini view for it so you do not have to do the same where clause
+-- three times, this keeps it consistent accross all joins. 
+
+
+
+
+CREATE OR REPLACE TEMP VIEW bill_to_logic AS 
+WITH directors AS (
+  SELECT
+    AcuID,
+    Director
+  FROM sales_people
+  WHERE Director IS NOT NULL
+) 
 SELECT
   'PavDirect' AS Distributor,
   Account AS AccountNumber,
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
-  NULL AS BillToCity,
-  NULL AS BillToZip,
   "Account Group" AS AccountGroup,
-  'ShipTo' AS CreditType,
+  Type AS PayStructure,
+  'SalesPerson' AS AppliesToQuota,
   Credit AS SalesRep,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
-  "Tran Desc" AS ProductDescription,
+  Description AS ProductDescription,
   Qty AS Quantity,
   Amount AS ExtendedSaleAmount,
   "Order Number" AS OrderNumber,
@@ -24,4 +39,4 @@ SELECT
   EXTRACT(MONTH FROM "Invoice Date") AS CreditMonth,
   EXTRACT(YEAR FROM "Invoice Date") AS CreditYear,
   MONTHNAME("Invoice Date") AS CreditMonthName
-FROM raw_ship_to;
+FROM raw_bill_to;

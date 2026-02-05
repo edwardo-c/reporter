@@ -1,4 +1,4 @@
-CREATE OR REPLACE TEMP VIEW all_direct AS 
+CREATE OR REPLACE TEMP VIEW all_direct_logic AS 
 WITH base AS (
 SELECT
   'PavDirect' AS Distributor,
@@ -8,6 +8,7 @@ SELECT
   NULL AS BillToCity,
   NULL AS BillToZip,
   "Account Group" AS AccountGroup,
+  Type AS PayStructure,
   "Inside Sales Salesperson" AS InsideSales,
   "Key Manager Salesperson" AS KeyManager,
   "Key Director Salesperson" AS KeyDirector,
@@ -33,7 +34,7 @@ FROM raw_all_direct
 UNPIVOT base
 ON InsideSales, KeyManager, KeyDirector, SalesOperations, OutsideRepFirm
 INTO 
-  Name CreditType
+  Name AppliesToQuota
   Value AcuID
 )
 SELECT 
@@ -44,6 +45,7 @@ SELECT
   u.BillToCity,
   u.BillToZip,
   u.AccountGroup,
+  u.PayStructure,
   u.CreditType,
   sp.FullName AS SalesRep,
   u.PartNumber,

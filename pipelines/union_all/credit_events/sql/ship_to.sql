@@ -1,19 +1,16 @@
--- selects available columns for Canonical Schema from raw_bill_to --
-
-CREATE OR REPLACE TEMP VIEW bill_to AS 
+CREATE OR REPLACE TEMP VIEW ship_to_logic AS 
 SELECT
   'PavDirect' AS Distributor,
   Account AS AccountNumber,
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
-  NULL AS BillToCity,
-  NULL AS BillToZip,
   "Account Group" AS AccountGroup,
-  'BillTo' AS CreditType,
+  Type AS PayStructure,
+  'SalesPerson' AS AppliesToQuota,
   Credit AS SalesRep,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
-  Description AS ProductDescription,
+  "Tran Desc" AS ProductDescription,
   Qty AS Quantity,
   Amount AS ExtendedSaleAmount,
   "Order Number" AS OrderNumber,
@@ -26,4 +23,4 @@ SELECT
   EXTRACT(MONTH FROM "Invoice Date") AS CreditMonth,
   EXTRACT(YEAR FROM "Invoice Date") AS CreditYear,
   MONTHNAME("Invoice Date") AS CreditMonthName
-FROM raw_bill_to;
+FROM raw_ship_to;

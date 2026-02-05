@@ -1,15 +1,14 @@
 database: ${DATABASE}
 
-
 credit_events_pipeline:
   year: 2025
 
   sources:
     sales_people:
       kind: excel_sheet
-      path: ${CREDIT_EVENTS_PATH}
-      sheet: "State Assignments"
-      header: 2
+      path: ${HELPER_INTERFACE}
+      sheet: "sales_people"
+      header: 0
       register_as: raw_sales_people
 
     bill_to:
@@ -42,14 +41,14 @@ credit_events_pipeline:
 
     reclass_pos:
       kind: excel_sheet
-      path: ${RECLASS_EVENTS_PATH}
+      path: ${HELPER_INTERFACE}
       sheet: "reclass_pos"
       header: 0
       register_as: raw_reclass_pos
 
     reclass_non_pos:
       kind: excel_sheet
-      path: ${RECLASS_EVENTS_PATH}
+      path: ${HELPER_INTERFACE}
       sheet: "reclass_non_pos"
       header: 0
       register_as: raw_reclass_non_pos
@@ -65,4 +64,21 @@ credit_events_pipeline:
       - reclass_non_pos.sql
       - reclass_pos.sql
       - stg_credit_events.sql
+  
+  finalize:
+    contract: 
+      schema_module: schema_contract
+      mode: defaults
+    
+    unions:
+      - name: credit_events_all
+        branches:
+          - logic_view: bill_to_logic
+            final_view: bill_to_final
+
+          - logic_view: ship_to_logic
+            final_view: ship_to_final
+          
+          - logic_view: all_direct_logic
+            final_view: all_direct_final
 
