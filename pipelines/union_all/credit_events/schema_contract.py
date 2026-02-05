@@ -1,4 +1,4 @@
-from data_toolkit.duckdb.pipeline_finalize import Col
+from data_toolkit.duckdb.contract_projection import Col
 
 FINAL_SCHEMA = [
     Col("Distributor",         "VARCHAR",    "NULL"),

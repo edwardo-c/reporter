@@ -1,11 +1,9 @@
-CREATE OR REPLACE TEMP VIEW ship_to AS 
+CREATE OR REPLACE TEMP VIEW ship_to_logic AS 
 SELECT
   'PavDirect' AS Distributor,
   Account AS AccountNumber,
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
-  NULL AS BillToCity,
-  NULL AS BillToZip,
   "Account Group" AS AccountGroup,
   Type AS PayStructure,
   'SalesPerson' AS AppliesToQuota,
