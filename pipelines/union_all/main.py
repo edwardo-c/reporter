@@ -22,11 +22,11 @@ def main():
 
     with duckdb.connect(db) as conn:
         
-        register_frames(conn, sources)
+        _ = register_frames(conn, sources)
        
-        run_ordered_sql(conn, ordered_sql)
-        
         breakpoint()
+
+        run_ordered_sql(conn, ordered_sql)
 
         # enforce CanonicalSchema and apply UNION ALL
     

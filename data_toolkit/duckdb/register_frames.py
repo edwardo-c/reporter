@@ -2,58 +2,71 @@ from dataclasses import dataclass, field
 import duckdb
 from pathlib import Path
 import pandas as pd
+from typing import Mapping, Any
+from data_toolkit.config_reader import validators
+
 
 @dataclass
-class SourceConfig:
-    kind: str
-    path: str
-    sheet: str
+class CsvFrame():
+    kind: str = "csv"
+    path: Path
+    header: int
     register_as: str
-    header: int = 0
-    ext: str = field(default="")
 
-    def __post_init__(self):
-        test_path = Path(self.path)
+    @classmethod
+    def from_cfg(cls, cfg: Mapping[str, Any]):
+        path = validators.get_path(cfg)
+        register_as = validators.get_register_as(cfg)
+        header = validators.get_header(cfg)
 
-        assert test_path.exists() and test_path.is_file(), (
-            f"invalid path {self.path} for {self.register_as}"
+        return cls(
+            path=path, 
+            header=header, 
+            register_as=register_as
         )
 
-        if not self.ext:
-            self.ext = test_path.suffix
+@dataclass
+class ExcelFrame():
+    kind: str = "excel_sheet"
+    path: Path
+    header: int
+    sheet: str
+    register_as: str
 
-
-def register_frames(
-        conn: duckdb.DuckDBPyConnection,
-        cfg: dict[str, dict[str, str, int]],
-    ) -> list[str]:
-    
-    registered = []
-
-    for _, src_params in cfg.items():
+    @classmethod
+    def from_cfg(cls, cfg: Mapping[str, Any]):
         
-        src_cfg = SourceConfig(**src_params)
+        path = validators.get_path(cfg)
+        register_as = validators.get_register_as(cfg)
+        header = validators.get_header(cfg)
+        sheet = validators.get_sheet(cfg)
+
+        return cls(
+            path=path, 
+            header=header, 
+            sheet=sheet, 
+            register_as=register_as
+        )
+
+FRAME_REGISTRY = {
+    "csv"  : CsvFrame,
+    "xlsm" : ExcelFrame,
+    "xlsx" : ExcelFrame
+}
+
+def register_from_cfg(cfg, conn):
+    """dispatch for frame type registration from config"""
+    frame_map = {}
+    for raw_frame_cfg in cfg:
+
+        kind = validators.get_kind(raw_frame_cfg, FRAME_REGISTRY)
         
-        if src_cfg.ext == "csv":
-            df = pd.read_csv(
-                src_cfg.path, 
-                header=src_cfg.header
-            )
-        elif (src_cfg.ext == ".xlsx") or (src_cfg.ext == "xlsm"):
-            df = pd.read_excel(
-                src_cfg.path, 
-                header=src_cfg.header, 
-                sheet_name=src_cfg.sheet
-            )
-        else:
-            raise NotImplementedError(
-                f"unable to read {src_cfg.path}, invalid extension"
-            )
+        frame = 
 
-        conn.register(src_cfg.register_as, df)
+def register_mapping(frame_map: dict, conn):
+    """expects alias -> dataframe"""
+    for alias, df in frame_map.items():
+        pass
 
-        registered.append(src_cfg.register_as)
-    
-    return registered
-    
-    
+
+
