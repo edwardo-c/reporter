@@ -1,0 +1,8 @@
+credentials:
+  username: ${}
+  password: ${}
+  security_token: ${}
+
+report:
+  report_id: "00O2K000005uTHX"
+  include_details: True

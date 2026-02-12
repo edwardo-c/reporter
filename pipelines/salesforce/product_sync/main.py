@@ -1,7 +1,7 @@
 """scaffolding for product sync procedure from Acumatica to Salesforce"""
 
 from data_toolkit.clients.acumatica import AcumaticaClient
-from data_toolkit.clients.salesforce import SFClient
+from data_toolkit.salesforce.client import SFClient
 from utils.yaml_loader import load_yaml
 from dotenv import load_dotenv
 from config.paths import SALESFORCE_PRODUCT_SYNC_CFG, SALESFORCE_PRODUCT_SYNC_ENV

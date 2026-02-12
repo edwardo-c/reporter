@@ -4,7 +4,7 @@ import os
 import pytest
 
 from config.paths import SF_CRED
-from data_toolkit.clients.salesforce import SFClient
+from data_toolkit.salesforce.client import SFClient
 from salesforce.ids import registry
 from salesforce.objects.new_part import NewPart
 from salesforce.objects.msrp_entry import MSRPEntry

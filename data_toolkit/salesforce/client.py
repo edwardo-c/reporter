@@ -44,3 +44,30 @@ class SFClient:
             return pd.DataFrame(records).drop(columns=["attributes"], errors="ignore")
         else:
             return records
+    
+    def get_report(
+            self, 
+            report_id: str, 
+            include_details: bool
+        ):
+        """
+        returns the json response body from a predefined salesforce report
+        """
+        
+        if not isinstance(report_id, str):
+            raise TypeError(f"report_id must be str, got: {type(report_id)}")
+        elif len(report_id) == 0:
+            raise ValueError(
+                f"report_id cannot be a 0 length string"
+                "report_ids are approximatly 13-15 characters,"
+                "usually starting with '00O', often found in the URL of the report"
+            )
+
+
+        report_results = self._sf.restful(
+            f'analytics/reports/{report_id}?includeDetails={str(include_details)}'
+        )
+        
+        # TODO: log the name of the report found using the metadata
+
+        return report_results
