@@ -1,7 +1,7 @@
 credentials:
-  username: ${}
-  password: ${}
-  security_token: ${}
+  username: ${SF_USERNAME}
+  password: ${SF_PASSWORD}
+  security_token: ${SF_TOKEN}
 
 report:
   report_id: "00O2K000005uTHX"
