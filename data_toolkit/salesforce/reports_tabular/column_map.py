@@ -26,11 +26,27 @@ class ColumnMap:
         self.grp_labels_to_idx:       dict[str, int] = {}
         self._norm_grp_labels_to_idx: dict[str, int] = {}
 
+        self.agg_keys_to_idx:         dict[str, int] = {}
+        self._norm_agg_keys_to_idx:   dict[str, int] = {}
+
+        self.agg_labels_to_idx:       dict[str, int] = {}
+        self._norm_agg_labels_to_idx: dict[str, int] = {}
+
         self._init_detail_maps(payload)
         self._init_grouping_maps(payload)
+        self._init_agg_maps(payload)
 
-    def _init_detail_maps(self, payload):
-        """get all maps from detailColumnInfo"""
+    def _init_agg_maps(self, payload: Mapping[Any, Any]):
+        col_info = payload["reportExtendedMetadata"]["aggregateColumnInfo"]
+
+        maps = self._extract_maps(col_info)
+
+        self.agg_keys_to_idx         = maps["keys_to_idx"]
+        self._norm_agg_keys_to_idx   = maps["norm_keys_to_idx"]
+        self.agg_labels_to_idx       = maps["labels_to_idx"]
+        self._norm_agg_labels_to_idx = maps["norm_labels_to_idx"]
+
+    def _init_detail_maps(self, payload: Mapping[Any, Any]):
         col_info = payload["reportExtendedMetadata"]["detailColumnInfo"]
 
         maps = self._extract_maps(col_info)
