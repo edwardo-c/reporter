@@ -1,21 +1,21 @@
-"""
-emails count from salesforce report
-expected to have user_email in the grouping
-"""
 
-from data_toolkit.salesforce.client import SFClient
-from utils.yaml_loader import load_yaml
 from dotenv import load_dotenv
 
-from pipelines.paths.cfg_paths import SALESFORCE_GRP_RPT_TO_EMAIL_CFGS
 from config.paths import SF_GRP_EMAILS_ENV
-
-from data_toolkit.salesforce.reports_tabular.column_map import ColumnMap
+from data_toolkit.clients.outlook.outlook_sender import BaseEmail
+from data_toolkit.clients.outlook.outlook_sender import send_emails
+from data_toolkit.salesforce.client import SFClient
 from data_toolkit.salesforce.reducers.grouped_to_agg import single_grp_to_agg
+from data_toolkit.salesforce.reports_tabular.column_map import ColumnMap
+from pipelines.salesforce.grp_rpt_to_email.email_bodies.registry import get_email_func
+from pipelines.paths.cfg_paths import SALESFORCE_GRP_RPT_TO_EMAIL_CFGS
+from utils.yaml_loader import load_yaml
+
 
 """file name of the config to use for the pipeline"""
 CFG_FILE_NAME = "overdue_opps.yaml"
 
+PROD = False
 
 def main():
 
@@ -42,13 +42,11 @@ def main():
     
     # guard rail against unexpected group key
     try:
-        grp_key = cfg["report"]["grp_key"]
-        grp_idx = column_map._get_grp_index_by_key(grp_key)
+        grp_idx = column_map._get_grp_index_by_key("OWNER_EMAIL")
     except KeyError:
         raise KeyError(
-            f"Unexpected group key! Expected: '{grp_key}', "
+            f"Unexpected group key! Expected: 'OWNER_EMAIL', "
             f"got {list(column_map.grp_keys_to_idx.keys())[0]}. "
-            f"config may be incorrect or "
             f"grouped columns in report are not as expected"
         )
     
@@ -67,7 +65,19 @@ def main():
     
     email_to_row_count: dict = single_grp_to_agg(payload)
 
-    breakpoint()
+    emails_to_send: list[BaseEmail] = []
+
+    body_func = get_email_func(cfg["email"]["body_func_key"])
+
+    for email_addr, agg_val in email_to_row_count.items():
+        e = BaseEmail(
+            recipients=email_addr,
+            subject=cfg["email"]["subject"],
+            body=body_func(agg_val),
+        )
+        emails_to_send.append(e)
+
+    sent_count = send_emails(emails_to_send, prod=PROD)
 
 if __name__ == "__main__":
     main()

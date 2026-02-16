@@ -5,11 +5,12 @@ credentials:
 
 report:
   id: "00O2K000005uTHXUA2"
-  grp_key: "Owner_Email"
   agg_key: "RowCount"
 
 email:
-  something: something_else
+  subject: "Overdue Opportunities Notification"
+  body_func_key: "overdue_opps" 
+  
 
 
      

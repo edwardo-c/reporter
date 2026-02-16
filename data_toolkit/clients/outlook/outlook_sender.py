@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Sequence
+from typing import Sequence, Mapping, Any
 
 olMailItem = 0  # Outlook constant
 
@@ -72,3 +72,31 @@ class OutlookSender:
         else:
             mail.Display()  # preview in dev
             breakpoint()
+
+
+def send_emails(emails_to_send: list[BaseEmail], prod: bool) -> int:
+    """
+    convenience wrapper -
+    allows user pass in pre-built BaseEmails for sending
+    if prod = true, emails will be sent, else breakpoint() to inspect first email
+
+    CAUTION: 
+    performance degraded if using more than once due to 
+    bind (and re-bind) of outlook instance (see OLClient)
+    if using multiple [BaseEmails], use seperate adapter for performance boost
+    """
+    sent_count = 0
+    from data_toolkit.clients.outlook.outlook import OLClient
+
+    with OLClient() as ol_app:
+        sender = OutlookSender(
+            ol_app,
+            sent_on_behalf="sales@peerless-av.com",
+            prod=prod
+        )
+        
+        for e in emails_to_send:
+            sender.send(e)
+            sent_count += 1
+    
+    return sent_count

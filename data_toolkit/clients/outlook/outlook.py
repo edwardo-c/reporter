@@ -19,3 +19,5 @@ class OLClient:
         # do not quit Outlook — let it finish sending
         self._outlook = None
         self._owns_outlook = False
+
+
