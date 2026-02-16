@@ -11,17 +11,3 @@ def count_by_col_index(col_index: int, payload) -> dict[Any, int]:
         else:
             d[row_value] = 1
     return d
-
-
-
-"""
-used when grouping exists
-
-exepcted result: Mapping[str, int] = {
-    'ec@email.com': 10, 
-}
-"""
-
-def get_grouped_row_count(payload: Mapping[Any, Any]):
-    """get group value and row count for group"""
-    pass

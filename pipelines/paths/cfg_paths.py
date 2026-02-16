@@ -6,6 +6,6 @@ SALESFORCE_GRP_RPT_TO_EMAIL_CFGS = (
     PROJECT_ROOT / 
     "pipelines"  / 
     "salesforce" / 
-    "grouped_report_to_email" / 
+    "grp_rpt_to_email" / 
     "cfgs"
 )

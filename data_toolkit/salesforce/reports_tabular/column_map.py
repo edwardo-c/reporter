@@ -1,4 +1,6 @@
-from typing import Any, Mapping
+from typing import Any, Mapping, Callable
+
+from utils.raises.strings import raise_invalid_string
 
 """
 # example usage: 
@@ -14,11 +16,11 @@ def normalize_string(s: str):
 class ColumnMap:
     def __init__(self, payload: Mapping[Any, Any]):
 
-        self.keys_to_idx:             dict[str, int] = {}
-        self._norm_keys_to_idx:       dict[str, int] = {}
+        self.col_keys_to_idx:         dict[str, int] = {}
+        self._norm_col_keys_to_idx:   dict[str, int] = {}
 
-        self.labels_to_idx:           dict[str, int] = {}
-        self._norm_labels_to_idx:     dict[str, int] = {}
+        self.col_labels_to_idx:       dict[str, int] = {}
+        self._norm_col_labels_to_idx: dict[str, int] = {}
         
         self.grp_keys_to_idx:         dict[str, int] = {}
         self._norm_grp_keys_to_idx:   dict[str, int] = {}
@@ -32,7 +34,7 @@ class ColumnMap:
         self.agg_labels_to_idx:       dict[str, int] = {}
         self._norm_agg_labels_to_idx: dict[str, int] = {}
 
-        self._init_detail_maps(payload)
+        self._init_column_maps(payload)
         self._init_grouping_maps(payload)
         self._init_agg_maps(payload)
 
@@ -46,15 +48,15 @@ class ColumnMap:
         self.agg_labels_to_idx       = maps["labels_to_idx"]
         self._norm_agg_labels_to_idx = maps["norm_labels_to_idx"]
 
-    def _init_detail_maps(self, payload: Mapping[Any, Any]):
+    def _init_column_maps(self, payload: Mapping[Any, Any]):
         col_info = payload["reportExtendedMetadata"]["detailColumnInfo"]
 
         maps = self._extract_maps(col_info)
 
-        self.keys_to_idx         = maps["keys_to_idx"]
-        self._norm_keys_to_idx   = maps["norm_keys_to_idx"]
-        self.labels_to_idx       = maps["labels_to_idx"]
-        self._norm_labels_to_idx = maps["norm_labels_to_idx"]
+        self.col_keys_to_idx         = maps["keys_to_idx"]
+        self._norm_col_keys_to_idx   = maps["norm_keys_to_idx"]
+        self.col_labels_to_idx       = maps["labels_to_idx"]
+        self._norm_col_labels_to_idx = maps["norm_labels_to_idx"]
 
     def _init_grouping_maps(self, payload: Mapping[Any, Any]):
         col_info = payload["reportExtendedMetadata"]["groupingColumnInfo"]
@@ -90,7 +92,10 @@ class ColumnMap:
                 "Use API names or disambiguate labels."
         )
 
-    def _extract_maps(self, col_info: dict[Any, Any]):
+    def _extract_maps(
+            self, 
+            col_info: dict[Any, Any]
+        ) -> Mapping[str, Mapping[str, int]]:
         key_map = {}
         norm_key_map = {}
         label_map = {}
@@ -125,38 +130,121 @@ class ColumnMap:
             "norm_labels_to_idx": norm_label_map
         }
 
-    def get_index_by_key(self, key_name: str) -> int:
-        norm_name = normalize_string(key_name)
-        if norm_name not in self._norm_keys_to_idx:  
+    def _get_col_index_by_key(self, col_key_name: str) -> int:
+        norm_name = normalize_string(col_key_name)
+        if norm_name not in self._norm_col_keys_to_idx:  
             raise KeyError(
-                f"Column key '{key_name}' not found"
+                f"Column key '{col_key_name}' not found"
                 "Available keys come from report detailColumnInfo."
             )
-        return self._norm_keys_to_idx[norm_name]
+        return self._norm_col_keys_to_idx[norm_name]
     
-    def get_index_by_label(self, label_name: str) -> int:
-        norm_name = normalize_string(label_name)
-        if norm_name not in self._norm_labels_to_idx:  
+    def _get_col_index_by_label(self, col_label_name: str) -> int:
+        norm_name = normalize_string(col_label_name)
+        if norm_name not in self._norm_col_labels_to_idx:  
             raise KeyError(
-                f"Column label '{label_name}' not found"
+                f"Column label '{col_label_name}' not found"
                  "Labels must match the report column labels"
             )
-        return self._norm_labels_to_idx[norm_name]
+        return self._norm_col_labels_to_idx[norm_name]
 
-    def get_grp_index_by_key(self, grp_key_name: str) -> int:
+    def _get_grp_index_by_key(self, grp_key_name: str) -> int:
         norm_name = normalize_string(grp_key_name)
-        if norm_name not in self._norm_keys_to_idx:  
+        if norm_name not in self._norm_grp_keys_to_idx:  
             raise KeyError(
                 f"Group column key '{grp_key_name}' not found"
                 "Available keys come from report 'groupingColumnInfo'"
             )
         return self._norm_grp_keys_to_idx[norm_name]
     
-    def get_grp_index_by_label(self, grp_label_name: str) -> int:
+    def _get_grp_index_by_label(self, grp_label_name: str) -> int:
         norm_name = normalize_string(grp_label_name)
-        if norm_name not in self._norm_labels_to_idx:  
+        if norm_name not in self._norm_grp_labels_to_idx:  
             raise KeyError(
                 f"Column label '{grp_label_name}' not found"
                  "Labels must match the report column labels."
             )
         return self._norm_grp_labels_to_idx[norm_name]
+    
+    def _get_agg_index_by_key(self, agg_key_name: str) -> int:
+        norm_name = normalize_string(agg_key_name)
+        if norm_name not in self._norm_agg_keys_to_idx:  
+            raise KeyError(
+                f"Aggregate column key '{agg_key_name}' not found"
+                "Available keys come from report 'aggregateColumnInfo'"
+            )
+        return self._norm_agg_keys_to_idx[norm_name]
+    
+    def _get_agg_index_by_label(self, agg_label_name: str) -> int:
+        norm_name = normalize_string(agg_label_name)
+        if norm_name not in self._norm_agg_labels_to_idx:  
+            raise KeyError(
+                f"Aggregate label '{agg_label_name}' not found"
+                 "Labels must match the report group by column labels."
+            )
+        return self._norm_agg_labels_to_idx[norm_name]
+
+    def _dispatch_index_getter(self, column_type: str, id_type: str) -> Callable:
+        
+        raise_invalid_string(column_type, "column_type")
+        raise_invalid_string(id_type, "id_type")
+
+        norm_col_type = normalize_string(column_type)
+        norm_id_type = normalize_string(id_type)
+
+        col_to_id_types = {
+            "column": {
+                "key": self._get_col_index_by_key,
+                "label": self._get_col_index_by_label
+            },
+
+            "group" : {
+                "key": self._get_grp_index_by_key,
+                "label": self._get_grp_index_by_label
+            },
+
+            "agg"   : {
+                "key": self._get_agg_index_by_key,
+                "label": self._get_agg_index_by_label,
+            },
+        }
+
+        if norm_col_type not in col_to_id_types:
+            raise KeyError(
+                f"Invalid column type, got: {column_type}. "
+                "available options: 'column', 'group', 'agg'"
+            )
+
+        if norm_id_type not in ('key', 'label'):
+            raise KeyError(
+                f"Invalid id type, got: {id_type}. "
+                "available options: 'key', 'label'"
+            )
+    
+        return col_to_id_types[norm_col_type][norm_id_type]
+
+    def get_index(self, name: str, column_type: str, id_type: str) -> int:
+        """
+        universal entry for all index types
+        
+        column_types: 
+          'detail': the columns from the table
+          'group': the columns in the "group by" portion 
+          'agg': the summary values produced by the grouped values 
+            (e.g RowCount, Amount, etc)
+
+        id_types:
+          'key': the api name from payload
+          'label' the name of the column on the report
+
+        name: the name to get the column index for
+          
+        """
+        raise_invalid_string(name, "name")
+        raise_invalid_string(column_type, "column_type")
+        raise_invalid_string(id_type, "id_type")
+
+        getter = self._dispatch_index_getter(column_type, id_type)
+        return getter(name)
+        
+        

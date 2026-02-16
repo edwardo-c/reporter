@@ -1,0 +1,15 @@
+credentials:
+  username: ${SF_USERNAME}
+  password: ${SF_PASSWORD}
+  security_token: ${SF_TOKEN}
+
+report:
+  id: "00O2K000005uTHXUA2"
+  grp_key: "Owner_Email"
+  agg_key: "RowCount"
+
+email:
+  something: something_else
+
+
+     
