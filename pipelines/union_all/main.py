@@ -12,31 +12,27 @@ def main():
     cfg = load_yaml(CREDIT_EVENTS_CFG)
     
     db = cfg["database"]
+    conn = duckdb.connect(db)
     
     sources = cfg["credit_events_pipeline"]["sources"]
+    cfg_normalizer = ConfigNormalizer()
     
     ordered_sql = cfg["credit_events_pipeline"]["sql"]
 
-    cfg_normalizer = ConfigNormalizer()
 
-    with duckdb.connect(db) as conn:
-        
-        
-        for cfg_id, raw_src_cfg in sources.items():
+    for cfg_id, raw_src_cfg in sources.items():
 
-            clean_cfg = cfg_normalizer.from_cfg(raw_src_cfg)
-            breakpoint()
+        clean_cfg = cfg_normalizer.from_cfg(raw_src_cfg)
 
+        # TODO: register frame
+        ...
 
-            # register frame
+    # holds all business logic
+    run_ordered_sql(conn, ordered_sql)
 
-        run_ordered_sql(conn, ordered_sql)
-
-        # enforce CanonicalSchema and apply UNION ALL
+    # TODO: enforce CanonicalSchema and apply UNION ALL
     
-        # inspect export manually - escape hatch:
-        # df = conn.execute("select * from stg_credit_events").df()
-        # df.to_csv(r"C:\Users\eddiec11us\Documents\credit_events.csv", index=False)
+    # TODO: export
 
 
 """
