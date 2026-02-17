@@ -57,6 +57,10 @@ def create_union_all_query(views: list[str]):
     expr = [f"SELECT * FROM {view}" for view in views]
     return "\nUNION ALL\n".join(expr)
 
+
+
+
+
 def contract_enforced_union_all(
         conn: duckdb.DuckDBPyConnection, 
         schema: list[Col],

@@ -1,7 +1,6 @@
 # Group Report To Email
 
-Configurable pipeline that emails single-grouped (OWNER_EMAIL) Salesforce reports using
-a user-specified aggregate.
+Configurable pipeline that emails single-grouped (OWNER_EMAIL) Salesforce reports using a user-specified aggregate.
 
 ## Why This Exists
 

@@ -5,49 +5,49 @@ credit_events_pipeline:
 
   sources:
     sales_people:
-      kind: excel_sheet
+      kind: xlsx
       path: ${HELPER_INTERFACE}
       sheet: "sales_people"
       header: 0
       register_as: raw_sales_people
 
     bill_to:
-      kind: excel_sheet
+      kind: xlsx
       path: ${CREDIT_EVENTS_PATH}
       sheet: "Bill To"
       header: 5
       register_as: raw_bill_to
 
     ship_to:
-      kind: excel_sheet
+      kind: xlsx
       path: ${CREDIT_EVENTS_PATH}
       sheet: "Ship To"
       header: 5
       register_as: raw_ship_to
     
     all_direct:
-      kind: excel_sheet
+      kind: xlsx
       path: ${CREDIT_EVENTS_PATH}
       sheet: "All Direct"
       header: 5
       register_as: raw_all_direct
 
     pos:
-      kind: excel_sheet
+      kind: xlsx
       path: ${CREDIT_EVENTS_PATH}
       sheet: "POS"
       header: 5
       register_as: raw_pos
 
     reclass_pos:
-      kind: excel_sheet
+      kind: xlsx
       path: ${HELPER_INTERFACE}
       sheet: "reclass_pos"
       header: 0
       register_as: raw_reclass_pos
 
     reclass_non_pos:
-      kind: excel_sheet
+      kind: xlsx
       path: ${HELPER_INTERFACE}
       sheet: "reclass_non_pos"
       header: 0

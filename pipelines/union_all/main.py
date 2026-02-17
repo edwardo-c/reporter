@@ -2,11 +2,8 @@ import duckdb
 from utils.yaml_loader import load_yaml
 from config.paths import CREDIT_EVENTS_ENV, CREDIT_EVENTS_CFG
 from dotenv import load_dotenv
-import pandas as pd
-from pathlib import Path
-from data_toolkit.duckdb.register_frames import register_frames
 from data_toolkit.duckdb.execute_sql import run_ordered_sql
-
+from data_toolkit.duckdb.register_frames import register_frames_from_cfg
 
 def main():
 
@@ -22,7 +19,7 @@ def main():
 
     with duckdb.connect(db) as conn:
         
-        _ = register_frames(conn, sources)
+        register_frames_from_cfg(conn, sources)
        
         breakpoint()
 

@@ -16,22 +16,32 @@ def valid_dir(directory: str | Path ) -> Path:
 
     return directory
 
-def valid_path(file_path: str | Path) -> Path:
-    """confirms path is valid returns pathlib.Path Object"""
-    # is it a string?        
+def validate_path(file_path: str | Path) -> None:
+    
     if not isinstance(file_path, (str, Path)):
-        raise TypeError(f"valid_path: expected str|Path, received: {type(file_path)}")
+        raise TypeError(f"expected Path or str, got: {type(file_path)}")
     
-    # if string, is it a valid file path?
-    if isinstance(file_path, str):
-        try:
-            file_path = Path(file_path)
-        except Exception as e:
-            raise ValueError(f"valid_path: invalid file path, {file_path}")
+    if isinstance(path, str):
+        if len(path) == 0:
+            raise ValueError(f"path cannot be an empty string")
+        else:
+            path = Path(path)
 
-    # does the file exist?
-    if not file_path.exists():
-        raise FileNotFoundError(f"valid_path: {file_path} does not exist")
-    
-    # passed all tests, return Path object
-    return file_path
+    if not path.exists():
+        raise FileNotFoundError(f"path does not exist, {path}")
+
+def validate_str(s: str, allow_zero: bool = False) -> None:
+    if not isinstance(s, str):
+        raise TypeError(f"expected type str, got {type(s)}")
+    elif not allow_zero:
+        if len(s) == 0:
+            raise ValueError(
+                f"cannot be 0 length str"
+                "bypass: set allow_zero = True"
+            )
+
+def validate_positive_int(val: int) -> None:
+    if not isinstance(val, int):
+        raise ValueError(f"must be integer, got {type(val)}")
+    elif val < 0:
+        raise ValueError(f"must be a positive integer")
