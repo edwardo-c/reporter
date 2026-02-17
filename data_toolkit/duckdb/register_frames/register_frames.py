@@ -72,9 +72,6 @@ class FrameRegistry():
         expects normalized kind_id, see ConfigNormalizer
         """
         return cls.registry[kind_id]
-    
-
-
 
 class FrameReader():
     registry = {

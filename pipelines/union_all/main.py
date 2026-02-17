@@ -3,7 +3,7 @@ from utils.yaml_loader import load_yaml
 from config.paths import CREDIT_EVENTS_ENV, CREDIT_EVENTS_CFG
 from dotenv import load_dotenv
 from data_toolkit.duckdb.execute_sql import run_ordered_sql
-from data_toolkit.duckdb.register_frames import register_frames_from_cfg
+from data_toolkit.duckdb.register_frames.config_normalizer import ConfigNormalizer
 
 def main():
 
@@ -17,11 +17,18 @@ def main():
     
     ordered_sql = cfg["credit_events_pipeline"]["sql"]
 
+    cfg_normalizer = ConfigNormalizer()
+
     with duckdb.connect(db) as conn:
         
-        register_frames_from_cfg(conn, sources)
-       
-        breakpoint()
+        
+        for cfg_id, raw_src_cfg in sources.items():
+
+            clean_cfg = cfg_normalizer.from_cfg(raw_src_cfg)
+            breakpoint()
+
+
+            # register frame
 
         run_ordered_sql(conn, ordered_sql)
 

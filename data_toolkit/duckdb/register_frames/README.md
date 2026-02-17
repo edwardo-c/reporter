@@ -16,13 +16,13 @@ Use ConfigNormalizer when initialing a *Frame to validate input
 ├─ data_toolkit/
     └─ duckdb/
         └─ register_frames/
-            └─ config_normalizer.py   # entry
+            └─ config_normalizer.py      # entry
 ├─ utils/
-    └─ validators.py                  # general type validators (path, str, ...)
+    └─ validators.py                     # general type validators (path, str, ...)
 
 ## Quick Start Guide
-
-cfg = ConfigNormalizer.from_cfg(raw_cfg)
+normalizer = ConfigNormalizer()          # to initialize the register
+clean_cfg = normalizer.from_cfg(raw_cfg)
 
 ## Configuration
 ```

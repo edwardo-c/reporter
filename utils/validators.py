@@ -21,14 +21,14 @@ def validate_path(file_path: str | Path) -> None:
     if not isinstance(file_path, (str, Path)):
         raise TypeError(f"expected Path or str, got: {type(file_path)}")
     
-    if isinstance(path, str):
-        if len(path) == 0:
+    if isinstance(file_path, str):
+        if len(file_path) == 0:
             raise ValueError(f"path cannot be an empty string")
         else:
-            path = Path(path)
+            file_path = Path(file_path)
 
-    if not path.exists():
-        raise FileNotFoundError(f"path does not exist, {path}")
+    if not file_path.exists():
+        raise FileNotFoundError(f"path does not exist, {file_path}")
 
 def validate_str(s: str, allow_zero: bool = False) -> None:
     if not isinstance(s, str):
