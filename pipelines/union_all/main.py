@@ -3,7 +3,10 @@ from utils.yaml_loader import load_yaml
 from config.paths import CREDIT_EVENTS_ENV, CREDIT_EVENTS_CFG
 from dotenv import load_dotenv
 from data_toolkit.duckdb.execute_sql import run_ordered_sql
-from data_toolkit.duckdb.register_frames.config_normalizer import ConfigNormalizer
+from data_toolkit.duckdb.register_frames.register_frames import register_frames_from_cfg
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 def main():
 
@@ -12,23 +15,21 @@ def main():
     cfg = load_yaml(CREDIT_EVENTS_CFG)
     
     db = cfg["database"]
-    conn = duckdb.connect(db)
+    
     
     sources = cfg["credit_events_pipeline"]["sources"]
-    cfg_normalizer = ConfigNormalizer()
-    
+
     ordered_sql = cfg["credit_events_pipeline"]["sql"]
 
+    with duckdb.connect(db) as conn:
 
-    for cfg_id, raw_src_cfg in sources.items():
+        register_frames_from_cfg(sources, conn)
+        logging.info(f"frames registered")
 
-        clean_cfg = cfg_normalizer.from_cfg(raw_src_cfg)
-
-        # TODO: register frame
-        ...
-
+    breakpoint()
+    
     # holds all business logic
-    run_ordered_sql(conn, ordered_sql)
+    # run_ordered_sql(conn, ordered_sql)
 
     # TODO: enforce CanonicalSchema and apply UNION ALL
     

@@ -1,104 +1,37 @@
-from dataclasses import dataclass
+from data_toolkit.duckdb.register_frames.config_normalizer import ConfigNormalizer
+from data_toolkit.duckdb.register_frames.factory import FrameFactory
+from data_toolkit.duckdb.register_frames.reader import FrameReader
 import duckdb
-import pandas as pd
-from pathlib import Path
-from typing import Mapping, Any
-
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
-@dataclass
-class CsvFrame():
-    kind: str
-    path: Path
-    header: int
-    register_as: str
-
-    @classmethod
-    def from_cfg(cls, cfg: Mapping[str, Any]):
-        path = validators.get_path(cfg)
-        register_as = validators.get_register_as(cfg)
-        header = validators.get_header(cfg)
-
-        return cls(
-            path=path, 
-            header=header, 
-            register_as=register_as
-        )
-
-@dataclass
-class ExcelFrame():
-    kind: str
-    path: Path
-    header: int
-    sheet: str
-    register_as: str
-
-    @classmethod
-    def from_cfg(cls, cfg: Mapping[str, Any]):
-        
-        path = validators.get_path(cfg)
-        register_as = validators.get_register_as(cfg)
-        header = validators.get_header(cfg)
-        sheet = validators.get_sheet(cfg)
-
-        return cls(
-            path=path, 
-            header=header, 
-            sheet=sheet, 
-            register_as=register_as
-        )
-
-class FrameRegistry():
+def register_frames_from_cfg(cfg, conn: duckdb.DuckDBPyConnection) -> None:
     """
-    Frame registry dispatch of data classes
-    
-    example usage:
-
-        frame_type = FrameRegistry.get_kind("xlsx")
-
+    registers each frame in conn from cfg
     """
-    registry = {
-        "csv"  : CsvFrame,
-        "xlsm" : ExcelFrame,
-        "xlsx" : ExcelFrame
-    }
+    # TODO: assert key matches between cfg_norm, reader, and factory
 
-    @classmethod
-    def get_kind(cls, kind_id: str):
-        """
-        expects normalized kind_id, see ConfigNormalizer
-        """
-        return cls.registry[kind_id]
+    cfg_normalizer = ConfigNormalizer()
+    reader = FrameReader()
+    factory = FrameFactory()
 
-class FrameReader():
-    registry = {
-        "xlsx": pd.read_excel,
-        "xlsm": pd.read_excel,
-        "csv":  pd.read_csv,
-    }
+    for cfg_id, raw_src_cfg in cfg.items():
 
-    @classmethod
-    def read(frame: CsvFrame | ExcelFrame):
-        ...
+        logging.info(f"processing cfg_id: {cfg_id}")
 
-def register_frames_from_cfg(cfg, conn):
-    """dispatch frame registration from config"""
+        clean_cfg = cfg_normalizer.from_cfg(raw_src_cfg)
 
-    for frame_id, frame_details in cfg.items():
+        frame = factory.make_frame(clean_cfg)
 
-        logging.info(f"reading frame_id: {frame_id}")
-        frame = FrameRegistry.get_kind(frame_details["kind"])
+        df = reader.read(frame)
 
-        # normalize config, pass properly formatted inputs to the frame
-        frame = ...
+        conn.register(frame.register_as, df)
 
-def register_mapping(frame_map: dict, conn):
-    """expects alias -> dataframe"""
-    for alias, df in frame_map.items():
-        pass
+        logging.info(f"Registered cfg_id: {cfg_id} as {frame.register_as}")
+
+
 
 
 

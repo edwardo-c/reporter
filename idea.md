@@ -13,6 +13,11 @@ crucial step: normalize account numbers
 ==================================================
 
 - register frames
+    clean config
+    fill data class
+    read frame
+    register
+
 - enforce schema
 - union all
 
@@ -22,3 +27,7 @@ registery.get specific python pipeline
 add to existing persistent table
 
 log run
+
+
+==========================================
+

@@ -91,23 +91,24 @@ class ConfigNormalizer():
         path = self.get_path(raw_cfg)
         header = self.get_header(raw_cfg)
         register_as = self.get_register_as(raw_cfg)
+        sheet = self.get_sheet(raw_cfg)
 
         return {
             "path": path,
             "header": header,
+            "sheet": sheet,
             "register_as": register_as
         }
 
     def _process_csv_cfg(self, raw_cfg) -> Mapping[str, str | int | Path]:
         path = self.get_path(raw_cfg)
         header = self.get_header(raw_cfg)
-        sheet = self.get_sheet(raw_cfg)
+        
         register_as = self.get_register_as(raw_cfg)
 
         return {
             "path": path,
             "header": header,
-            "sheet": sheet,
             "register_as": register_as
         }
 
@@ -123,8 +124,3 @@ class ConfigNormalizer():
         cfg = pipeline(raw_cfg)
         cfg["kind"] = kind
         return cfg
-        
-
-
-
-
