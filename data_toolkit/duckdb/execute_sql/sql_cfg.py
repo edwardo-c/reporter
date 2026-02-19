@@ -1,9 +1,7 @@
-from dataclasses import dataclass, field
-
-import duckdb
+from dataclasses import dataclass
 from pathlib import Path
-
 from typing import Any, Sequence, Mapping
+
 
 @dataclass(frozen=True)
 class SqlCfg():
@@ -70,19 +68,3 @@ class SqlCfg():
         cleaned_files = cls._validate_files(clean_base_dir, raw_files)
         
         return cls(base_dir=clean_base_dir, files=cleaned_files)
-
-def run_ordered_sql(
-        conn: duckdb.DuckDBPyConnection,
-        cfg: Mapping[str, Any],
-):
-    """
-    runs all files from config
-    """
-    sql_cfg = SqlCfg.from_mapping(cfg)
-
-    for f in sql_cfg.files:
-        sql = f.read_text(encoding="utf-8")
-        conn.execute(sql)
-
-    return sql_cfg.files
-
