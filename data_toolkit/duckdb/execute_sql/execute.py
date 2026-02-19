@@ -1,20 +1,16 @@
 import duckdb
 from typing import Any, Mapping
-from data_toolkit.duckdb.execute_sql.sql_cfg import SqlCfg
-
+from data_toolkit.duckdb.execute_sql.sql_cfg import (
+    get_ordered_sql, 
+    OrderedSql
+)
 
 def run_ordered_sql(
         conn: duckdb.DuckDBPyConnection,
-        cfg: Mapping[str, Any],
+        raw_cfg: Mapping[str, Any],
 ):
-    """
-    runs all files from config
-    """
-    sql_cfg = SqlCfg.from_mapping(cfg)
-
-    for f in sql_cfg.files:
+    sql_files: OrderedSql = get_ordered_sql(raw_cfg)
+    for f in sql_files:
         sql = f.read_text(encoding="utf-8")
         conn.execute(sql)
-
-    return sql_cfg.files
 

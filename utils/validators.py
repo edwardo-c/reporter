@@ -1,6 +1,7 @@
 from pathlib import Path
+from typing import Mapping, Any
 
-def valid_dir(directory: str | Path ) -> Path:
+def validate_dir(directory: str | Path ) -> None:
     
     if not isinstance(directory, (str, Path)):
         raise TypeError(f"Expected str or Path, received {type(directory)}")
@@ -13,8 +14,6 @@ def valid_dir(directory: str | Path ) -> Path:
 
     if not directory.exists() and directory.is_dir():
         raise NotADirectoryError(f"{directory} is not a valid directory")
-
-    return directory
 
 def validate_path(file_path: str | Path) -> None:
     
@@ -45,3 +44,9 @@ def validate_positive_int(val: int) -> None:
         raise ValueError(f"must be integer, got {type(val)}")
     elif val < 0:
         raise ValueError(f"must be a positive integer")
+    
+def validate_key_existence(key: str, cfg: Mapping[Any, Any]) -> None:
+    if key not in cfg:
+        raise KeyError(
+            f"key '{key}' not found in cfg"
+        )

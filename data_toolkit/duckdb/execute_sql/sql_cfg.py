@@ -1,70 +1,63 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence, Mapping
+from typing import Sequence, Tuple
+from utils.validators import validate_dir, validate_path, validate_key_existence
+from typing import Mapping, Any
 
 
 @dataclass(frozen=True)
-class SqlCfg():
-
-    base_dir: Path
+class OrderedSql():
+    """Verified .sql file paths"""
     files: tuple[Path, ...]
 
-    @staticmethod
-    def _validate_base_dir(base_dir: str | Path) -> Path:
-        if isinstance(base_dir, str):
-            base_dir = Path(base_dir)
-        if not base_dir.is_dir(): 
-            raise NotADirectoryError(f"base_dir is not a directory, got: {base_dir}")
+class SqlFileCompiler():
+    def __init__(
+            self,
+            base_dir: str | Path,
+            raw_files: Sequence[str | Path]
+        ):
+        self._base_dir = base_dir
+        self._raw_files = raw_files
 
-        return base_dir
-
-    @staticmethod
-    def _validate_files(
-        base_dir: Path,
-        files: str | Path | Sequence[str | Path]
-    ) -> tuple[Path, ...]:
+        validate_dir(base_dir)
+        self.file_paths = self._build_full_paths()
         
-        if isinstance(files, (str, Path)):
-            files = [files]
-        elif not isinstance(files, Sequence):
-            raise ValueError(
-                f'invalid "files" type, expected Sequence got {type(files)}'
-            )
+    def _build_full_paths(self) -> Tuple[Path, ...]:
+        paths = []
+        for file in self._raw_files:
+    
+            if isinstance(file, str):
+                file = Path(file)
+            
+            if file.suffix.lower() != ".sql": 
+                raise ValueError(
+                    f"invalid sql step file: {file}"
+                    f"all 'steps' must be '.sql' files."
+                )
+    
+            full_path = self._base_dir / file
+            validate_path(full_path)
+            paths.append(full_path)
 
-        cleaned_files = []
-
-        for f in files:
-
-            if isinstance(f, str):
-                f = Path(f)
-
-            f = base_dir / f
-
-            if not f.is_file(): raise FileNotFoundError(f"invalid file: {f}")
-            if not f.suffix.lower() == ".sql": raise ValueError(f"file must be .sql, got: {f.suffix}")
-
-            cleaned_files.append(f)
-        
-        return tuple(cleaned_files)
+        return paths
 
     @classmethod
-    def from_mapping(
-        cls,
-        raw_cfg: Mapping[str, Any]
-    ):
-        
-        if not "base_dir" in raw_cfg:
-            raise KeyError(f"'base_dir' not found in raw_cfg, got {raw_cfg}")
+    def from_cfg(cls, raw_cfg):
+        validate_key_existence("base_dir", raw_cfg)
+        validate_key_existence("steps", raw_cfg)
+        base_dir = raw_cfg["base_dir"]
+        raw_files = raw_cfg["steps"]
+        return cls(base_dir, raw_files)
 
-        raw_base_dir = raw_cfg["base_dir"]
+# =============== Entry ================
+def get_ordered_sql(
+        raw_cfg: Mapping[str, str | Path],
+) -> OrderedSql:
+    """
+    Returns verified full sql file paths
+    Raises on invalid steps: must be valid .sql files
+    """
+    compiler = SqlFileCompiler.from_cfg(raw_cfg)
+    return OrderedSql(compiler.file_paths)
 
-        clean_base_dir: Path = cls._validate_base_dir(raw_base_dir)
-
-        if not "files" in raw_cfg:
-            raise KeyError(f"'files' not found in raw_cfg, got {raw_cfg}")
-
-        raw_files = raw_cfg["files"]
-
-        cleaned_files = cls._validate_files(clean_base_dir, raw_files)
-        
-        return cls(base_dir=clean_base_dir, files=cleaned_files)
+    
