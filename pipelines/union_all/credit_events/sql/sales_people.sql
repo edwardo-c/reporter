@@ -9,7 +9,6 @@ FROM raw_sales_people;
 CREATE OR REPLACE TEMP VIEW directors AS
 SELECT
   FullName,
-  
   AcuID,
   Director
 FROM sales_people

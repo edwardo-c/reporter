@@ -1,11 +1,42 @@
 import duckdb
 from dataclasses import dataclass
+from typing import Mapping
+
+from data_toolkit.duckdb.union_all.cfg_validator import validate_cfg
+
 
 @dataclass(frozen=True)
 class Col():
     name: str
     dtype: str
     default_sql:str = "NULL"
+
+
+def contract_enforced_union_all(
+        raw_cfg: Mapping[str, str | list[str]],
+        conn: duckdb.DuckDBPyConnection
+    ):
+    
+    # validate config
+    validate_cfg(raw_cfg)
+
+    final_schema = ...
+
+    # enforce contract
+    """
+    what do you mean by this?
+    given a branch, create a select all statement in the order of the provided schema
+    """
+
+    # build union all statement
+
+    # execute union all
+    ...
+
+
+
+
+
 
 @dataclass(frozen=True)
 class RelationPair():
@@ -34,6 +65,12 @@ def create_projection_query(
     
     return "SELECT\n " + ", \n".join(exprs) + f"\nFROM {relation}"
 
+
+
+
+
+
+
 def materialize_view(
         conn: duckdb.DuckDBPyConnection,
         final_view_name: str,
@@ -58,10 +95,7 @@ def create_union_all_query(views: list[str]):
     return "\nUNION ALL\n".join(expr)
 
 
-
-
-
-def contract_enforced_union_all(
+def dep_contract_enforced_union_all(
         conn: duckdb.DuckDBPyConnection, 
         schema: list[Col],
         relation_pairs: list[RelationPair],
@@ -84,3 +118,5 @@ def contract_enforced_union_all(
     return final_view_name
 
 # All pair.final views must share identical column order + types (enforced by schema projection).
+
+

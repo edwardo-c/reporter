@@ -50,3 +50,10 @@ def validate_key_existence(key: str, cfg: Mapping[Any, Any]) -> None:
         raise KeyError(
             f"key '{key}' not found in cfg"
         )
+
+def validate_list_str(
+        list_to_validate: list[str], 
+        allow_zero: bool = False
+    ):
+    for s in list_to_validate:
+        validate_str(s, allow_zero=allow_zero)

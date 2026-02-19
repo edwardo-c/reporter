@@ -4,7 +4,7 @@ from config.paths import CREDIT_EVENTS_ENV, CREDIT_EVENTS_CFG
 from dotenv import load_dotenv
 from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
 from data_toolkit.duckdb.register_frames.register_frames import register_frames_from_cfg
-
+from data_toolkit.duckdb.union_all.contract_projection import contract_enforced_union_all
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -16,21 +16,21 @@ def main():
     cfg = load_yaml(CREDIT_EVENTS_CFG)
     
     db = cfg["database"]
-    
-    
-    sources = cfg["credit_events_pipeline"]["sources"]
+    sources = cfg["sources"]
+    ordered_sql = cfg["sql"]
+    union_all_cfg = cfg["union_all"]
 
-    ordered_sql = cfg["credit_events_pipeline"]["sql"]
+    contract_enforced_union_all(union_all_cfg, "")
 
-    with duckdb.connect(db) as conn:
+    # with duckdb.connect(db) as conn:
 
         # enables running of sql files
-        register_frames_from_cfg(sources, conn)
-        logging.info(f"frames registered")
+        # register_frames_from_cfg(sources, conn)
+        # logging.info(f"frames registered")
 
         # holds all business logic
-        run_ordered_sql(conn, ordered_sql)
-        logging.info(f"ordered sql ran")
+        # run_ordered_sql(conn, ordered_sql)
+        # logging.info(f"ordered sql ran")
 
 
     # TODO: enforce CanonicalSchema and apply UNION ALL
