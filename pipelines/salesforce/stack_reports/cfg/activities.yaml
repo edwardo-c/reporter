@@ -6,27 +6,38 @@ credentials:
   security_token: "${SF_TOKEN}"
 
 reports:
+  - sf_id: 00OPW00001F09es2AB
+    register_as: "raw_sales_people"
+    human_readable: True
+
   - sf_id: "00OPW00001Eh2yr2AB"
     register_as: "raw_new_contacts"
+    human_readable: False
   
   - sf_id: "00OPW00001Eguzi2AB"
     register_as: "raw_new_opps"
+    human_readable: False
 
   - sf_id: "00OPW00001EguV52AJ"
     register_as: "raw_new_accts"
+    human_readable: False
   
   - sf_id: "00OPW00001Ehefx2AB"
     register_as: "raw_new_quotes"
+    human_readable: False
   
   - sf_id: "00OPW00001Eh7k32AB"
     register_as: "raw_converted_leads"
+    human_readable: False
   
   - sf_id: "00OPW00001EiOPS2A3"
     register_as: "raw_calls"
+    human_readable: False
 
 sql:
   base_dir: ${SQL_BASE_DIR}
   steps:
+  - sales_people.sql
   - "contacts.sql"
   - "opps.sql"
   - "accts.sql"
@@ -35,7 +46,13 @@ sql:
   - "calls.sql"
 
 union_all:
-  name: ActivityLedger
+  final_view:
+    name: ActivityLedger
+    temp: True
+  schema:
+    module_name: pipelines.salesforce.stack_reports.schemas.activities
+    final_schema_name: FINAL_SCHEMA
+    strict: True
   branches:
   - new_contacts
   - new_opps
@@ -43,3 +60,8 @@ union_all:
   - new_quotes
   - new_leads
   - new_calls
+
+enrich:
+  base_dir: ${SQL_BASE_DIR}
+  steps:
+  - finalize.sql

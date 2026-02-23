@@ -1,0 +1,6 @@
+CREATE OR REPLACE TEMP VIEW sales_people AS  
+SELECT 
+  FIRST_NAME,
+  LAST_NAME,
+  USER_ID
+FROM raw_sales_people

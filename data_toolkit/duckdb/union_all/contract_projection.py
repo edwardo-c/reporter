@@ -4,6 +4,10 @@ from typing import Mapping
 
 from data_toolkit.duckdb.union_all.cfg_validator import validate_cfg
 
+from utils.validators import validate_str
+from typing import Sequence
+import importlib
+
 
 @dataclass(frozen=True)
 class Col():
@@ -11,41 +15,34 @@ class Col():
     dtype: str
     default_sql:str = "NULL"
 
+def _validate_schema(schema: Sequence[Col]) -> None:
+    for col in schema:
+        if not isinstance(col, Col):
+            raise TypeError(
+                f"All columns in schema must be type Col. "
+                f"from data_toolkit.duckdb.contract_projection"
+                )
 
-def contract_enforced_union_all(
-        raw_cfg: Mapping[str, str | list[str]],
-        conn: duckdb.DuckDBPyConnection
-    ):
+def get_final_schema(
+        module_name: str, 
+        final_schema_name: str = "FINAL_SCHEMA",
+        strict: bool = True
+    ): 
     
-    # validate config
-    validate_cfg(raw_cfg)
+    validate_str(module_name, allow_zero=False)
 
-    final_schema = ...
+    module = importlib.import_module(module_name)
+    
+    if hasattr(module, final_schema_name):
+        schema = getattr(module, final_schema_name)
+    else:
+        raise AttributeError(f"{final_schema_name} not found in {module}")
 
-    # enforce contract
-    """
-    what do you mean by this?
-    given a branch, create a select all statement in the order of the provided schema
-    """
+    if strict:
+        _validate_schema(schema)
 
-    # build union all statement
+    return schema
 
-    # execute union all
-    ...
-
-
-
-
-
-
-@dataclass(frozen=True)
-class RelationPair():
-    """
-    logic: name of existing sql logic view
-    final: name of CanonicalSchema enforced view
-    """
-    logic: str
-    final: str
 
 def get_columns(conn: duckdb.DuckDBPyConnection, relation: str) -> tuple[str]:
     result = conn.execute(f"DESCRIBE {relation}").fetchall()
@@ -65,17 +62,11 @@ def create_projection_query(
     
     return "SELECT\n " + ", \n".join(exprs) + f"\nFROM {relation}"
 
-
-
-
-
-
-
-def materialize_view(
+def materialize_intermediate_view(
         conn: duckdb.DuckDBPyConnection,
-        final_view_name: str,
+        projection_name: str,
         projection_sql:str
-    ):
+    ) -> str:
     """
     expects projection_sql to be a complete SELECT statement
     
@@ -86,37 +77,70 @@ def materialize_view(
     assert projection_sql.lstrip().lower().startswith("select"), (
         f"projection_sql must be a complete SELECT statement; got: {projection_sql}"
     )
-    conn.execute(f"CREATE OR REPLACE TEMP VIEW {final_view_name} AS {projection_sql}")
-    return final_view_name
+    conn.execute(f"CREATE OR REPLACE TEMP VIEW _{projection_name} AS {projection_sql}")
+    return f"_{projection_name}"
 
 def create_union_all_query(views: list[str]):
     """generates union all statement for list of view names"""
     expr = [f"SELECT * FROM {view}" for view in views]
     return "\nUNION ALL\n".join(expr)
 
-
-def dep_contract_enforced_union_all(
-        conn: duckdb.DuckDBPyConnection, 
-        schema: list[Col],
-        relation_pairs: list[RelationPair],
-        final_view_name: str = "temp_stg_view",
+def execute_union_all(
+        conn: duckdb.DuckDBPyConnection,
+        *, 
+        final_name: str,
+        union_all_projection_sql,
+        temp: bool = True
     ):
 
-    for pair in relation_pairs:
+    base = f"CREATE OR REPLACE $ VIEW {final_name} AS {union_all_projection_sql}"
+    
+    if temp:
+        sql = base.replace("$", "TEMP")
+    else:
+        sql = base.replace("$", "")
 
-        existing_columns = get_columns(conn, pair.logic)
+    conn.execute(sql)
 
-        projection_sql = create_projection_query(existing_columns, pair.logic, schema)
+# ======================== ENTRY ============================
+def contract_enforced_union_all(
+        raw_cfg: Mapping[str, str | list[str]],
+        conn: duckdb.DuckDBPyConnection
+    ):
+    
+    # validate config
+    validate_cfg(raw_cfg)
+    final_view_cfg = raw_cfg["final_view"]
+    schema_cfg = raw_cfg["schema"]
+    branches_cfg = raw_cfg["branches"]
 
-        materialize_view(conn, pair.final, projection_sql)
+    final_schema = get_final_schema(**schema_cfg)
 
-    final_views = [pair.final for pair in relation_pairs]
-    union_all_query = create_union_all_query(final_views)
+    intermediate_views_exprs = []
 
-    materialize_view(conn, final_view_name, union_all_query)
+    for branch in branches_cfg:
+        # enforce contract for each branch
+        """
+        create select all statement in the order of the provided schema
+        """
+        existing_columns = get_columns(conn, branch)
+        projection_sql = create_projection_query(existing_columns, branch, final_schema)
+        
+        intermediate_view = materialize_intermediate_view(conn, branch, projection_sql)
 
-    return final_view_name
+        intermediate_views_exprs.append(intermediate_view)
 
-# All pair.final views must share identical column order + types (enforced by schema projection).
+    union_all_query = create_union_all_query(intermediate_views_exprs)
+
+    execute_union_all(
+        conn, 
+        final_name=final_view_cfg["name"], 
+        union_all_projection_sql=union_all_query, 
+        temp=final_view_cfg["temp"]
+    )
+
+    return final_view_cfg["name"]
+
+
 
 

@@ -1,6 +1,12 @@
 import pandas as pd
 
-def payload_to_df(payload):
+def payload_to_df(
+        payload,
+        human_readable: bool = False
+    ):
+    """
+    
+    """
     rows = payload["factMap"]['T!T']['rows']
     cols = payload["reportMetadata"]["detailColumns"]
     result = []
@@ -14,7 +20,12 @@ def payload_to_df(payload):
             )
 
         for col, cell in zip(cols, cells):
-            row_dict[col] = cell.get("label", "value")
+            
+            if human_readable:
+                row_dict[col] = cell["label"]
+            else:
+                row_dict[col] = cell["value"]
+            
         result.append(row_dict)
 
     return pd.DataFrame(result)

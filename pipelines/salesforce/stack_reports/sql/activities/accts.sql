@@ -5,4 +5,4 @@ SELECT
   CREATED_DATE AS ActivityDate,
   CDF1 AS ActivityScore,
   ACCOUNT_ID AS ActivityID
-FROM raw_new_accts
+FROM raw_new_accts;
