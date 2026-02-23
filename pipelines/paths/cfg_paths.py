@@ -9,3 +9,11 @@ SALESFORCE_GRP_RPT_TO_EMAIL_CFGS = (
     "grp_rpt_to_email" / 
     "cfgs"
 )
+
+SALESFORCE_REPORT_STACK_CFGS = (
+    PROJECT_ROOT / 
+    "pipelines" /
+    "salesforce" /
+    "stack_reports" /
+    "cfg"
+)

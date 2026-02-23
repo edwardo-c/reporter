@@ -1,0 +1,45 @@
+database: ${DATABASE}
+
+credentials:
+  username: "${SF_USERNAME}"
+  password: "${SF_PASSWORD}"
+  security_token: "${SF_TOKEN}"
+
+reports:
+  - sf_id: "00OPW00001Eh2yr2AB"
+    register_as: "raw_new_contacts"
+  
+  - sf_id: "00OPW00001Eguzi2AB"
+    register_as: "raw_new_opps"
+
+  - sf_id: "00OPW00001EguV52AJ"
+    register_as: "raw_new_accts"
+  
+  - sf_id: "00OPW00001Ehefx2AB"
+    register_as: "raw_new_quotes"
+  
+  - sf_id: "00OPW00001Eh7k32AB"
+    register_as: "raw_converted_leads"
+  
+  - sf_id: "00OPW00001EiOPS2A3"
+    register_as: "raw_calls"
+
+sql:
+  base_dir: ${SQL_BASE_DIR}
+  steps:
+  - "contacts.sql"
+  - "opps.sql"
+  - "accts.sql"
+  - "quotes.sql"
+  - "leads.sql"
+  - "calls.sql"
+
+union_all:
+  name: ActivityLedger
+  branches:
+  - new_contacts
+  - new_opps
+  - new_accts
+  - new_quotes
+  - new_leads
+  - new_calls

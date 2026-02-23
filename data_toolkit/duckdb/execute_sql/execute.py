@@ -10,7 +10,7 @@ def run_ordered_sql(
         raw_cfg: Mapping[str, Any],
 ):
     sql_files: OrderedSql = get_ordered_sql(raw_cfg)
-    for f in sql_files:
+    for f in sql_files.files:
         sql = f.read_text(encoding="utf-8")
         conn.execute(sql)
 

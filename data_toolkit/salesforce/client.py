@@ -48,7 +48,7 @@ class SFClient:
     def get_report(
             self, 
             report_id: str, 
-            include_details: bool
+            include_details: bool = True
         ):
         """
         returns the json response body from a predefined salesforce report
