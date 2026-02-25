@@ -25,8 +25,7 @@ def _validate_schema(schema: Sequence[Col]) -> None:
 
 def get_final_schema(
         module_name: str, 
-        final_schema_name: str = "FINAL_SCHEMA",
-        strict: bool = True
+        final_schema_name: str = "FINAL_SCHEMA"
     ): 
     
     validate_str(module_name, allow_zero=False)
@@ -37,9 +36,6 @@ def get_final_schema(
         schema = getattr(module, final_schema_name)
     else:
         raise AttributeError(f"{final_schema_name} not found in {module}")
-
-    if strict:
-        _validate_schema(schema)
 
     return schema
 
@@ -90,24 +86,21 @@ def execute_union_all(
         *, 
         final_name: str,
         union_all_projection_sql,
-        temp: bool = True
+        
     ):
-
-    base = f"CREATE OR REPLACE $ VIEW {final_name} AS {union_all_projection_sql}"
-    
-    if temp:
-        sql = base.replace("$", "TEMP")
-    else:
-        sql = base.replace("$", "")
-
+    sql = f"CREATE OR REPLACE TEMP VIEW {final_name} AS {union_all_projection_sql}"
     conn.execute(sql)
 
 # ======================== ENTRY ============================
 def contract_enforced_union_all(
         raw_cfg: Mapping[str, str | list[str]],
         conn: duckdb.DuckDBPyConnection
-    ):
-    
+    ) -> str:
+    """
+    Materializes union all view of branches
+    returns name of final union all from raw_cfg
+    Raises invalid config
+    """
     # validate config
     validate_cfg(raw_cfg)
     final_view_cfg = raw_cfg["final_view"]
@@ -115,6 +108,7 @@ def contract_enforced_union_all(
     branches_cfg = raw_cfg["branches"]
 
     final_schema = get_final_schema(**schema_cfg)
+    _validate_schema(final_schema)
 
     intermediate_views_exprs = []
 
@@ -135,8 +129,7 @@ def contract_enforced_union_all(
     execute_union_all(
         conn, 
         final_name=final_view_cfg["name"], 
-        union_all_projection_sql=union_all_query, 
-        temp=final_view_cfg["temp"]
+        union_all_projection_sql=union_all_query
     )
 
     return final_view_cfg["name"]

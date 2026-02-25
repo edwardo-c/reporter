@@ -5,9 +5,15 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  Type AS PayStructure,
+  'Ship To' AS PayStructure,
   'SalesPerson' AS AppliesToQuota,
-  Credit AS SalesRep,
+  
+  CASE Credit 
+    WHEN 'Christina Martinez' THEN 'No Rep' 
+    ELSE Credit 
+  END AS SalesRep,
+  
+  d.Director AS Director,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
   "Tran Desc" AS ProductDescription,
@@ -23,4 +29,6 @@ SELECT
   EXTRACT(MONTH FROM "Invoice Date") AS CreditMonth,
   EXTRACT(YEAR FROM "Invoice Date") AS CreditYear,
   MONTHNAME("Invoice Date") AS CreditMonthName
-FROM raw_ship_to;
+FROM raw_ship_to r
+LEFT JOIN directors d
+  ON r.Credit = d.FullName

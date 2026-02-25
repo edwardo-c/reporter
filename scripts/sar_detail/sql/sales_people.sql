@@ -12,4 +12,4 @@ SELECT
   AcuID,
   Director
 FROM sales_people
-WHERE Director IS NOT NULL;
+WHERE Director IS NOT NULL AND Director <> '';

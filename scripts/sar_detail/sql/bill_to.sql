@@ -5,13 +5,17 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  Type AS PayStructure,
-  'SalesPerson' AS AppliesToQuota,
-  Credit AS SalesRep,
-  d.Director AS DirectorCredit
+  'Bill To' AS PayStructure,
+  
+  CASE Credit 
+    WHEN 'Christina Martinez' THEN 'No Rep' 
+    ELSE Credit 
+  END AS SalesRep,
+  
+  d.Director AS Director,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
-  Description AS ProductDescription,
+  "Description" AS ProductDescription,
   Qty AS Quantity,
   Amount AS ExtendedSaleAmount,
   "Order Number" AS OrderNumber,
@@ -26,4 +30,4 @@ SELECT
   MONTHNAME("Invoice Date") AS CreditMonthName
 FROM raw_bill_to r
 LEFT JOIN directors d
-  ON r.SalesRep = d.FullName;
+  ON r.Credit = d.FullName

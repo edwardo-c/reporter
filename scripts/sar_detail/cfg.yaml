@@ -1,4 +1,5 @@
 database: ${DATABASE}
+out_path: ${OUT_PATH}
 
 sources:
   sales_people:
@@ -60,11 +61,17 @@ sql:
     - pos.sql
     - reclass_non_pos.sql
     - reclass_pos.sql
-    - stg_credit_events.sql
-  
+
 union_all:
-  final_name: credit_events
-  schema_module: "pipelines.union_all.credit_events.schema_contract"
+  final_view:
+    name: CreditEvents
+  schema:
+    module_name: "scripts.sar_detail.schema_contract"
+    final_schema_name: FINAL_SCHEMA
   branches:
-    - bill_to_logic
-    - ship_to_logic
+  - bill_to_logic
+  - ship_to_logic
+  - all_direct_logic
+  - pos_logic
+  - reclass_pos_logic
+  - reclass_non_pos_logic

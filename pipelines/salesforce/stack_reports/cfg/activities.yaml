@@ -52,7 +52,6 @@ union_all:
   schema:
     module_name: pipelines.salesforce.stack_reports.schemas.activities
     final_schema_name: FINAL_SCHEMA
-    strict: True
   branches:
   - new_contacts
   - new_opps

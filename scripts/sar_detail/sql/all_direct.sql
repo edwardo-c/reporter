@@ -5,10 +5,7 @@ SELECT
   Account AS AccountNumber,
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
-  NULL AS BillToCity,
-  NULL AS BillToZip,
   "Account Group" AS AccountGroup,
-  Type AS PayStructure,
   "Inside Sales Salesperson" AS InsideSales,
   "Key Manager Salesperson" AS KeyManager,
   "Key Director Salesperson" AS KeyDirector,
@@ -16,7 +13,7 @@ SELECT
   "Outside Rep Firm" AS OutsideRepFirm,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
-  Description AS ProductDescription,
+  "Description" AS ProductDescription,
   Qty AS Quantity,
   Amount AS ExtendedSaleAmount,
   "Order Number" AS OrderNumber,
@@ -34,35 +31,12 @@ FROM raw_all_direct
 UNPIVOT base
 ON InsideSales, KeyManager, KeyDirector, SalesOperations, OutsideRepFirm
 INTO 
-  Name AppliesToQuota
+  Name CreditType
   Value AcuID
 )
 SELECT 
-  u.Distributor,
-  u.AccountNumber,
-  u.CustomerName,
-  u.BillToState,
-  u.BillToCity,
-  u.BillToZip,
-  u.AccountGroup,
-  u.PayStructure,
-  u.CreditType,
-  sp.FullName AS SalesRep,
-  u.PartNumber,
-  u.ProductCategory, 
-  u.ProductDescription,
-  u.Quantity,
-  u.ExtendedSaleAmount,
-  u.OrderNumber,
-  u.PoNumber,
-  u.InvoiceDate,
-  u.ShipToLineOne,
-  u.ShipToCity,
-  u.ShipToState,
-  u.ShipToZip,
-  u.CreditMonth,
-  u.CreditYear,
-  u.CreditMonthName  
+  u.*,
+  sp.FullName AS SalesRep
 FROM unpivoted u
 LEFT JOIN sales_people sp 
   ON u.AcuID = sp.AcuID
