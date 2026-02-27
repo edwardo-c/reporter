@@ -5,7 +5,7 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  'Ship To' AS PayStructure,
+  'Ship To' AS CreditType,
   'SalesPerson' AS AppliesToQuota,
   
   CASE Credit 
@@ -14,6 +14,7 @@ SELECT
   END AS SalesRep,
   
   d.Director AS Director,
+
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
   "Tran Desc" AS ProductDescription,

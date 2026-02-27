@@ -35,8 +35,15 @@ INTO
   Value AcuID
 )
 SELECT 
-  u.*,
-  sp.FullName AS SalesRep
+  u.* EXCLUDE (CreditType),
+  sp.FullName AS SalesRep,
+
+  CASE 
+    WHEN u.CreditType IN ('KeyManager', 'KeyDirector') 
+    THEN 'KeyAccount'
+    ELSE u.CreditType
+  END AS CreditType
+
 FROM unpivoted u
 LEFT JOIN sales_people sp 
   ON u.AcuID = sp.AcuID

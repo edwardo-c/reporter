@@ -10,6 +10,7 @@ CREATE OR REPLACE TEMP VIEW directors AS
 SELECT
   FullName,
   AcuID,
-  Director
+  Director,
+  'Region' AS CreditType
 FROM sales_people
 WHERE Director IS NOT NULL AND Director <> '';

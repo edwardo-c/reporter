@@ -5,7 +5,7 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  'Bill To' AS PayStructure,
+  'Bill To' AS CreditType,
   
   CASE Credit 
     WHEN 'Christina Martinez' THEN 'No Rep' 
@@ -13,6 +13,7 @@ SELECT
   END AS SalesRep,
   
   d.Director AS Director,
+
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
   "Description" AS ProductDescription,

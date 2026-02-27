@@ -4,7 +4,7 @@ SELECT
   SoldToName AS CustomerName,
   BillToCustomerState AS BillToState,
   BillToCustomerZip AS BillToZip,
-  'POS' AS PayStructure,
+  'POS' AS CreditType,
 
   CASE Credit 
     WHEN 'Christina Martinez' THEN 'No Rep' 
@@ -12,6 +12,7 @@ SELECT
   END AS SalesRep,
   
   d.Director AS Director,
+
   PiiPartNumber AS PartNumber,
   PiiCategory AS ProductCategory,
   ShipQuantity AS Quantity,

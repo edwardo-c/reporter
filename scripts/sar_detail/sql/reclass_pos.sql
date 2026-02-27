@@ -5,9 +5,8 @@ SELECT
   SoldToName AS CustomerName,
   BillToCustomerState AS BillToState,
   BillToCustomerZip AS BillToZip,
-  'reclass' AS PayStructure,
+  'Reclass' AS CreditType,
   'SalesPerson' AS AppliesToQuota, 
-  Credit AS SalesRep,
   PiiPartNumber AS PartNumber,
   "Reclass Cat" AS ProductCategory,
   ShipQuantity AS Quantity,
@@ -28,6 +27,7 @@ SELECT
     Reclass = 'Christina Martinez' THEN 'No Rep'
     ELSE Reclass
   END AS AddTo
+
 FROM raw_reclass_pos
 ), variants AS (
 SELECT 'positive' AS variant, 1 AS sign
@@ -35,11 +35,14 @@ SELECT 'positive' AS variant, 1 AS sign
 SELECT 'negative' AS variant, -1 AS sign
 ), crossed AS (
 SELECT 
-  b.*,
+
+  b.* EXCLUDE (ExtendedSaleAmount),
+
   CASE v.variant
     WHEN 'positive' THEN b.AddTo
     WHEN 'negative' THEN b.SubtractFrom
   END AS SalesRep,
+
   (b.ExtendedSaleAmount * v.sign) AS ExtendedSaleAmount
 FROM base b
 CROSS JOIN variants v

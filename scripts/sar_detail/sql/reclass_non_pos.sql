@@ -6,7 +6,7 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  'reclass' AS PayStructure,
+  'Reclass' AS CreditType,
   "Inventory CD" AS PartNumber,
   "Reclass Cat" AS ProductCategory,
   "Description" AS ProductDescription,
@@ -58,3 +58,4 @@ SELECT
 FROM crossed x
 LEFT JOIN directors d
   ON x.SalesRep = d.FullName
+
