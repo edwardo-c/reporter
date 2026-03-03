@@ -1,12 +1,17 @@
-from data_toolkit.salesforce.client import SFClient
-from utils.yaml_loader import load_yaml
 from dotenv import load_dotenv
-from pipelines.paths.cfg_paths import SALESFORCE_REPORT_STACK_CFGS
-from config.paths import SF_ACTIVITIES_ENV
-from data_toolkit.salesforce.reports_tabular.payload_to_df import payload_to_df
-from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
+
 import duckdb
+
+from config.paths import SF_ACTIVITIES_ENV, SF_ACTIVITIES_REPORT_CFG
+from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
 from data_toolkit.duckdb.union_all.contract_projection import contract_enforced_union_all
+from data_toolkit.salesforce.client import SFClient
+from data_toolkit.salesforce.reports_tabular.payload_to_df import payload_to_df
+
+from utils.yaml_loader import load_yaml
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # the configuration file to use for the pipeline
 YAML = "activities.yaml"
@@ -14,7 +19,7 @@ YAML = "activities.yaml"
 def main():
 
     load_dotenv(SF_ACTIVITIES_ENV)
-    cfg = load_yaml(SALESFORCE_REPORT_STACK_CFGS / YAML)
+    cfg = load_yaml(SF_ACTIVITIES_REPORT_CFG)
     sf = SFClient(**cfg["credentials"])
 
     with duckdb.connect() as conn:
@@ -35,7 +40,7 @@ def main():
 
         df = conn.execute(f"SELECT * FROM enriched").df()
 
-    df.to_csv(r"TEST_OUT", index=False)
+    df.to_csv(cfg["test_out"], index=False)
 
 if __name__ == "__main__":
     main()

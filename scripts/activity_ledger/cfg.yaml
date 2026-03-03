@@ -1,4 +1,5 @@
 database: ${DATABASE}
+test_out: ${CSV_OUT}
 
 credentials:
   username: "${SF_USERNAME}"
@@ -9,6 +10,10 @@ reports:
   - sf_id: 00OPW00001F09es2AB
     register_as: "raw_sales_people"
     human_readable: True
+
+  - sf_id: 00OPW00001EeX372AF
+    register_as: "raw_meeting_events"
+    human_readable: False
 
   - sf_id: "00OPW00001Eh2yr2AB"
     register_as: "raw_new_contacts"
@@ -38,19 +43,20 @@ sql:
   base_dir: ${SQL_BASE_DIR}
   steps:
   - sales_people.sql
-  - "contacts.sql"
-  - "opps.sql"
-  - "accts.sql"
-  - "quotes.sql"
-  - "leads.sql"
-  - "calls.sql"
+  - events.sql
+  - contacts.sql
+  - opps.sql
+  - accts.sql
+  - quotes.sql
+  - leads.sql
+  - calls.sql
 
 union_all:
   final_view:
     name: ActivityLedger
     temp: True
   schema:
-    module_name: pipelines.salesforce.stack_reports.schemas.activities
+    module_name: scripts.activity_ledger.schema
     final_schema_name: FINAL_SCHEMA
   branches:
   - new_contacts
@@ -59,6 +65,7 @@ union_all:
   - new_quotes
   - new_leads
   - new_calls
+  - new_events
 
 enrich:
   base_dir: ${SQL_BASE_DIR}
