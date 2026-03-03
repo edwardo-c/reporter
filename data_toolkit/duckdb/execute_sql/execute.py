@@ -5,12 +5,18 @@ from data_toolkit.duckdb.execute_sql.sql_cfg import (
     OrderedSql
 )
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 def run_ordered_sql(
         conn: duckdb.DuckDBPyConnection,
         raw_cfg: Mapping[str, Any],
 ):
+    
+
     sql_files: OrderedSql = get_ordered_sql(raw_cfg)
     for f in sql_files.files:
+        logging.info(f"executing sql file: {f}")
         sql = f.read_text(encoding="utf-8")
         conn.execute(sql)
 

@@ -9,7 +9,16 @@ FINAL_SCHEMA = [
     Col("BillToZip",           "VARCHAR",    "NULL"),
     Col("AccountGroup",        "VARCHAR",    "NULL"),
     Col("PayStructure",        "VARCHAR",    "NULL"),
-    Col("SalesRep",            "VARCHAR",    "NULL"),
+    
+    # === credit and credit oversight columns ====
+    Col("SalesRepID",          "VARCHAR",    "NULL"), 
+    Col("InsideSalesID",       "VARCHAR",    "NULL"),
+    Col("KeyManagerID",        "VARCHAR",    "NULL"),
+    Col("KeyDirectorID",       "VARCHAR",    "NULL"),
+    Col("SalesOpsID",          "VARCHAR",    "NULL"),
+    # === end ===
+    
+    Col("RepType",             "VARCHAR",    "NULL"), 
     Col("Director",            "VARCHAR",    "NULL"),
     Col("CreditType",          "VARCHAR",    "NULL"),
     Col("PartNumber",          "VARCHAR",    "NULL"),

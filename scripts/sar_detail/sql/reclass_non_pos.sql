@@ -6,7 +6,11 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  'Reclass' AS CreditType,
+  
+  'Reclass' AS PayStructure,
+
+  'SalesPerson' AS RepType,
+
   "Inventory CD" AS PartNumber,
   "Reclass Cat" AS ProductCategory,
   "Description" AS ProductDescription,
@@ -23,13 +27,13 @@ SELECT
   EXTRACT(YEAR FROM "Invoice Date") AS CreditYear,
   "SAR Month" AS CreditMonthName,
   -- both captured in base, only one used in output for positive and negative values
-  CASE WHEN 
-    Credit = 'Christina Martinez' THEN 'No Rep'
+  CASE Credit 
+    WHEN 'Christina Martinez' THEN 'No Rep'
     ELSE Credit 
   END AS SubtractFrom,
   
-  CASE WHEN 
-    Reclass = 'Christina Martinez' THEN 'No Rep'
+  CASE Reclass 
+    WHEN 'Christina Martinez' THEN 'No Rep'
     ELSE Reclass
   END AS AddTo
 
@@ -41,9 +45,9 @@ FROM raw_reclass_non_pos
 ), crossed AS (
 SELECT 
   
-  b.* EXCLUDE (ExtendedSaleAmount),
+  b.* EXCLUDE (b.ExtendedSaleAmount),
 
-  CASE v.variant 
+  CASE v.variant
     WHEN 'positive' THEN b.AddTo 
     WHEN 'negative' THEN b.SubtractFrom 
   END AS SalesRep,

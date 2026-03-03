@@ -5,15 +5,23 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  'Bill To' AS CreditType,
+  'Bill To' AS PayStructure,
   
-  CASE Credit 
-    WHEN 'Christina Martinez' THEN 'No Rep' 
-    ELSE Credit 
-  END AS SalesRep,
-  
-  d.Director AS Director,
+  -- credit and credit oversight -- 
+  CASE "Account Owner" 
+    WHEN 'CM6746' THEN 'No Rep' 
+    ELSE "Account Owner" 
+  END AS SalesRepID,
 
+  "Inside Sales Salesperson" AS InsideSalesID,
+  "Key Manager Salesperson" AS KeyManagerID,
+  "Key Director Salesperson" AS KeyDirectorID,
+  "Sales Operations Salesperson" AS SalesOpsID,
+
+
+  
+
+  d.Director AS Director,
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
   "Description" AS ProductDescription,

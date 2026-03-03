@@ -1,18 +1,23 @@
 CREATE OR REPLACE TEMP VIEW pos_logic AS 
 SELECT
-  Customer AS Distributor,
+
+  CASE Customer
+    WHEN 'EXERTIS ALMO' THEN 'ALMO'
+    ELSE Customer
+  END AS Distributor,  
+  
   SoldToName AS CustomerName,
   BillToCustomerState AS BillToState,
   BillToCustomerZip AS BillToZip,
-  'POS' AS CreditType,
+  'POS' AS PayStructure,
 
   CASE Credit 
     WHEN 'Christina Martinez' THEN 'No Rep' 
     ELSE Credit 
-  END AS SalesRep,
-  
-  d.Director AS Director,
+  END AS SalesRep_FullName,
+  s.AcuID AS SalesRepID, 
 
+  d.Director AS Director,
   PiiPartNumber AS PartNumber,
   PiiCategory AS ProductCategory,
   ShipQuantity AS Quantity,
@@ -26,3 +31,5 @@ SELECT
 FROM raw_pos r
 LEFT JOIN directors d
   ON r.Credit = d.FullName
+LEFT JOIN sales_people s
+  ON r.Credit = s.FullName

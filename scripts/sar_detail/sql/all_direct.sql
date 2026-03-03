@@ -6,11 +6,15 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
+
   "Inside Sales Salesperson" AS InsideSales,
-  "Key Manager Salesperson" AS KeyManager,
   "Key Director Salesperson" AS KeyDirector,
   "Sales Operations Salesperson" AS SalesOperations,
   "Outside Rep Firm" AS OutsideRepFirm,
+  
+  -- "Key Manager Salesperson" AS KeyManager,
+
+
   "Inventory CD" AS PartNumber,
   "Classification(Sales Category)" AS ProductCategory,
   "Description" AS ProductDescription,
@@ -29,20 +33,20 @@ SELECT
 FROM raw_all_direct
 ), unpivoted AS (
 UNPIVOT base
-ON InsideSales, KeyManager, KeyDirector, SalesOperations, OutsideRepFirm
+ON InsideSales, KeyDirector, SalesOperations, OutsideRepFirm -- ,KeyManager
 INTO 
-  Name CreditType
+  Name RepType
   Value AcuID
 )
 SELECT 
-  u.* EXCLUDE (CreditType),
+  u.* EXCLUDE (RepType),
   sp.FullName AS SalesRep,
 
   CASE 
-    WHEN u.CreditType IN ('KeyManager', 'KeyDirector') 
+    WHEN u.RepType IN ('KeyManager', 'KeyDirector') 
     THEN 'KeyAccount'
-    ELSE u.CreditType
-  END AS CreditType
+    ELSE u.RepType
+  END AS RepType
 
 FROM unpivoted u
 LEFT JOIN sales_people sp 

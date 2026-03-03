@@ -23,12 +23,12 @@ sources:
     header: 5
     register_as: raw_ship_to
   
-  all_direct:
-    kind: xlsx
-    path: ${CREDIT_EVENTS_PATH}
-    sheet: "All Direct"
-    header: 5
-    register_as: raw_all_direct
+  # all_direct:
+  #   kind: xlsx
+  #   path: ${CREDIT_EVENTS_PATH}
+  #   sheet: "All Direct"
+  #   header: 5
+  #   register_as: raw_all_direct
 
   pos:
     kind: xlsx
@@ -57,7 +57,7 @@ sql:
     - sales_people.sql
     - bill_to.sql
     - ship_to.sql
-    - all_direct.sql
+    # - all_direct.sql
     - pos.sql
     - reclass_non_pos.sql
     - reclass_pos.sql
@@ -71,7 +71,7 @@ union_all:
   branches:
   - bill_to_logic
   - ship_to_logic
-  - all_direct_logic
+  # - all_direct_logic
   - pos_logic
   - reclass_pos_logic
   - reclass_non_pos_logic

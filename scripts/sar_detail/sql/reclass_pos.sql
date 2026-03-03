@@ -5,8 +5,7 @@ SELECT
   SoldToName AS CustomerName,
   BillToCustomerState AS BillToState,
   BillToCustomerZip AS BillToZip,
-  'Reclass' AS CreditType,
-  'SalesPerson' AS AppliesToQuota, 
+  'Reclass' AS PayStructure,
   PiiPartNumber AS PartNumber,
   "Reclass Cat" AS ProductCategory,
   ShipQuantity AS Quantity,
@@ -17,6 +16,9 @@ SELECT
   EXTRACT(MONTH FROM PeriodDate) AS CreditMonth,
   EXTRACT(YEAR FROM PeriodDate) AS CreditYear,
   "SAR Month" AS CreditMonthName,
+
+  'SalesPerson' AS RepType,
+
   -- both captured in base, only one used in output for positive and negative values
   CASE WHEN 
     Credit = 'Christina Martinez' THEN 'No Rep'

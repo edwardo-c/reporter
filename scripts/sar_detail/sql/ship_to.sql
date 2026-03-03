@@ -5,14 +5,20 @@ SELECT
   "Customer Name" AS CustomerName,
   "Customer State" AS BillToState,
   "Account Group" AS AccountGroup,
-  'Ship To' AS CreditType,
-  'SalesPerson' AS AppliesToQuota,
-  
+  'Ship To' AS PayStructure,
+
+  "Key Manager Salesperson" AS KeyManager,
+  "Inside Sales Salesperson" AS InsideSalesID,
+  "Key Director Salesperson" AS KeyDirectorID,
+  "Sales Operations Salesperson" AS SalesOpsID,
+
   CASE Credit 
     WHEN 'Christina Martinez' THEN 'No Rep' 
     ELSE Credit 
-  END AS SalesRep,
-  
+  END AS SalesRep_FullName,
+  s.AcuID AS SalesRepID, 
+
+
   d.Director AS Director,
 
   "Inventory CD" AS PartNumber,
@@ -33,3 +39,5 @@ SELECT
 FROM raw_ship_to r
 LEFT JOIN directors d
   ON r.Credit = d.FullName
+LEFT JOIN sales_people s
+  ON r.Credit = s.FullName
