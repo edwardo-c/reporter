@@ -19,7 +19,7 @@ from data_toolkit.clients.outlook.outlook_sender import BaseEmail, OutlookSender
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSchema as RLS
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSentToVals as RLS_SentToVals
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogNone as RLS_NA
-from data_toolkit.clients.outlook import OLClient
+from data_toolkit.clients.outlook.outlook import OLClient
 from data_toolkit.clients.acumatica import AcumaticaClient
 
 from collections import defaultdict
@@ -33,7 +33,7 @@ Send Emails = (DRY_RUN = False) and (PROD = True)
 
 DRY_RUN = False # True = exit after send log creation, no emails sent
 PROD = True # False = breakpoint at send email to inspect email
-RUN_ID = "February_2026"
+RUN_ID = "March_2026"
 
 def main():
 
