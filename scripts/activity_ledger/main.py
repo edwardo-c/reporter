@@ -9,6 +9,7 @@ from data_toolkit.salesforce.client import SFClient
 from data_toolkit.salesforce.reports_tabular.payload_to_df import payload_to_df
 
 from utils.yaml_loader import load_yaml
+from scripts.activity_ledger.SOQL.registry import get_query, load_queries
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -16,19 +17,21 @@ logging.basicConfig(level=logging.INFO)
 # the configuration file to use for the pipeline
 YAML = "activities.yaml"
 
+
+
 def main():
 
     load_dotenv(SF_ACTIVITIES_ENV)
     cfg = load_yaml(SF_ACTIVITIES_REPORT_CFG)
+    load_queries()
+
     sf = SFClient(**cfg["credentials"])
 
     with duckdb.connect() as conn:
 
         for report in cfg["reports"]:
             
-            payload = sf.get_report(report["sf_id"])
-            
-            df = payload_to_df(payload, report["human_readable"])
+            df = sf.query(get_query(report["query_key"]), df=True)
 
             conn.register(report["register_as"], df)
         

@@ -7,42 +7,31 @@ credentials:
   security_token: "${SF_TOKEN}"
 
 reports:
-  - sf_id: 00OPW00001F09es2AB
-    register_as: "raw_sales_people"
-    human_readable: True
-
-  - sf_id: 00OPW00001EeX372AF
+  - query_key: "events"
     register_as: "raw_meeting_events"
-    human_readable: False
 
-  - sf_id: "00OPW00001Eh2yr2AB"
+  - query_key: "contacts"
     register_as: "raw_new_contacts"
-    human_readable: False
   
-  - sf_id: "00OPW00001Eguzi2AB"
+  - query_key: "opportunities"
     register_as: "raw_new_opps"
-    human_readable: False
 
-  - sf_id: "00OPW00001EguV52AJ"
+  - query_key: "accounts"
     register_as: "raw_new_accts"
-    human_readable: False
   
-  - sf_id: "00OPW00001Ehefx2AB"
+  - query_key: "quotes"
     register_as: "raw_new_quotes"
-    human_readable: False
   
-  - sf_id: "00OPW00001Eh7k32AB"
+  - query_key: "leads"
     register_as: "raw_converted_leads"
-    human_readable: False
   
-  - sf_id: "00OPW00001EiOPS2A3"
+  - query_key: "calls"
     register_as: "raw_calls"
-    human_readable: False
 
 sql:
   base_dir: ${SQL_BASE_DIR}
   steps:
-  - sales_people.sql
+  - scoring.sql
   - events.sql
   - contacts.sql
   - opps.sql

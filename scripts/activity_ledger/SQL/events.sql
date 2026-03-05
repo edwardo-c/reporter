@@ -1,19 +1,11 @@
 CREATE OR REPLACE TEMP VIEW new_events AS  
-WITH meeting_scores(meeting_code, score) AS (
-    VALUES
-        ('Z01', 5),  -- Virtual Project Meeting
-        ('Z02', 5),  -- Virtual Training 
-        ('X01', 10), -- In-Person QBR 
-        ('X02', 10), -- In-Person Training 
-        ('X03', 10)  -- In-Person Engagement 
-)
 SELECT 
-  r.ASSIGNED AS SalesRep,
-  'Event' AS CreditType,
-  DUE_DATE AS ActivityDate,
-  UPPER(LEFT("Location", 3)) AS MeetingCode, -- extract meeting code from location
-  ms.score AS ActivityScore,
-  ACTIVITY_ID AS ActivityID
+  r.OwnerID AS SalesRepID18,
+  s.ActivityCode AS ActivityCode,
+  r.ActivityDate AS ActivityDate
 FROM raw_meeting_events r
-INNER JOIN meeting_scores ms
-  ON UPPER(LEFT(r."Location", 3)) = ms.meeting_code
+INNER JOIN scoring s
+  ON UPPER(LEFT(r.Location, 3)) = UPPER(s.ActivityCode)
+WHERE LOWER(s.category) = 'event'
+-- match to predefined meeting codes, 
+-- business rule: place meeting code as first three letters of location field

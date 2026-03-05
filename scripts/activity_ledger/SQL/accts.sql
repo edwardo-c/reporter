@@ -1,8 +1,6 @@
 CREATE OR REPLACE TEMP VIEW new_accts AS  
 SELECT 
-  CREATED AS SalesRep,
-  'Created Account' AS CreditType,
-  CREATED_DATE AS ActivityDate,
-  CDF1 AS ActivityScore,
-  ACCOUNT_ID AS ActivityID
+  CreatedById AS SalesRepID18,
+  'ACCT' AS ActivityCode,
+  CreatedDate AS ActivityDate
 FROM raw_new_accts;

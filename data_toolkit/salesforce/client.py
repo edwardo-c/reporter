@@ -68,6 +68,13 @@ class SFClient:
             f'analytics/reports/{report_id}?includeDetails={str(include_details)}'
         )
         
+        if not bool(report_results["allData"]):
+            raise ValueError(
+                f"Incomplete data set captured! \n"
+                f"Due to pagination, you are not capturing the complete data set \n"
+                f"Prefer SFCLient.query(MY_SOQL_STR)"    
+            )
+
         # TODO: log the name of the report found using the metadata
 
         return report_results
