@@ -1,9 +1,37 @@
-CREATE OR REPLACE TEMP VIEW enriched AS
+CREATE TEMP TABLE final_payload (
+    Sales_Rep__c              VARCHAR NOT NULL,
+    Period_Start__c           DATE NOT NULL,
+    Period_Type__c            VARCHAR NOT NULL,
+    External_ID__c            VARCHAR NOT NULL,
+    Total_Score__c            INTEGER NOT NULL,
+    Calls_Count__c            INTEGER NOT NULL,
+    Calls_Score__c            INTEGER NOT NULL,
+    Contacts_Count__c         INTEGER NOT NULL,
+    Contacts_Score__c         INTEGER NOT NULL,
+    Converted_Leads_Count__c  INTEGER NOT NULL,
+    Converted_Leads_Score__c  INTEGER NOT NULL,
+    Accounts_Count__c         INTEGER NOT NULL,
+    Accounts_Score__c         INTEGER NOT NULL,
+    Opportunities_Count__c    INTEGER NOT NULL,
+    Opportunities_Score__c    INTEGER NOT NULL,
+    In_Person_Events_Count__c INTEGER NOT NULL,
+    In_Person_Events_Score__c INTEGER NOT NULL,
+    Quotes_Count__c           INTEGER NOT NULL,
+    Quotes_Score__c           INTEGER NOT NULL,
+    Virtual_Events_Count__c   INTEGER NOT NULL,
+    Virtual_Events_Score__c   INTEGER NOT NULL,
+ 
+    PRIMARY KEY (Sales_Rep__c, Period_Start__c, Period_Type__c)
+
+);
+
+INSERT INTO final_payload
 SELECT 
   ledger.SalesRepID18 AS Sales_Rep__c,
   DATE_TRUNC('month', ledger.ActivityDate) AS Period_Start__c,
   'Monthly' AS Period_Type__c,
-  
+  CONCAT_WS('|', ledger.SalesRepID18, DATE_TRUNC('month', ledger.ActivityDate), 'Monthly') AS External_ID__c,
+
   SUM(s.Score) AS Total_Score__c,
 
   -- Virtual Events --

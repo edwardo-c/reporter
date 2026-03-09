@@ -41,9 +41,14 @@ def main():
 
         finalize_sql = run_ordered_sql(conn, cfg["enrich"])
 
-        df = conn.execute(f"SELECT * FROM enriched").df()
+        df = conn.execute(f"SELECT * FROM final_payload").df()
+
+        breakpoint()
 
     df.to_csv(cfg["test_out"], index=False)
 
 if __name__ == "__main__":
     main()
+
+
+# External ID: RepID | PeriodStart | PeriodType

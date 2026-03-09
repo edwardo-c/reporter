@@ -45,15 +45,39 @@ def validate_positive_int(val: int) -> None:
     elif val < 0:
         raise ValueError(f"must be a positive integer")
     
-def validate_key_existence(key: str, cfg: Mapping[Any, Any]) -> None:
-    if key not in cfg:
-        raise KeyError(
-            f"key '{key}' not found in cfg"
-        )
+def validate_key_existence(keys: str | list[str], cfg: Mapping[Any, Any]) -> None:
+    if isinstance(keys, str):
+        keys = [keys]
+
+    for k in keys:
+        if k not in cfg:
+            raise KeyError(
+                f"key '{k}' not found in cfg"
+            )
 
 def validate_list_str(
         list_to_validate: list[str], 
         allow_zero: bool = False
     ):
+    if not isinstance(list_to_validate, list):
+        raise ValueError(f"Execpted type list, got {type(list_to_validate)}")
+    
     for s in list_to_validate:
         validate_str(s, allow_zero=allow_zero)
+
+
+def cols_in_df(cols: str | list[str], existing_cols: list[str]):
+
+    if not isinstance(cols, [str, list]):
+        raise TypeError(f"cols must be type str, or list[str], got: {type(cols)}")
+    elif not isinstance(existing_cols, list):
+        raise TypeError(f"existing_cols must be type list[str], got: {type(existing_cols)}")    
+    elif 
+
+    if isinstance(cols, str):
+        cols = [cols]
+
+    missing = [c for c in cols if c not in existing_cols]
+    if missing:
+        raise ValueError(f"df is missing columns: {missing}")
+    
