@@ -66,13 +66,7 @@ def validate_list_str(
         validate_str(s, allow_zero=allow_zero)
 
 
-def cols_in_df(cols: str | list[str], existing_cols: list[str]):
-
-    if not isinstance(cols, [str, list]):
-        raise TypeError(f"cols must be type str, or list[str], got: {type(cols)}")
-    elif not isinstance(existing_cols, list):
-        raise TypeError(f"existing_cols must be type list[str], got: {type(existing_cols)}")    
-    elif 
+def cols_in_df(cols: str | list[str], existing_cols: tuple[str]) -> None:
 
     if isinstance(cols, str):
         cols = [cols]

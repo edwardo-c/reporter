@@ -20,9 +20,12 @@ logging.basicConfig(level=logging.INFO)
 """
 SMELLS:
 what if a sheet name or index changes?
+
+!!Out file is not dynamically updated!!
+
 """
 
-PERIOD_DATE = "01/31/2026"
+PERIOD_DATE = "02/28/2026"
 STRICT_CATEGORIES = True
 
 def main():
@@ -121,7 +124,7 @@ def main():
     db = duckdb.connect(global_cfg["pos_sales_db"])
     db.sql("CREATE OR REPLACE TABLE pos_sales AS SELECT * FROM enriched_df")
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\January_2026_POS.csv", index=False)
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\February_2026_POS.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())

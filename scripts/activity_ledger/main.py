@@ -43,12 +43,11 @@ def main():
 
         df = conn.execute(f"SELECT * FROM final_payload").df()
 
+        
+
         breakpoint()
 
     df.to_csv(cfg["test_out"], index=False)
 
 if __name__ == "__main__":
     main()
-
-
-# External ID: RepID | PeriodStart | PeriodType
