@@ -47,14 +47,18 @@ def get_columns(conn: duckdb.DuckDBPyConnection, relation: str) -> tuple[str]:
 def create_projection_query(
         existing_columns: tuple[str], 
         relation: str, 
-        schema: list[Col]) -> str:
+        schema: list[Col],
+        strict: bool = False) -> str:
     """produces a single sql SELECT statement with a CanonicalSchema enforced"""
     exprs = []
     for col in schema:
         if col.name in existing_columns:
             exprs.append(f'CAST("{col.name}" AS {col.dtype}) AS "{col.name}"')
         else:
-            exprs.append(f'CAST({col.default_sql} AS {col.dtype}) AS "{col.name}"')
+            if strict:
+                raise ValueError(f"strict schema error, {col.name} not found")
+            else:
+                exprs.append(f'CAST({col.default_sql} AS {col.dtype}) AS "{col.name}"')
     
     return "SELECT\n " + ", \n".join(exprs) + f"\nFROM {relation}"
 
@@ -118,7 +122,12 @@ def contract_enforced_union_all(
         create select all statement in the order of the provided schema
         """
         existing_columns = get_columns(conn, branch)
-        projection_sql = create_projection_query(existing_columns, branch, final_schema)
+        projection_sql = create_projection_query(
+            existing_columns, 
+            branch, 
+            final_schema, 
+            final_view_cfg["strict"]
+        )
         
         intermediate_view = materialize_intermediate_view(conn, branch, projection_sql)
 

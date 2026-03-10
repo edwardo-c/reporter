@@ -16,8 +16,9 @@ def _validate_schema_cfg(raw_cfg):
 
 def _validate_final_view_cfg(raw_cfg):
     validate_key_existence("final_view", raw_cfg)
-    final_view_cfg = raw_cfg["final_view"]
-    validate_key_existence("name", final_view_cfg)
+    final_view = raw_cfg["final_view"]
+    validate_key_existence("name", final_view)
+    validate_key_existence("strict", final_view)
 
 def validate_cfg(raw_cfg):
     

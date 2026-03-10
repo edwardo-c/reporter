@@ -36,7 +36,8 @@ FINAL_SCHEMA = [Col(), Col(), ...]
 ## Configuration
 ```
 final_view:
-    name: UnionAll_VIewName
+    name: UnionAll_ViewName
+    strict: (bool)                          # toggle for using defaults (False) or raise missing columns (True) 
 schema:
     module_name: "folder.sub_folder.module" # module path of schema contract
     final_schema_name: FINAL_SCHEMA         # name of schema in module_name

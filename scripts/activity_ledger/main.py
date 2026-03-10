@@ -1,13 +1,13 @@
 from dotenv import load_dotenv
 
 import duckdb
-
 from config.paths import SF_ACTIVITIES_ENV, SF_ACTIVITIES_REPORT_CFG
 from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
 from data_toolkit.duckdb.union_all.contract_projection import contract_enforced_union_all
 from data_toolkit.salesforce.client import SFClient
-from data_toolkit.salesforce.reports_tabular.payload_to_df import payload_to_df
-
+from data_toolkit.cleaners.df_dtypes.dtype import enforce_schema
+from scripts.activity_ledger.schema import OUTPUT_SCHEMA, EXTERNAL_ID
+from data_toolkit.salesforce.payload import df_bulk_payload
 from utils.yaml_loader import load_yaml
 from scripts.activity_ledger.SOQL.registry import get_query, load_queries
 
@@ -16,8 +16,6 @@ logging.basicConfig(level=logging.INFO)
 
 # the configuration file to use for the pipeline
 YAML = "activities.yaml"
-
-
 
 def main():
 
@@ -41,13 +39,19 @@ def main():
 
         finalize_sql = run_ordered_sql(conn, cfg["enrich"])
 
-        df = conn.execute(f"SELECT * FROM final_payload").df()
+        # clean dataframe types and values
+        df = enforce_schema(
+            OUTPUT_SCHEMA,
+            conn.execute(f"SELECT * FROM final_payload").df()
+        )
 
-        
+        # generate payload
+        payload = df_bulk_payload(df, EXTERNAL_ID)
 
-        breakpoint()
+    # upsert
+    breakpoint()
 
-    df.to_csv(cfg["test_out"], index=False)
+
 
 if __name__ == "__main__":
     main()

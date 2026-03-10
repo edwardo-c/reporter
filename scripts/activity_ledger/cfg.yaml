@@ -43,10 +43,10 @@ sql:
 union_all:
   final_view:
     name: ActivityLedger
-    temp: True
+    strict: True
   schema:
     module_name: scripts.activity_ledger.schema
-    final_schema_name: FINAL_SCHEMA
+    final_schema_name: INPUT_SCHEMA
   branches:
   - new_contacts
   - new_opps
