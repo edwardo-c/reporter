@@ -1,6 +1,10 @@
 from simple_salesforce import Salesforce
 import pandas as pd
 
+from data_toolkit.salesforce.payload import BulkObj
+
+import logging
+
 class SFClient:
     def __init__(
             self, 
@@ -31,6 +35,11 @@ class SFClient:
     def __exit__(self, exc_type, exc, tb):
         self._sf = None
 
+    def upsert(self, bulk_obj: BulkObj, payload: list[dict]) -> list[dict]:
+        return getattr(
+            self._sf.bulk, bulk_obj.name
+        ).upsert(payload, bulk_obj.external_id_name)
+
     def insert_record(self, obj_name: str, data: dict):
         return getattr(self._sf, obj_name).create(data)
     
@@ -54,6 +63,8 @@ class SFClient:
         returns the json response body from a predefined salesforce report
         """
         
+        logging.warning(f"get_report() is subject to pagination! use query() instead")
+
         if not isinstance(report_id, str):
             raise TypeError(f"report_id must be str, got: {type(report_id)}")
         elif len(report_id) == 0:

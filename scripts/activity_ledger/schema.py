@@ -1,14 +1,14 @@
 from data_toolkit.duckdb.union_all.contract_projection import Col
 
-# contract enforced schema for imported data - required columns to build union all
-# these are part of the data compilation step
+# contract enforced schema for imported data via SOQL
+# required columns to build Activity Ledger Long Data
 INPUT_SCHEMA = [
     Col("SalesRepID18",   "VARCHAR", "NULL"),
     Col("ActivityCode",   "VARCHAR", "NULL"),
     Col('ActivityDate',   "DATE",    "NULL")
 ]
 
-# Activity Ledger Output Schema
+# Activity Ledger Output Schema, columns required in Payload
 # used to normalize column dtypes, raises on missing columns
 from data_toolkit.cleaners.df_dtypes.dtype import StrCol, IntCol, DateCol, ColError, DateFmt
 
@@ -16,33 +16,26 @@ OUTPUT_SCHEMA = [
     StrCol('Sales_Rep__c'),
     DateCol('Period_Start__c',  format = DateFmt.YYYY_MM_DD),
     StrCol('Period_Type__c'),
-    IntCol('Total_Score__c', errors=ColError.RAISE),
-    IntCol('Calls_Count__c', errors=ColError.RAISE),
-    IntCol('Calls_Score__c', errors=ColError.RAISE),
-    IntCol('Contacts_Count__c', errors=ColError.RAISE),
-    IntCol('Contacts_Score__c', errors=ColError.RAISE),
-    IntCol('Converted_Leads_Count__c', errors=ColError.RAISE),
-    IntCol('Converted_Leads_Score__c', errors=ColError.RAISE),
-    IntCol('Accounts_Count__c', errors=ColError.RAISE),
-    IntCol('Accounts_Score__c', errors=ColError.RAISE),
-    IntCol('Opportunities_Count__c', errors=ColError.RAISE),
-    IntCol('Opportunities_Score__c', errors=ColError.RAISE),
-    IntCol('In_Person_Events_Count__c', errors=ColError.RAISE),
-    IntCol('In_Person_Events_Score__c', errors=ColError.RAISE),
-    IntCol('Quotes_Count__c', errors=ColError.RAISE),
-    IntCol('Quotes_Score__c', errors=ColError.RAISE),
-    IntCol('Virtual_Events_Count__c', errors=ColError.RAISE),
-    IntCol('Virtual_Events_Score__c', errors=ColError.RAISE),
+    StrCol('Type__c'),
+    StrCol('SubType__c'),
+    StrCol('Activity__c'),
+    IntCol('Activity_Count__c', errors=ColError.RAISE),
+    IntCol('Activity_Score__c', errors=ColError.RAISE),
 ]
 
+from data_toolkit.salesforce.payload import BulkObj
 
-from data_toolkit.salesforce.payload import ExternalID
-
-EXTERNAL_ID = ExternalID(
-    name="External_ID__c",
-    id_parts=[
+# Salesforce bulk object for upsert and concatenated External id key
+BULK_OBJ = BulkObj(
+    name="Activity_Ledger__c",
+    external_id_name="External_ID__c",
+    external_id_parts=tuple([
         'Sales_Rep__c',
         'Period_Start__c',
-        'Period_Type__c'
-        ]
-    )
+        'Period_Type__c',
+        'Type__c',
+        'SubType__c',
+        'Activity__c'
+    ])
+)
+  
