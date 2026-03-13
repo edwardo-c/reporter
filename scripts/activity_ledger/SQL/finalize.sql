@@ -3,7 +3,7 @@ CREATE TEMP TABLE final_payload (
     Period_Start__c           DATE NOT NULL,
     Period_Type__c            VARCHAR NOT NULL,
     Type__c                   VARCHAR NOT NULL,
-    SubType__c                VARCHAR NOT NULL,
+    Sub_Type__c               VARCHAR NOT NULL,
     Activity__c               VARCHAR NOT NULL,
     Activity_Count__c         INTEGER NOT NULL,
     Activity_Score__c         INTEGER NOT NULL,
@@ -13,7 +13,7 @@ CREATE TEMP TABLE final_payload (
         Period_Start__c, 
         Period_Type__c, 
         Type__c, 
-        SubType__c,
+        Sub_Type__c,
         Activity__c
     )
 );
@@ -24,7 +24,7 @@ SELECT
     DATE_TRUNC('month', ActivityDate) AS Period_Start__c,
     'Monthly' AS Period_Type__c,
     s.Type AS Type__c,
-    s.SubType AS SubType__c,
+    s.SubType AS Sub_Type__c,
     s.Activity AS Activity__c,
     COUNT(*) AS Activity_Count__c,
     SUM(s.Score) AS Activity_Score__c

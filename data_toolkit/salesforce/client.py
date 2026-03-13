@@ -1,7 +1,7 @@
 from simple_salesforce import Salesforce
 import pandas as pd
 
-from data_toolkit.salesforce.payload import BulkObj
+from data_toolkit.salesforce.payload.payload import BulkObj
 
 import logging
 

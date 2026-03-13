@@ -7,9 +7,10 @@ from data_toolkit.duckdb.union_all.contract_projection import contract_enforced_
 from data_toolkit.salesforce.client import SFClient
 from data_toolkit.cleaners.df_dtypes.dtype import enforce_schema
 from scripts.activity_ledger.schema import OUTPUT_SCHEMA, BULK_OBJ
-from data_toolkit.salesforce.payload import build_bulk_payload
+from data_toolkit.salesforce.payload.payload import build_bulk_payload
 from utils.yaml_loader import load_yaml
 from scripts.activity_ledger.SOQL.registry import get_query, load_queries
+from data_toolkit.salesforce.payload.results import build_failed_df
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -47,7 +48,15 @@ def main():
 
         payload = build_bulk_payload(df, BULK_OBJ, validate=True)
 
-    sf.upsert(BULK_OBJ, payload)
+    result = sf.upsert(BULK_OBJ, payload)
+
+    failed_df = build_failed_df(result, payload)
+
+    if len(failed_df) > 0:
+        failed_df.to_csv(r"C:\Users\eddiec11us\Desktop\failed.csv")
+        print(f"Failed rows saved to desktop")
+    else:
+        print("Successfuly ran Activity Ledger upsert")
 
 if __name__ == "__main__":
     main()

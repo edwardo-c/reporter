@@ -7,6 +7,8 @@ expected shape:
         
 """
 import pandas as pd
+import numpy as np
+from decimal import Decimal
 
 from dataclasses import dataclass
 
@@ -50,6 +52,35 @@ def valid_payload(
     
     return True
 
+def serialize_dataframe_for_api(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convert dataframe values into JSON-safe primitives for API transport.
+    """
+    
+    df = df.copy()
+
+    for col in df.columns:
+
+        # Convert datetime columns to ISO string
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].dt.strftime("%Y-%m-%d")
+
+        # Convert numpy numbers to Python numbers
+        elif pd.api.types.is_integer_dtype(df[col]):
+            df[col] = df[col].astype("Int64").astype(object)
+
+        elif pd.api.types.is_float_dtype(df[col]):
+            df[col] = df[col].astype(float)
+
+    # Replace NaN with None
+    df = df.replace({np.nan: None})
+
+    # Convert Decimal if present
+    df = df.map(lambda x: float(x) if isinstance(x, Decimal) else x)
+
+    return df
+
+
 def build_bulk_payload(
         df: pd.DataFrame, 
         bulk_obj: BulkObj,
@@ -60,9 +91,9 @@ def build_bulk_payload(
     conforms to the final schema contract.
     Assumes required columns and NOT NULL constraints are enforced upstream.
     """
-    _df = df.copy()
-
-    _df[bulk_obj.name] = _df[bulk_obj.external_id_parts].astype(str).agg('|'.join, axis=1)
+    _df = serialize_dataframe_for_api(df)
+    
+    _df[bulk_obj.external_id_name] = _df[[*bulk_obj.external_id_parts]].astype(str).agg('|'.join, axis=1)
 
     payload = _df.to_dict('records')
     

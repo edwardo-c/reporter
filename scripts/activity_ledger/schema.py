@@ -17,13 +17,13 @@ OUTPUT_SCHEMA = [
     DateCol('Period_Start__c',  format = DateFmt.YYYY_MM_DD),
     StrCol('Period_Type__c'),
     StrCol('Type__c'),
-    StrCol('SubType__c'),
+    StrCol('Sub_Type__c'),
     StrCol('Activity__c'),
     IntCol('Activity_Count__c', errors=ColError.RAISE),
     IntCol('Activity_Score__c', errors=ColError.RAISE),
 ]
 
-from data_toolkit.salesforce.payload import BulkObj
+from data_toolkit.salesforce.payload.payload import BulkObj
 
 # Salesforce bulk object for upsert and concatenated External id key
 BULK_OBJ = BulkObj(
@@ -34,7 +34,7 @@ BULK_OBJ = BulkObj(
         'Period_Start__c',
         'Period_Type__c',
         'Type__c',
-        'SubType__c',
+        'Sub_Type__c',
         'Activity__c'
     ])
 )

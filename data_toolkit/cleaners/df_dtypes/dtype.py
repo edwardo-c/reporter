@@ -56,6 +56,7 @@ def enforce_schema(
 
         elif isinstance(col, DateCol):
             df[col.name] = pd.to_datetime(df[col.name], errors=col.errors, format=col.format.value)
+            
 
     return df
 
