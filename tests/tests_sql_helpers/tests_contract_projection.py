@@ -1,5 +1,5 @@
 import pytest
-from data_toolkit.duckdb.union_all.contract_projection import Col, get_columns, create_projection_query
+from data_toolkit.duckdb.union_all.dep_contract_projection import Col, get_columns, create_projection_query
 
 import duckdb
 import pandas as pd

@@ -1,4 +1,4 @@
-from data_toolkit.duckdb.union_all.contract_projection import Col
+from data_toolkit.duckdb.union_all.dep_contract_projection import Col
 
 # contract enforced schema for imported data via SOQL
 # required columns to build Activity Ledger Long Data

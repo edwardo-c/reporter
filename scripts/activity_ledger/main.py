@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import duckdb
 from config.paths import SF_ACTIVITIES_ENV, SF_ACTIVITIES_REPORT_CFG
 from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
-from data_toolkit.duckdb.union_all.contract_projection import contract_enforced_union_all
+from data_toolkit.duckdb.union_all.dep_contract_projection import contract_enforced_union_all
 from data_toolkit.salesforce.client import SFClient
 from data_toolkit.cleaners.df_dtypes.dtype import enforce_schema
 from scripts.activity_ledger.schema import OUTPUT_SCHEMA, BULK_OBJ

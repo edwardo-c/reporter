@@ -6,7 +6,7 @@ import duckdb
 from config.paths import CREDIT_EVENTS_ENV, CREDIT_EVENTS_CFG
 from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
 from data_toolkit.duckdb.register_frames.register_frames import register_frames_from_cfg
-from data_toolkit.duckdb.union_all.contract_projection import contract_enforced_union_all
+from data_toolkit.duckdb.union_all.dep_contract_projection import contract_enforced_union_all
 from utils.yaml_loader import load_yaml
 
 logging.basicConfig(level=logging.INFO)

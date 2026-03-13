@@ -1,13 +1,7 @@
 import duckdb
 from dataclasses import dataclass
-from typing import Mapping
-
-from data_toolkit.duckdb.union_all.cfg_validator import validate_cfg
-
-from utils.validators import validate_str
 from typing import Sequence
-import importlib
-
+import logging
 
 @dataclass(frozen=True)
 class Col():
@@ -15,30 +9,29 @@ class Col():
     dtype: str
     default_sql:str = "NULL"
 
-def _validate_schema(schema: Sequence[Col]) -> None:
-    for col in schema:
-        if not isinstance(col, Col):
-            raise TypeError(
-                f"All columns in schema must be type Col. "
-                f"from data_toolkit.duckdb.contract_projection"
-                )
+@dataclass(frozen=True)
+class UnionAllCfg:
+    name: str
+    schema: list[Col]
+    branches: list[str]
 
-def get_final_schema(
-        module_name: str, 
-        final_schema_name: str = "FINAL_SCHEMA"
-    ): 
-    
-    validate_str(module_name, allow_zero=False)
+    def __post_init__(self):
+        
+        self._validate_schema(self.schema)
 
-    module = importlib.import_module(module_name)
-    
-    if hasattr(module, final_schema_name):
-        schema = getattr(module, final_schema_name)
-    else:
-        raise AttributeError(f"{final_schema_name} not found in {module}")
+        if " " in self.name:
+            no_white_space = self.name.replace(" ", "")
+            logging.info(f"{self.name} changed to {no_white_space}")
+            object.__setattr__(self, "name", no_white_space)
 
-    return schema
-
+    @staticmethod
+    def _validate_schema(schema: Sequence[Col]) -> None:
+        for col in schema:
+            if not isinstance(col, Col):
+                raise TypeError(
+                    f"All columns in schema must be type Col. "
+                    f"from data_toolkit.duckdb.execute"
+                    )
 
 def get_columns(conn: duckdb.DuckDBPyConnection, relation: str) -> tuple[str]:
     result = conn.execute(f"DESCRIBE {relation}").fetchall()
@@ -48,17 +41,14 @@ def create_projection_query(
         existing_columns: tuple[str], 
         relation: str, 
         schema: list[Col],
-        strict: bool = False) -> str:
+    ) -> str:
     """produces a single sql SELECT statement with a CanonicalSchema enforced"""
     exprs = []
     for col in schema:
         if col.name in existing_columns:
             exprs.append(f'CAST("{col.name}" AS {col.dtype}) AS "{col.name}"')
         else:
-            if strict:
-                raise ValueError(f"strict schema error, {col.name} not found")
-            else:
-                exprs.append(f'CAST({col.default_sql} AS {col.dtype}) AS "{col.name}"')
+            exprs.append(f'CAST({col.default_sql} AS {col.dtype}) AS "{col.name}"')
     
     return "SELECT\n " + ", \n".join(exprs) + f"\nFROM {relation}"
 
@@ -97,26 +87,20 @@ def execute_union_all(
 
 # ======================== ENTRY ============================
 def contract_enforced_union_all(
-        raw_cfg: Mapping[str, str | list[str]],
+        cfg: UnionAllCfg,
         conn: duckdb.DuckDBPyConnection
-    ) -> str:
+    ) -> None:
     """
     Materializes union all view of branches
-    returns name of final union all from raw_cfg
     Raises invalid config
     """
-    # validate config
-    validate_cfg(raw_cfg)
-    final_view_cfg = raw_cfg["final_view"]
-    schema_cfg = raw_cfg["schema"]
-    branches_cfg = raw_cfg["branches"]
 
-    final_schema = get_final_schema(**schema_cfg)
-    _validate_schema(final_schema)
+    if not isinstance(cfg, UnionAllCfg):
+        raise TypeError(f"invalid cfg, expected ..UnionAllCfg, got: {type(cfg).__name__}")
 
     intermediate_views_exprs = []
 
-    for branch in branches_cfg:
+    for branch in cfg.branches:
         # enforce contract for each branch
         """
         create select all statement in the order of the provided schema
@@ -125,8 +109,7 @@ def contract_enforced_union_all(
         projection_sql = create_projection_query(
             existing_columns, 
             branch, 
-            final_schema, 
-            final_view_cfg["strict"]
+            cfg.schema
         )
         
         intermediate_view = materialize_intermediate_view(conn, branch, projection_sql)
@@ -137,11 +120,9 @@ def contract_enforced_union_all(
 
     execute_union_all(
         conn, 
-        final_name=final_view_cfg["name"], 
+        final_name=cfg.name, 
         union_all_projection_sql=union_all_query
     )
-
-    return final_view_cfg["name"]
 
 
 
