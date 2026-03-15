@@ -1,5 +1,6 @@
 CREATE OR REPLACE TEMP VIEW all_direct_2025_logic AS 
 SELECT
+  'PAVDIRECT' AS Distributor,
   Account AS "Account Number",
   "Customer Name",
   "Inventory CD" AS "Part Number",

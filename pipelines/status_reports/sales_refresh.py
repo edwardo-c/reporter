@@ -4,7 +4,7 @@
 import pandas as pd
 
 from data_toolkit.readers.single_file import read_data
-from data_toolkit.duckdb.duck_query import create_or_replace
+from data_toolkit.duckdb._duck_query import create_or_replace
 
 def refresh_data(*, data_cfg: dict, conn: object):
     """Read, clean, and load sales data from network file to duckdb"""

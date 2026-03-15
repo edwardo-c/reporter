@@ -35,11 +35,6 @@ class SFClient:
     def __exit__(self, exc_type, exc, tb):
         self._sf = None
 
-    def upsert(self, bulk_obj: BulkObj, payload: list[dict]) -> list[dict]:
-        return getattr(
-            self._sf.bulk, bulk_obj.name
-        ).upsert(payload, bulk_obj.external_id_name)
-
     def insert_record(self, obj_name: str, data: dict):
         return getattr(self._sf, obj_name).create(data)
     
@@ -53,39 +48,3 @@ class SFClient:
             return pd.DataFrame(records).drop(columns=["attributes"], errors="ignore")
         else:
             return records
-    
-    def get_report(
-            self, 
-            report_id: str, 
-            include_details: bool = True
-        ):
-        """
-        returns the json response body from a predefined salesforce report
-        """
-        
-        logging.warning(f"get_report() is subject to pagination! use query() instead")
-
-        if not isinstance(report_id, str):
-            raise TypeError(f"report_id must be str, got: {type(report_id)}")
-        elif len(report_id) == 0:
-            raise ValueError(
-                f"report_id cannot be a 0 length string"
-                "report_ids are approximatly 13-15 characters,"
-                "usually starting with '00O', often found in the URL of the report"
-            )
-
-
-        report_results = self._sf.restful(
-            f'analytics/reports/{report_id}?includeDetails={str(include_details)}'
-        )
-        
-        if not bool(report_results["allData"]):
-            raise ValueError(
-                f"Incomplete data set captured! \n"
-                f"Due to pagination, you are not capturing the complete data set \n"
-                f"Prefer SFCLient.query(MY_SOQL_STR)"    
-            )
-
-        # TODO: log the name of the report found using the metadata
-
-        return report_results

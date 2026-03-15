@@ -1,54 +1,52 @@
-from dotenv import load_dotenv
+from data_toolkit.duckdb.client import DuckRunner
+from scripts.activity_ledger.cfg import (
+    SOURCES,
+    ORDERED_SQL, 
+    UNION_ALL_CFG, 
+    SQL_DIR, 
+    CTX,
+    OUTPUT_SCHEMA,
+    BULK_OBJ
+)
 
-import duckdb
-from config.paths import SF_ACTIVITIES_ENV, SF_ACTIVITIES_REPORT_CFG
-from data_toolkit.duckdb.execute_sql.execute import run_ordered_sql
-from data_toolkit.duckdb.union_all.dep_contract_projection import contract_enforced_union_all
-from data_toolkit.salesforce.client import SFClient
+from data_toolkit.readers.readers import get_dataframe_from_source
 from data_toolkit.cleaners.df_dtypes.dtype import enforce_schema
-from scripts.activity_ledger.schema import OUTPUT_SCHEMA, BULK_OBJ
 from data_toolkit.salesforce.payload.payload import build_bulk_payload
-from utils.yaml_loader import load_yaml
-from scripts.activity_ledger.SOQL.registry import get_query, load_queries
 from data_toolkit.salesforce.payload.results import build_failed_df
 
 import logging
 logging.basicConfig(level=logging.INFO)
 
-# the configuration file to use for the pipeline
-YAML = "activities.yaml"
-
 def main():
 
-    load_dotenv(SF_ACTIVITIES_ENV)
-    cfg = load_yaml(SF_ACTIVITIES_REPORT_CFG)
-    load_queries()
+    with DuckRunner(db_path=None) as duck:
 
-    sf = SFClient(**cfg["credentials"])
-
-    with duckdb.connect() as conn:
-
-        for report in cfg["reports"]:
+        for src in SOURCES:
             
-            df = sf.query(get_query(report["query_key"]), df=True)
+            df = get_dataframe_from_source(src, CTX)
 
-            conn.register(report["register_as"], df)
-        
-        run_ordered_sql(conn, cfg["sql"])
+            duck.conn.register(src.df_id, df)
 
-        contract_enforced_union_all(cfg["union_all"], conn)
+        duck.run_ordered_sql(ORDERED_SQL)
 
-        run_ordered_sql(conn, cfg["enrich"])
-
-        # clean dataframe types and values
-        df = enforce_schema(
-            OUTPUT_SCHEMA,
-            conn.execute(f"SELECT * FROM final_payload").df()
+        duck.contract_enforced_union_all(
+            final_name=UNION_ALL_CFG.name, 
+            branches=UNION_ALL_CFG.branches, 
+            schema=UNION_ALL_CFG.schema
         )
 
-        payload = build_bulk_payload(df, BULK_OBJ, validate=True)
+        duck.run_sql_file(SQL_DIR.get_path("finalize"))
 
-    result = sf.upsert(BULK_OBJ, payload)
+        df = enforce_schema(
+            OUTPUT_SCHEMA,
+            duck.conn.execute(f"SELECT * FROM final_payload").df()
+        )
+    
+    payload = build_bulk_payload(df, BULK_OBJ, validate=True)
+
+    result = getattr(
+        CTX.sf.bulk, BULK_OBJ.name
+        ).upsert(payload, BULK_OBJ.external_id_name)
 
     failed_df = build_failed_df(result, payload)
 

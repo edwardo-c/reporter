@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Mapping, Any
 
-def validate_dir(directory: str | Path ) -> None:
+def normalize_dir(directory: str | Path ) -> None:
     
     if not isinstance(directory, (str, Path)):
         raise TypeError(f"Expected str or Path, received {type(directory)}")
@@ -14,6 +14,8 @@ def validate_dir(directory: str | Path ) -> None:
 
     if not directory.exists() and directory.is_dir():
         raise NotADirectoryError(f"{directory} is not a valid directory")
+
+    return directory
 
 def validate_path(file_path: str | Path) -> None:
     

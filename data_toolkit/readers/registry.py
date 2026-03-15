@@ -1,5 +1,3 @@
-from data_toolkit.readers.sources import XLBundle, Sources
-
 READERS_REGISTRY = {}
 
 def register_reader(reader_id: str):
