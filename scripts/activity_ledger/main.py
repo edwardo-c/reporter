@@ -5,14 +5,13 @@ from scripts.activity_ledger.cfg import (
     UNION_ALL_CFG, 
     SQL_DIR, 
     CTX,
-    OUTPUT_SCHEMA,
-    BULK_OBJ
+    ACTIVITY_LEDGER_NAME,
+    ACTIVITY_LEDGER_SCHEMA,
+    ACTIVITY_LEDGER_EXT_ID
 )
 
 from data_toolkit.readers.readers import get_dataframe_from_source
-from data_toolkit.cleaners.df_dtypes.dtype import enforce_schema
-from data_toolkit.salesforce.payload.payload import build_bulk_payload
-from data_toolkit.salesforce.payload.results import build_failed_df
+from data_toolkit.salesforce.bulk_upsert import SFBulkObj
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -37,22 +36,22 @@ def main():
 
         duck.run_sql_file(SQL_DIR.get_path("finalize"))
 
-        df = enforce_schema(
-            OUTPUT_SCHEMA,
-            duck.conn.execute(f"SELECT * FROM final_payload").df()
-        )
+        stacked_df = duck.conn.execute(f"SELECT * FROM final_payload").df()
+
+    # check to see if results have changed, only upsert if changes found
+
+    activity_ledger = SFBulkObj(
+        object_name=ACTIVITY_LEDGER_NAME,
+        external_id=ACTIVITY_LEDGER_EXT_ID,
+        schema=ACTIVITY_LEDGER_SCHEMA,
+        df=stacked_df
+    )
     
-    payload = build_bulk_payload(df, BULK_OBJ, validate=True)
+    activity_ledger.upsert(CTX.sf)
 
-    result = getattr(
-        CTX.sf.bulk, BULK_OBJ.name
-        ).upsert(payload, BULK_OBJ.external_id_name)
-
-    failed_df = build_failed_df(result, payload)
-
-    if len(failed_df) > 0:
-        failed_df.to_csv(r"C:\Users\eddiec11us\Desktop\failed.csv")
-        print(f"Failed rows saved to desktop")
+    if activity_ledger.has_failed_rows:
+        activity_ledger.failed_df_to_csv(r"C:\Users\eddiec11us\Desktop\failed.csv")
+        print("exported failed rows")
     else:
         print("Successfuly ran Activity Ledger upsert")
 

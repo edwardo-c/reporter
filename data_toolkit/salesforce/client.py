@@ -1,10 +1,6 @@
 from simple_salesforce import Salesforce
 import pandas as pd
 
-from data_toolkit.salesforce.payload.payload import BulkObj
-
-import logging
-
 class SFClient:
     def __init__(
             self, 
@@ -34,13 +30,7 @@ class SFClient:
 
     def __exit__(self, exc_type, exc, tb):
         self._sf = None
-
-    def insert_record(self, obj_name: str, data: dict):
-        return getattr(self._sf, obj_name).create(data)
     
-    def delete_record(self, obj_name: str, id: str):
-        return getattr(self._sf, obj_name).delete(id)
-
     def query(self, soql: str, df: bool = True) -> pd.DataFrame | dict:
         res = self._sf.query_all(soql)
         records = res["records"]

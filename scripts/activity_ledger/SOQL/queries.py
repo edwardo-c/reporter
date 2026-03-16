@@ -67,3 +67,12 @@ WHERE
   AND ActivityDate = THIS_YEAR
 """
 register_query("calls", CALLS)
+
+EMAILS = """
+SELECT 
+  CreatedById,
+  MessageDate
+FROM EmailMessage
+WHERE MessageDate >= THIS_YEAR
+"""
+register_query("emails", CALLS)

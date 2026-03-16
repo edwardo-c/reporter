@@ -31,7 +31,8 @@ SOURCES = [
     SFQuery(soql=get_query("accounts"), df_id="raw_new_accts"),
     SFQuery(soql=get_query("quotes"), df_id="raw_new_quotes"),
     SFQuery(soql=get_query("leads"), df_id="raw_converted_leads"),
-    SFQuery(soql=get_query("calls"), df_id="raw_calls")
+    SFQuery(soql=get_query("calls"), df_id="raw_calls"),
+    SFQuery(soql=get_query("emails"), df_id="raw_emails")
 ]
 
 SQL_DIR = SqlDir(getenv("SQL_BASE_DIR"))
@@ -45,7 +46,8 @@ ORDERED_SQL = SQL_DIR.paths_list(
         "accts", 
         "quotes", 
         "leads", 
-        "calls"
+        "calls",
+        "emails"
     ]
 )
 
@@ -65,15 +67,13 @@ UNION_ALL_CFG = UnionAllCfg(
         "new_leads", 
         "new_calls", 
         "new_events",
+        "new_emails"
     ]
 )
 
-
-# ============ not yet ready to refactor this part ====================
-
 from data_toolkit.cleaners.df_dtypes.dtype import StrCol, IntCol, DateCol, ColError, DateFmt
 
-OUTPUT_SCHEMA = [
+ACTIVITY_LEDGER_SCHEMA = [
     StrCol('Sales_Rep__c'),
     DateCol('Period_Start__c',  format = DateFmt.YYYY_MM_DD),
     StrCol('Period_Type__c'),
@@ -83,20 +83,5 @@ OUTPUT_SCHEMA = [
     IntCol('Activity_Count__c', errors=ColError.RAISE),
     IntCol('Activity_Score__c', errors=ColError.RAISE),
 ]
-
-from data_toolkit.salesforce.payload.payload import BulkObj
-
-# Salesforce bulk object for upsert and concatenated External id key
-BULK_OBJ = BulkObj(
-    name="Activity_Ledger__c",
-    external_id_name="External_ID__c",
-    external_id_parts=tuple([
-        'Sales_Rep__c',
-        'Period_Start__c',
-        'Period_Type__c',
-        'Type__c',
-        'Sub_Type__c',
-        'Activity__c'
-    ])
-)
-  
+ACTIVITY_LEDGER_NAME = "Activity_Ledger__c"
+ACTIVITY_LEDGER_EXT_ID = "External_ID__c"
