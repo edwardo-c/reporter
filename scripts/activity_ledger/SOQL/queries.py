@@ -7,7 +7,7 @@ SELECT
   Location
 FROM Event
 WHERE ActivityDate >= 2026-01-01 
-  AND ActivityDate <= TODAY
+  AND ActivityDate <= THIS_MONTH
 """
 register_query("events", EVENTS)
 
