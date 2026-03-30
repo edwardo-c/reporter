@@ -1,6 +1,11 @@
 from pathlib import Path
 import re
 
+"""
+DEPRECATED! see attachments.mapper for replacement
+"""
+
+
 def id_to_path_map(attachmends_dir: Path) -> dict[str, Path]:
         """Return {acct: path} from files_dir"""
         def _extract_acct_num(s: Path | str) -> str | None:

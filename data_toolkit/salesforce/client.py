@@ -1,5 +1,12 @@
 from simple_salesforce import Salesforce
 import pandas as pd
+from dataclasses import dataclass
+
+@dataclass
+class SFCred:
+    username: str
+    password: str
+    token: str
 
 class SFClient:
     def __init__(
@@ -38,3 +45,4 @@ class SFClient:
             return pd.DataFrame(records).drop(columns=["attributes"], errors="ignore")
         else:
             return records
+

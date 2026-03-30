@@ -1,8 +1,9 @@
 from pathlib import Path
 from typing import Mapping, Any
 
-def normalize_dir(directory: str | Path ) -> None:
-    
+def normalize_dir(directory: str | Path ) -> Path:
+    """Validates a directory and returns directory"""
+
     if not isinstance(directory, (str, Path)):
         raise TypeError(f"Expected str or Path, received {type(directory)}")
 
@@ -31,7 +32,7 @@ def validate_path(file_path: str | Path) -> None:
     if not file_path.exists():
         raise FileNotFoundError(f"path does not exist, {file_path}")
 
-def validate_str(s: str, allow_zero: bool = False) -> None:
+def validate_str(s: str, allow_zero: bool = False) -> str:
     if not isinstance(s, str):
         raise TypeError(f"expected type str, got {type(s)}")
     elif not allow_zero:
@@ -40,6 +41,7 @@ def validate_str(s: str, allow_zero: bool = False) -> None:
                 f"cannot be 0 length str"
                 "bypass: set allow_zero = True"
             )
+    return s
 
 def validate_positive_int(val: int) -> None:
     if not isinstance(val, int):

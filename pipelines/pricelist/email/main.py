@@ -12,7 +12,7 @@ import pandas as pd
 # internal imports
 from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
 from utils.yaml_loader import load_yaml
-from data_toolkit.attachment_mapper.acu_id import id_to_path_map
+from data_toolkit.attachments.acu_id import id_to_path_map
 from data_toolkit.salesforce.client import SFClient
 from pipelines.pricelist.email.bodies import external_email, internal_email, external_boilerplate_email
 from data_toolkit.clients.outlook.outlook_sender import BaseEmail, OutlookSender

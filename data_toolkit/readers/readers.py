@@ -1,3 +1,5 @@
+"""useful if reading multiple dataframes in a single system"""
+
 from data_toolkit.readers.registry import READERS_REGISTRY
 from data_toolkit.readers.sources import XLBundle, CSV, DispatchEnum, SFQuery
 from data_toolkit.readers.registry import register_reader
@@ -31,6 +33,7 @@ def read_csv(src: CSV, context: ReaderContext | None = None) -> pd.DataFrame:
         header=src.header
         )
 
+
 @register_reader(DispatchEnum.SF.value)
 def sf_query_all(src: SFQuery, context: ReaderContext | None) -> pd.DataFrame:
     if context is None or context.sf is None:
@@ -38,4 +41,12 @@ def sf_query_all(src: SFQuery, context: ReaderContext | None) -> pd.DataFrame:
     
     res = context.sf.query_all(src.soql)
     records = res["records"]
+
+    """
+    previously used...
     return pd.DataFrame(records).drop(columns=["attributes"], errors="ignore")
+    but this did not flatten nested dictionaries
+    """
+
+    df = pd.json_normalize(records, sep=".")
+    return df.drop(columns=["attributes"], errors="ignore")
