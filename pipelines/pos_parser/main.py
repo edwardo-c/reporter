@@ -15,7 +15,7 @@ from pipelines.pos_parser.readers.factory import get_reader
 from schemas.pos_schema import PosSchemaMapping, POS_SCHEMA_DEF
 from utils.yaml_loader import load_yaml
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 """
 SMELLS:
@@ -25,7 +25,7 @@ what if a sheet name or index changes?
 
 """
 
-PERIOD_DATE = "02/28/2026"
+PERIOD_DATE = "03/31/2026"
 STRICT_CATEGORIES = True
 
 def main():
@@ -46,6 +46,9 @@ def main():
         logging.debug(f"parsing {file_cfg['src_id']}")
 
         path = next((file for file in files if file_id in file.stem.casefold()), None)
+
+        if path == None:
+            raise ValueError(f"{file_cfg['src_id']} file not found")
 
         # ================ Data Collection =================
 
@@ -124,7 +127,7 @@ def main():
     db = duckdb.connect(global_cfg["pos_sales_db"])
     db.sql("CREATE OR REPLACE TABLE pos_sales AS SELECT * FROM enriched_df")
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\February_2026_POS.csv", index=False)
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\March_2026_POS.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())

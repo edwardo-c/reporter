@@ -29,11 +29,13 @@ logging.basicConfig(level=logging.INFO, format= "%(message)s")
 
 """
 Send Emails = (DRY_RUN = False) and (PROD = True)
+Inspect email = (DRY_RUN = False) and (PROD = False)
+Dry run (recipient log only) = (DRY_RUN = True) and (PROD = False)
 """
 
 DRY_RUN = False # True = exit after send log creation, no emails sent
 PROD = True # False = breakpoint at send email to inspect email
-RUN_ID = "March_2026"
+RUN_ID = "April_2026"
 
 def main():
 

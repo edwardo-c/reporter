@@ -8,4 +8,6 @@ config/
 .env
 *.env
 
+.sfdx/
+
 databases/

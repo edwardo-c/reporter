@@ -9,7 +9,7 @@ files_cfg:
     CanonicalSchema:
       SoldToName: "CUST NAME"
       SaleDate: ~
-      PiiPartNumber: "VENDOR ITEM ."
+      PiiPartNumber: "VENDOR ITEM #"
       PartDescription: ~
       IsReturn: ~
       ShipQuantity: "EXTND QTY"
@@ -90,7 +90,7 @@ files_cfg:
   - file_id: "bluestar"
     reader: "standard"
     reader_cfg:
-      sheet_name: "CAN"
+      sheet_name: "CA"
     src_id: "BLUESTAR CN"
     src_col_name: "Customer"
     CanonicalSchema:
