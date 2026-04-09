@@ -71,7 +71,7 @@ UNION_ALL_CFG = UnionAllCfg(
     ]
 )
 
-from data_toolkit.cleaners.df_dtypes.dtype import StrCol, IntCol, DateCol, ColError, DateFmt
+from data_toolkit.cleaners.schema import StrCol, IntCol, DateCol, ColError, DateFmt
 
 ACTIVITY_LEDGER_SCHEMA = [
     StrCol('Sales_Rep__c'),

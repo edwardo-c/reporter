@@ -1,8 +1,8 @@
 import pandas as pd
-from data_toolkit.cleaners.df_dtypes.dtype import IntCol, StrCol, DateCol
+from data_toolkit.cleaners.schema import IntCol, StrCol, DateCol
 from simple_salesforce import Salesforce
 from data_toolkit.api_serialization import serialize_dataframe_for_api
-from data_toolkit.cleaners.df_dtypes.dtype import enforce_schema
+from data_toolkit.cleaners.schema import enforce_schema
 
 
 from pathlib import Path

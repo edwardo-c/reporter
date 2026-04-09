@@ -1,17 +1,14 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from utils.validators import validate_path
+from utils.validators import normalize_path
 from enum import Enum
 
 class DispatchEnum(Enum):
     BUNDLE="xl_bundle"
     SF="salesforce"
     CSV="csv"
+    ODATA="odata"
 
-def normalize_path(path: Path | str) -> Path:
-    path = Path(path) if isinstance(path, str) else path
-    validate_path(path)
-    return path
 
 def normalize_df_id(df_id: str) -> str:
     return df_id.replace(" ", "_")
@@ -51,3 +48,19 @@ class SFQuery:
     soql: str
     df_id: str
     src_type: str = field(default=DispatchEnum.SF.value, init=False)
+
+@dataclass(frozen=True)
+class OData:
+    params: dict | None
+    url: str
+    df_id: str
+    src_type: str = field(default=DispatchEnum.ODATA.value, init=False)
+
+    def normalize_params(self) -> dict[str, str]:
+        p = self.params or {}
+        p.setdefault("$format", "json")
+        return p
+
+    def __post_init__(self):
+        object.__setattr__(self, "params", self.normalize_params())
+        object.__setattr__(self, "df_id", normalize_df_id(self.df_id))

@@ -13,5 +13,11 @@ WHERE (
 """
 
 INTERNAL_CONTACTS_SOQL = """
-
+SELECT 
+  ACU_CUSTOMER_ID__c,
+  Price_List_Delivery_to_Salesperson__r.Email
+FROM Account
+WHERE 
+  Price_List_Delivery_to_Salesperson__c != NULL
+  AND ACU_CUSTOMER_ID__c != NULL
 """

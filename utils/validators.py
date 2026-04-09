@@ -18,7 +18,7 @@ def normalize_dir(directory: str | Path ) -> Path:
 
     return directory
 
-def validate_path(file_path: str | Path) -> None:
+def normalize_path(file_path: str | Path) -> Path:
     
     if not isinstance(file_path, (str, Path)):
         raise TypeError(f"expected Path or str, got: {type(file_path)}")
@@ -31,6 +31,12 @@ def validate_path(file_path: str | Path) -> None:
 
     if not file_path.exists():
         raise FileNotFoundError(f"path does not exist, {file_path}")
+    
+    return file_path
+
+
+
+
 
 def validate_str(s: str, allow_zero: bool = False) -> str:
     if not isinstance(s, str):

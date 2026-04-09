@@ -2,7 +2,24 @@ import requests
 import pandas as pd
 import logging
 
+def autheticated_session(username: str, password: str) -> requests.Session:
+    s = requests.Session()
+    s.auth = (username, password)
+    return s
 
+
+
+
+
+
+
+
+
+
+
+
+
+# ======== deprecated ======
 class AcumaticaClient():
     """
     Thin Acumatica Client for returning Odata

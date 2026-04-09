@@ -37,12 +37,12 @@ def enforce_schema(
         schema: list[StrCol | DateCol | IntCol],
         df: pd.DataFrame
     ) -> pd.DataFrame:
-    
+
     existing_columns = tuple(list(df.columns))
 
     for col in schema:
 
-        if not isinstance(col, COLUMNS):
+        if type(col) not in COLUMNS:
             raise TypeError(f"Invalid column class in schema")
 
         if col.name not in existing_columns:
@@ -55,8 +55,7 @@ def enforce_schema(
             df[col.name] = df[col.name].astype("string").str.strip()
 
         elif isinstance(col, DateCol):
-            df[col.name] = pd.to_datetime(df[col.name], errors=col.errors, format=col.format.value)
-            
+            df[col.name] = pd.to_datetime(df[col.name], errors=col.errors, format=col.format.value)      
 
     return df
 
