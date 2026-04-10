@@ -15,10 +15,15 @@ def build_contacts_map(
     mapping = get_mapping(contacts_df, key_col, value_col)
     return mapping
 
-def build_attachment_map(src_dir) -> AttchmentMap:
+def build_attachment_map(
+        src_dir, 
+        glob_pattern: str = config.GLOB_PATTERN, 
+        re_pattern: str = config.ACU_ID_RE
+    ) -> AttchmentMap:
+    
     return AttchmentMap(
         src_dir=src_dir,
-        glob_pattern=config.GLOB_PATTERN,
-        re_pattern=config.ACU_ID_RE
+        glob_pattern=glob_pattern,
+        re_pattern=re_pattern
     )
 
