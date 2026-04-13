@@ -1,29 +1,45 @@
+# arrangement of data for lookup from id -> resource
 import pandas as pd
 
 from data_toolkit.attachments.mapper import AttchmentMap
 from data_toolkit.arrangers.df_to_dict_list import get_mapping
-from scripts.pricelist.emailer import config
+from dataclasses import dataclass
 
-def build_contacts_map(
-        contacts_df: pd.DataFrame,
-        key_col: str,
-        value_col: str
-    ) -> dict[str, list[str]]:
-    """
-    thin wrapper for converting contacts dataframe to map
-    """
-    mapping = get_mapping(contacts_df, key_col, value_col)
-    return mapping
+from scripts.pricelist.emailer.loaders import ExternalData
+from scripts.pricelist.emailer.settings import AppSettings
+from scripts.pricelist.emailer.config import Sources
 
-def build_attachment_map(
-        src_dir, 
-        glob_pattern: str = config.GLOB_PATTERN, 
-        re_pattern: str = config.ACU_ID_RE
-    ) -> AttchmentMap:
-    
-    return AttchmentMap(
-        src_dir=src_dir,
-        glob_pattern=glob_pattern,
-        re_pattern=re_pattern
+@dataclass
+class Mappers:
+    contact_map: dict
+    pav_map: dict
+    nep_map: dict
+
+def get_mappers(
+        data: ExternalData, 
+        sources: Sources,
+        settings: AppSettings
+    ) -> Mappers:
+
+    breakpoint()
+
+    return Mappers(
+        contact_map=get_mapping(
+            data.contacts, 
+            key_col=sources.acu_customers_query.mapping.key_col,
+            values_col=sources.acu_customers_query.mapping.value_col
+        ),
+
+        pav_map=AttchmentMap(
+            src_dir=settings.PAVSettings.attachments_dir, 
+            glob_pattern=settings.PAVSettings.glob_pattern, 
+            re_pattern=settings.PAVSettings.id_re
+        ),
+
+        nep_map=AttchmentMap(
+            src_dir=settings.NEPSettings.attachments_dir, 
+            glob_pattern=settings.NEPSettings.glob_pattern, 
+            re_pattern=settings.NEPSettings.id_re
+        ),
     )
 

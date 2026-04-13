@@ -1,20 +1,25 @@
-from scripts.pricelist.emailer import config
-from scripts.pricelist.PathBuilder.path_builder import PriceListPathBuilder
-from data_toolkit.readers.context import ReaderContext
-from simple_salesforce import Salesforce
+# External connections to outside apps
+
 from os import getenv
+
+from simple_salesforce import Salesforce
+
 from data_toolkit.clients.acumatica import autheticated_session
+from data_toolkit.clients import outlook
+from data_toolkit.readers.context import ReaderContext
+from scripts.pricelist.emailer.secrets import PriceListEnvVars
 
-READER_CTX = ReaderContext(
-    sf=Salesforce(
-        username=getenv(config.SF_CRED.username), 
-        password=getenv(config.SF_CRED.password),
-        security_token=getenv(config.SF_CRED.token)
-    ),
-    acu=autheticated_session(
-        getenv(config.ACU_CRED.username), 
-        getenv(config.ACU_CRED.password)
+OUTLOOK = outlook.get_outlook()
+
+def get_reader_ctx(env_vars: PriceListEnvVars) -> ReaderContext:
+    return ReaderContext(
+        sf=Salesforce(
+            username=env_vars.sf_user, 
+            password=env_vars.sf_pw,
+            security_token=env_vars.sf_token
+        ),
+        acu=autheticated_session(
+            env_vars.acu_user, 
+            env_vars.acu_pw
+        )
     )
-)
-
-APP_DIR_PATH_BUILDER = PriceListPathBuilder(root=getenv("APP_FOLDER_ROOT_DIR"))

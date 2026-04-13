@@ -1,52 +1,39 @@
-from dotenv import load_dotenv
-from config.paths import PRICE_LIST_ENV
-load_dotenv(PRICE_LIST_ENV)
-
 from scripts.pricelist.emailer import config
-from scripts.pricelist.emailer import builders
-from scripts.pricelist.emailer.loaders import load_contacts_df, load_customers_df
-from scripts.pricelist.emailer.mappers import build_contacts_map, build_attachment_map
-
-
-#TODO: implement user input in yaml
+from config.paths import PRICE_LIST_ENV
+from scripts.pricelist.emailer.secrets import load_env_vars
+from scripts.pricelist.path_manager.manager import PriceListPathManager
+from scripts.pricelist.emailer.builders import get_reader_ctx
+from scripts.pricelist.emailer.loaders import get_external_data
+from scripts.pricelist.emailer.settings import load_app_settings
+from scripts.pricelist.emailer.mappers import get_mappers
 
 def main():
-    contacts_df = load_contacts_df(
-        internal_query=config.INTERNAL_CONTACTS_QUERY, 
-        external_query=config.EXTERNAL_CONTACTS_QUERY,
-        context=builders.READER_CTX
-    )
 
-    customers_df = load_customers_df(config.CUSTOMERS_ODATA, builders.READER_CTX)
+    env_vars = load_env_vars(PRICE_LIST_ENV)
 
-    contacts_map = build_contacts_map(
-        contacts_df, 
-        config.LoadersSchema.acu_id.value, 
-        value_col=config.LoadersSchema.email.value
-    )
+    path_manager = PriceListPathManager(env_vars.root, env_vars.yaml)
 
-    pav_attachment_map = build_attachment_map(
-        src_dir=(
-            builders
-            .APP_DIR_PATH_BUILDER
-            .build_pav_finished_lists_dir("April 2026")
-        )
-    )
+    app_settings = load_app_settings(path_manager)
 
-    nep_attachment_map = build_attachment_map(
-        src_dir=(
-            builders
-            .APP_DIR_PATH_BUILDER
-            .build_nep_finished_lists_dir("April 2026")
-        )
-    )
+    ctx = get_reader_ctx(env_vars)
 
+    # working through set up up external data-
+    # may have to recafor config SOURCES. it is becoming a junk drawer
+    # and becoming hard to reason about.
+    # look through loaders.py next
 
-    # assemble email objects
+    external_data = get_external_data(config.SOURCES, ctx)
 
-    # send all emails
+    mappers = get_mappers(external_data, config.SOURCES, app_settings)
+
+    breakpoint()
+
+    """
+    get maps 
+    assemble base emails
+    """
+
 
 
 if __name__ == "__main__":
-
     main()

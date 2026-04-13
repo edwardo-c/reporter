@@ -1,2 +1,23 @@
-finished_neptune_dir_name:  "April 2026"
-finished_peerless_dir_name: "April 2026"
+send_emails: False
+
+neptune:
+  dir_meta:
+    name:  "April 2026"
+    re_pattern: "[A-Za-z0-9]{1,3}[0-9]{6}"
+    glob_pattern: ".xlsx"
+  email:
+    subject: ""
+    body: ""
+    sent_on_behalf_of: ""
+    delete_after_send: ""
+
+peerless:
+  dir_meta:
+    name:  "April 2026"
+    re_pattern: "[A-Za-z0-9]{1,3}[0-9]{6}"
+    glob_pattern: ".xlsx"
+  email:
+    subject: ""
+    body: ""
+    sent_on_behalf_of: ""
+    delete_after_send: ""

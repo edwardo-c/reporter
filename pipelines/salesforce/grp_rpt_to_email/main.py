@@ -2,8 +2,8 @@
 from dotenv import load_dotenv
 
 from config.paths import SF_GRP_EMAILS_ENV
-from data_toolkit.clients.outlook.outlook_sender import BaseEmail
-from data_toolkit.clients.outlook.outlook_sender import send_emails
+from data_toolkit.clients._outlook.outlook_sender import BaseEmail
+from data_toolkit.clients._outlook.outlook_sender import send_emails
 from data_toolkit.salesforce.client import SFClient
 from data_toolkit.salesforce.reducers.grouped_to_agg import single_grp_to_agg
 from data_toolkit.salesforce.reports_tabular.column_map import ColumnMap

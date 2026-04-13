@@ -13,6 +13,9 @@ def get_mapping(
     Assumes data has been cleaned and datatypes managed upstream
 
     """
+
+    breakpoint()
+
     existing_cols = list(df.columns)
 
     if key_col not in existing_cols:

@@ -16,9 +16,9 @@ class BaseEmail:
 
     def __post_init__(self) -> None:
         if isinstance(self.recipients, str):
-            self.to = self.recipients.strip()
+            self.to = self.recipients
         else:
-            self.to = "; ".join(r.strip() for r in self.recipients if r)
+            self.to = "; ".join(r for r in self.recipients if r)
 
         if self.attachments is None:
             self._attachments = []
@@ -28,21 +28,28 @@ class BaseEmail:
             self._attachments = [a for a in self.attachments if a]
 
 class OutlookSender:
-    def __init__(self, ol_app: object, *, sent_on_behalf: str | None = None, prod: bool = False):
+    def __init__(
+            self, 
+            ol_app: object, 
+            *, 
+            sent_on_behalf: str | None = None, 
+            prod: bool = False
+        ):
+        
         self._ol_app = ol_app
         self._sent_on_behalf = sent_on_behalf
         self._prod = prod
 
     def send(
-        self,
-        email: BaseEmail | None = None,
-        *,
-        recipients: str | Sequence[str] | None = None,
-        subject: str | None = None,
-        body: str | None = None,
-        attachments: str | Sequence[str] | None = None,
-        delete_after_submit: bool = True,
-    ) -> None:
+            self,
+            email: BaseEmail | None = None,
+            *,
+            recipients: str | Sequence[str] | None = None,
+            subject: str | None = None,
+            body: str | None = None,
+            attachments: str | Sequence[str] | None = None,
+            delete_after_submit: bool = True,
+        ) -> None:
         """
         One-size-fits-many API:
         - Pass a BaseEmail OR loose args (recipients/subject/body/attachments).
@@ -86,7 +93,7 @@ def send_emails(emails_to_send: list[BaseEmail], prod: bool) -> int:
     if using multiple [BaseEmails], use seperate adapter for performance boost
     """
     sent_count = 0
-    from data_toolkit.clients.outlook.outlook import OLClient
+    from data_toolkit.clients._outlook.outlook import OLClient
 
     with OLClient() as ol_app:
         sender = OutlookSender(

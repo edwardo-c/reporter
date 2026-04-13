@@ -16,7 +16,6 @@ class OLClient:
         return self._outlook
 
     def __exit__(self, exc_type, exc, tb):
-        # do not quit Outlook — let it finish sending
         self._outlook = None
         self._owns_outlook = False
 

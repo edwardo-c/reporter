@@ -15,11 +15,11 @@ from utils.yaml_loader import load_yaml
 from data_toolkit.attachments.acu_id import id_to_path_map
 from data_toolkit.salesforce.client import SFClient
 from pipelines.pricelist.email.bodies import external_email, internal_email, external_boilerplate_email
-from data_toolkit.clients.outlook.outlook_sender import BaseEmail, OutlookSender
+from data_toolkit.clients._outlook.outlook_sender import BaseEmail, OutlookSender
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSchema as RLS
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSentToVals as RLS_SentToVals
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogNone as RLS_NA
-from data_toolkit.clients.outlook.outlook import OLClient
+from data_toolkit.clients._outlook.outlook import OLClient
 from data_toolkit.clients.acumatica import AcumaticaClient
 
 from collections import defaultdict
