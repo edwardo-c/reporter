@@ -6,6 +6,8 @@ from pathlib import Path
 from scripts.pricelist.path_manager.manager import PriceListPathManager
 from utils.yaml_loader import load_yaml
 
+from utils.validators import normalize_path
+
 @dataclass(frozen=True)
 class EmailSettings:
     subject: str
@@ -19,6 +21,7 @@ class BatchSettings:
     id_re: str
     glob_pattern: str
     email_settings: EmailSettings
+    static_attachments: list[Path] | None
 
 @dataclass(frozen=True)
 class AppSettings:
@@ -29,7 +32,20 @@ class AppSettings:
 def build_batch_settings(cfg) -> BatchSettings:
 
     dir_meta = cfg["dir_meta"]
-    email_meta = cfg["email"]  
+    email_meta = cfg["email"]
+
+    attachments = cfg["static_attachments"]
+    if not isinstance(attachments, list):
+        raise TypeError(f"static_attachments must be type list, got {type(attachments.__name__)}")
+
+    if attachments == []:
+        attachments = None
+    elif all(a == "" for a in attachments):
+        attachments = None
+    else:
+        attachments = normalize_static_attachments(
+            cfg["static_attachments"]
+        )
 
     return BatchSettings(
         
@@ -42,8 +58,12 @@ def build_batch_settings(cfg) -> BatchSettings:
             body=email_meta["body"],
             sent_on_behalf_of=email_meta["sent_on_behalf_of"],
             delete_after_send=email_meta["delete_after_send"]
-        )
+        ),
+        static_attachments=attachments
     )
+
+def normalize_static_attachments(static_attachments: list[str]) -> list[Path]:
+    return [normalize_path(p) for p in static_attachments]
 
 def load_app_settings(path_manager: PriceListPathManager) -> AppSettings:
     """

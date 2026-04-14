@@ -6,6 +6,7 @@ from scripts.pricelist.emailer.builders import get_reader_ctx
 from scripts.pricelist.emailer.loaders import get_external_data
 from scripts.pricelist.emailer.settings import load_app_settings
 from scripts.pricelist.emailer.mappers import get_mappers
+from scripts.pricelist.emailer.assemblers import assemble_outputs
 
 def main():
 
@@ -17,22 +18,23 @@ def main():
 
     ctx = get_reader_ctx(env_vars)
 
-    # working through set up up external data-
-    # may have to recafor config SOURCES. it is becoming a junk drawer
-    # and becoming hard to reason about.
-    # look through loaders.py next
-
     external_data = get_external_data(config.SOURCES, ctx)
 
     mappers = get_mappers(external_data, config.SOURCES, app_settings)
 
+    output_resources = assemble_outputs(
+        mappers, 
+        app_settings, 
+        config.RESULTS_LOG
+    )
+
     breakpoint()
 
     """
-    get maps 
-    assemble base emails
+    TODO: 
+    fill email bodies
+    send email bodies
     """
-
 
 
 if __name__ == "__main__":

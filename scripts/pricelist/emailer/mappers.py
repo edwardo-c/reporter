@@ -12,16 +12,14 @@ from scripts.pricelist.emailer.config import Sources
 @dataclass
 class Mappers:
     contact_map: dict
-    pav_map: dict
-    nep_map: dict
+    pav_map: AttchmentMap
+    nep_map: AttchmentMap
 
 def get_mappers(
         data: ExternalData, 
         sources: Sources,
         settings: AppSettings
     ) -> Mappers:
-
-    breakpoint()
 
     return Mappers(
         contact_map=get_mapping(

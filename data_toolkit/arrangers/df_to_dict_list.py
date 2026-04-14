@@ -14,8 +14,6 @@ def get_mapping(
 
     """
 
-    breakpoint()
-
     existing_cols = list(df.columns)
 
     if key_col not in existing_cols:
@@ -30,10 +28,8 @@ def get_mapping(
         .to_dict()
     )
 
-
-
-
 # deprecated
+# delete after refactored scripts.pricelist.emailer.main is complete:
 
 def extract_contacts_from_df(df: pd.DataFrame) -> dict[str, list[str]]:
     """Return {account -> [contacts]} from df."""

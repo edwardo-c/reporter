@@ -77,7 +77,14 @@ SOURCES = Sources(
             "CustomerName":LoadersSchema.cust_name.value
         },
         mapping=MapPair(
-            value_col=LoadersSchema.cust_name.value
+            value_col=LoadersSchema.email.value
         )
     )
 )
+
+RESULTS_LOG = {
+    "acu_id": [],
+    "pav_created": [],
+    "nep_created": [],
+    "contacts": []
+}

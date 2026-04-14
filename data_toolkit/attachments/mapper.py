@@ -1,7 +1,7 @@
 from pathlib import Path
 from utils.validators import validate_str
 import re
-
+from collections import defaultdict
 
 class AttchmentMap:
     """
@@ -21,31 +21,38 @@ class AttchmentMap:
         self.glob_pattern = validate_str(glob_pattern)
         self.re_pattern = validate_str(re_pattern)
 
-        self.attachment_map: dict[str, Path] | None = None
+        self._attachment_map: dict[str, list[Path]] | None = None
 
-    def build_map(self) -> dict[str, Path]:
+    @property
+    def attachment_map(self):
+        if self._attachment_map is None:
+            self.build_map()
+        return self._attachment_map
+
+    def build_map(self) -> dict[str, list[Path]]:
         
         glob = list(self.src_dir.glob(self.glob_pattern, case_sensitive=False))
         if glob == []:
             raise ValueError(f"No files found mattching {self.glob_pattern} in {self.src_dir}")
 
-        attachment_map = {}
+        _attachment_map = defaultdict(list)
         for f in glob:
             m = re.search(pattern=self.re_pattern, string=f.name)
-            if m: attachment_map[m[0]] = f
+            if m: 
+                _attachment_map[m[0]].append(f)
         
-        if attachment_map == {}:
+        if _attachment_map == {}:
             raise ValueError(f"attachment map is empty, no files match regex pattern: {self.re_pattern}")
 
-        self.attachment_map = attachment_map
+        self._attachment_map = _attachment_map
 
-        return attachment_map
+        return _attachment_map
 
     def get_attachment(self, key: str) -> Path:
-        if self.attachment_map is None:
+        if self._attachment_map is None:
             self.build_map()
 
-        if key not in self.attachment_map:
+        if key not in self._attachment_map:
             raise KeyError(f"{key} not found in attachment map")
         
-        return self.attachment_map[key]
+        return self._attachment_map[key]
