@@ -50,6 +50,7 @@ def read_odata(src: OData, context: ReaderContext | None):
         raise ValueError("requests.Session() is required for OData sources.")
     
     res = context.acu.get(src.url, params=src.params)
+    res.raise_for_status()
 
     try:
         payload: dict = res.json()
@@ -57,8 +58,5 @@ def read_odata(src: OData, context: ReaderContext | None):
         raise ValueError(f"Non-JSON response from Acumatica: {res.text[:200]}")
 
     data = payload.get("value", [])
-
-    if not data:
-        raise ValueError(f"Odata url returned nothing! -- {src.url}")
 
     return pd.json_normalize(data)

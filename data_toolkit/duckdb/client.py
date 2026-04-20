@@ -2,6 +2,30 @@ import duckdb
 from pathlib import Path
 from dataclasses import dataclass
 
+# ====================
+from utils.validators import normalize_path
+import duckdb
+def execule_sql_path(
+        sql_path: str | Path, 
+        conn: duckdb.DuckDBPyConnection
+    ) -> None:
+    """
+    executes .sql file on conn
+    raises invalid sql path
+    """
+
+    sql_path = normalize_path(sql_path)
+    
+    sfx = sql_path.suffix.lower() 
+    
+    if sfx != ".sql":
+        raise ValueError(f"invalid sql path, expected .sql recieved {sfx}")
+
+    sql = sql_path.read_text(encoding="utf-8")
+
+    conn.execute(sql)
+# ====================
+
 
 @dataclass(frozen=True)
 class SQLCol():
