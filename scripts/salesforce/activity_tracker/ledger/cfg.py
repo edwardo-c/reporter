@@ -20,7 +20,7 @@ CTX = ReaderContext(
     )
 )
 
-from scripts.activity_ledger.SOQL.registry import get_query, load_queries
+from scripts.salesforce.activity_tracker.ledger.SOQL.registry import get_query, load_queries
 
 load_queries()
 

@@ -1,5 +1,5 @@
 from data_toolkit.duckdb.client import DuckRunner
-from scripts.activity_ledger.cfg import (
+from scripts.salesforce.activity_tracker.ledger.cfg import (
     SOURCES,
     ORDERED_SQL, 
     UNION_ALL_CFG, 

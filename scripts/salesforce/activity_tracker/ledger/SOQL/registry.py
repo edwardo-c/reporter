@@ -30,4 +30,4 @@ def register_query(query_key: str, query: str) -> None:
         )
     
 def load_queries():
-    from scripts.activity_ledger.SOQL import queries
+    from scripts.salesforce.activity_tracker.ledger.SOQL import queries

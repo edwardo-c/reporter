@@ -1,7 +1,7 @@
-from scripts.salesforce_audit.customer_price_groups.config import SOURCES, ENV_VAR_PATH, SQL_PATH
-from scripts.salesforce_audit.customer_price_groups.loaders import query_and_load
-from scripts.salesforce_audit.secrets import load_env_vars
-from scripts.salesforce_audit.builders import get_reader_ctx
+from scripts.salesforce.audit.customer_price_groups.config import SOURCES, ENV_VAR_PATH, SQL_PATH
+from scripts.salesforce.audit.customer_price_groups.loaders import query_and_load
+from scripts.salesforce.audit.secrets import load_env_vars
+from scripts.salesforce.audit.builders import get_reader_ctx
 import duckdb
 from data_toolkit.duckdb.client import execule_sql_path
 

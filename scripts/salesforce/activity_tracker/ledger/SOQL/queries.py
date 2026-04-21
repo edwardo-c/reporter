@@ -1,4 +1,4 @@
-from scripts.activity_ledger.SOQL.registry import register_query
+from scripts.salesforce.activity_tracker.ledger.SOQL.registry import register_query
 
 EVENTS = """
 SELECT 
