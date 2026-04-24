@@ -38,11 +38,8 @@ def run_jobs(
 
             execule_sql_path(sql_path=job_cfg.sql, conn=conn)
 
-            # testing block ==========
-            df: pd.DataFrame = conn.execute(f"SELECT * FROM duplicates_in_sf").df()
-            breakpoint()
-            # testing end ============
+            for relation, out_path in job_cfg.artifacts.items():
+                df: pd.DataFrame = conn.execute(f"SELECT * FROM {relation}").df()
 
-            # df: pd.DataFrame = conn.execute(f"SELECT * FROM {job_cfg.final_name}").df()
+                df.to_csv(out_path, index=False)
 
-            # df.to_csv(job_cfg.out_path, index=False)

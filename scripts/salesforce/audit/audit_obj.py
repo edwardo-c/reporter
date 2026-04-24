@@ -8,8 +8,7 @@ from pathlib import Path
 class AuditObj:
     sources: list[SFQuery | OData]
     sql: Path | str
-    final_name: str
-    out_path: Path | str
+    artifacts: dict[str, str]
 
     def __post_init__(self):
         object.__setattr__(self, "sql", normalize_path(self.sql))

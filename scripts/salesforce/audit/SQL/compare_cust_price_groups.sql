@@ -60,7 +60,6 @@ JOIN acu_base ab ON
   b.CustGroupClassKey = ab.CustGroupClassKey
 ;
 
-
 CREATE OR REPLACE VIEW remove_keys AS
 WITH base AS (
 -- the Cust|Group|Class-Key in SF not in ACU
@@ -86,8 +85,10 @@ JOIN sf_base sb
   ON b.CustGroupClassKey = sb.CustGroupClassKey
 ;
 
-CREATE OR REPLACE VIEW result AS
-WITH base AS (SELECT * FROM new_keys
+CREATE OR REPLACE VIEW audited_cpg AS
+WITH base AS (
+SELECT * FROM new_keys
 UNION ALL
 SELECT * FROM remove_keys
-) SELECT * FROM base ORDER BY AcuId
+) 
+SELECT * FROM base ORDER BY AcuId
