@@ -25,7 +25,7 @@ what if a sheet name or index changes?
 
 """
 
-PERIOD_DATE = "03/31/2026"
+PERIOD_DATE = "05/31/2026"
 STRICT_CATEGORIES = True
 
 def main():
@@ -76,6 +76,7 @@ def main():
         dfs.append(df_norm)
 
     stacked = pd.concat(dfs)
+    
 
     # ================ Enrichment =================
     # Period date, credits, drop columns, category
@@ -127,7 +128,7 @@ def main():
     db = duckdb.connect(global_cfg["pos_sales_db"])
     db.sql("CREATE OR REPLACE TABLE pos_sales AS SELECT * FROM enriched_df")
 
-    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\March_2026_POS.csv", index=False)
+    enriched_df.to_csv(r"C:\Users\eddiec11us\Desktop\May_2026_POS.csv", index=False)
 
 if __name__ == "__main__":
     raise SystemExit(main())

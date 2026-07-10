@@ -24,5 +24,22 @@ INSERT INTO scoring VALUES
     ('ADM',       'Contact Maintenance',    'Created Contact',           'CONTACT', 3,  NULL, 'created contact'),
     ('ADM',       'Contact Maintenance',    'Converted Leads',           'LEAD',    3,  NULL, 'a lead you own had status updated to "Convterted"'),
     ('ADM',       'Outgoing Communication', 'Call Logged',               'CALL',    1,  NULL, 'task entered with Subtype = Call'),
-    ('ADM',       'Outgoing Communication', 'Outbound Email',            'EMAIL',   1,  50,   'outbound email logged')
+    ('ADM',       'Outgoing Communication', 'Outbound Email',            'EMAIL',   1,  50,   'outbound email logged'),
+    ('SO',        'System Development',     'System Development',        'SD1',     5,  NULL, 'System Development for 1 hour ex: Collaboration with IT to imporve existing systems'),
+    ('SO',        'System Development',     'System Development',        'SD2',     10, NULL, 'System Development for 2 hours ex: Collaboration with IT to imporve existing systems'),
+    ('SO',        'System Development',     'System Development',        'SD3',     15, NULL, 'System Development for 3 hours ex: Collaboration with IT to imporve existing systems'),
+    ('SO',        'Code Development',       'Code Development',          'CD1',     5,  NULL, 'Code Development for 1 hour'),
+    ('SO',        'Code Development',       'Code Development',          'CD2',     10, NULL, 'Code Development for 2 hours'),
+    ('SO',        'Code Development',       'Code Development',          'CD3',     15, NULL, 'Code Development for 3 hours'),
+    ('SO',        'Price Management',       'Price Management',          'PM1',     5,  NULL, 'Price Management for 1 hour - price lists/agreements/etc'),
+    ('SO',        'Price Management',       'Price Management',          'PM2',     10, NULL, 'Price Management for 2 hour - price lists/agreements/etc'),
+    ('SO',        'Price Management',       'Price Management',          'PM3',     15, NULL, 'Price Management for 3 hour - price lists/agreements/etc'),
+    ('SO',        'Team Training',          'Team Training',             'TT1',     10, NULL, 'New hire, salesforce training, acumatica training, etc'),
+    ('SO',        'Reporting',              'Reporting',                 'R01',     5,  NULL, 'Ad-hoc and scheduled (EOM, POS) report generation or walk-thru for 1 hour'),
+    ('SO',        'Reporting',              'Reporting',                 'R02',     10, NULL, 'Ad-hoc and scheduled (EOM, POS) report generation or walk-thru for 2 hour'),
+    ('SO',        'Reporting',              'Reporting',                 'R03',     15, NULL, 'Ad-hoc and scheduled (EOM, POS) report generation or walk-thru for 3 hour'),
+    ('SO',        'MAP Enforcement',        'URL Scan',                  'ME1',     10, NULL, 'Search reseller website for all MAP skus and sent to Wayvia'),
+    ('SO',        'MAP Enforcement',        'Email Enforcement',         'ME2',     5, NULL,  'Contacted approximatly 3-5 resellers about MAP violations')
 ;
+
+-- Program Funding - PF3

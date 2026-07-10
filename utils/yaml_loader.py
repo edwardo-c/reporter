@@ -4,6 +4,7 @@ from pathlib import Path
 
 def load_yaml(path):
     raw = Path(path).read_text(encoding="utf-8")
+
     # expand ${VAR} and defaults ${VAR:default}
     def sub(match):
         key, _, default = match.group(1).partition(":")
@@ -11,4 +12,5 @@ def load_yaml(path):
     
     import re
     raw = re.sub(r"\$\{([^}]+)\}", sub, raw)
+
     return yaml.safe_load(raw)

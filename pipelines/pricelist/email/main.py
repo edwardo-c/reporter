@@ -14,7 +14,7 @@ from config.paths import PRICE_LIST_ENV, PRICE_LIST_EMAILER_CFG
 from utils.yaml_loader import load_yaml
 from data_toolkit.attachments.acu_id import id_to_path_map
 from data_toolkit.salesforce.client import SFClient
-from pipelines.pricelist.email.bodies import external_email, internal_email, external_boilerplate_email
+from pipelines.pricelist.email.bodies import internal_email, external_boilerplate_email, external_price_increase_email_body
 from data_toolkit.clients._outlook.outlook_sender import BaseEmail, OutlookSender
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSchema as RLS
 from pipelines.pricelist.email.recipient_log_enums import RecipientLogSentToVals as RLS_SentToVals
@@ -34,14 +34,18 @@ Dry run (recipient log only) = (DRY_RUN = True) and (PROD = False)
 """
 
 DRY_RUN = False # True = exit after send log creation, no emails sent
-PROD = True # False = breakpoint at send email to inspect email
-RUN_ID = "April_2026"
+PROD = False # False = breakpoint at send email to inspect email
+RUN_ID = "July_2026"
+
+from os import getenv
 
 def main():
 
     logger.info("Starting Emailer")
 
     load_dotenv(PRICE_LIST_ENV)
+
+    pw = getenv("SF_PW")
 
     cfg = load_yaml(PRICE_LIST_EMAILER_CFG)
 
@@ -142,7 +146,7 @@ def main():
             BaseEmail(
                 recipients=recipients,
                 subject=f"Peerless-AV Monthly Price List - {acct}",
-                body=external_boilerplate_email(brand="Peerless-AV"),
+                body=external_price_increase_email_body(brand="Peerless-AV"),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()
@@ -153,7 +157,7 @@ def main():
             BaseEmail(
                 recipients=recipients,
                 subject=f"Neptune Monthly Price List - {acct}",
-                body=external_boilerplate_email("Neptune"),
+                body=external_price_increase_email_body("Neptune"),
                 attachments=attachments
             )
             for acct, recipients in external_contacts_cache.items()

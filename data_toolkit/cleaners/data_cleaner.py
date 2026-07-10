@@ -4,6 +4,8 @@ import re
 
 from dataclasses import dataclass, field
 
+import logging
+
 @dataclass
 class CleanerCfg:
     str_cols: list[str] = field(default_factory=list)
@@ -70,15 +72,18 @@ class DataCleaner():
     
     def add_postal(self, df: pd.DataFrame) -> pd.DataFrame:
         US_RE = r'^\s*(\d{5})(?:[-\s]?(\d{4}))?\s*$'
-        CA_RE = r'^\s*([ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z])(\d[ABCEGHJ-NPRSTV-Z]\d)\s*$'
+        CA_RE = r'^\s*([ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z])\s?(\d[ABCEGHJ-NPRSTV-Z]\d)\s*$'
 
         assigns: dict[str, pd.Series] = {}
 
         for col in self.cfg.zipcode_cols:
-            s = df[col].astype("string").str.upper().str.strip()
+            s = df[col].astype("string").str.upper().str.strip().str.replace(r"\.0$", "", regex=True)
 
             us = s.str.extract(US_RE)
             ca = s.str.replace(" ", "", regex=False).str.extract(CA_RE)
+
+            if us[0].isna().all():
+                logging.warning(f"All us zips are empty for {col}")
 
             primary = pd.Series(
                 np.where(

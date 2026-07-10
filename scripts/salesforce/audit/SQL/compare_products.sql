@@ -11,7 +11,9 @@ SELECT
   PART::DECIMAL(10,2) AS PART,
   DIST::DECIMAL(10,2) AS DIST,
   SPEC::DECIMAL(10,2) AS SPEC,
-  MSRP::DECIMAL(10,2) AS MSRP
+  MSRP::DECIMAL(10,2) AS MSRP,
+  DEALCI::DECIMAL(10,2) AS DEALCI,
+  DISTCI::DECIMAL(10,2) AS DISTCI
 FROM acu_products
 ;
 
@@ -35,7 +37,7 @@ SELECT
 FROM sf_price_list_entries
 ), prices_levels_pivoted AS (
 PIVOT price_levels 
-ON PriceClass IN ('DEAL', 'PART', 'DIST', 'SPEC')
+ON PriceClass IN ('DEAL', 'PART', 'DIST', 'SPEC', 'DEALCI', 'DISTCI')
 USING MAX(Price)
 ), msrp AS (
 SELECT
@@ -49,6 +51,8 @@ SELECT
   plp.PART AS PART,
   plp.DIST AS DIST,
   plp.SPEC AS SPEC,
+  plp.DEALCI AS DEALCI,
+  plp.DISTCI AS DISTCI,
   m.MSRP AS MSRP,
   pb.ItemStatus,
   pb.PriceGroup,
@@ -107,7 +111,13 @@ SELECT
   sb.SPEC as sf_SPEC,
 
   ab.MSRP AS acu_MSRP,
-  sb.MSRP AS sf_MSRP
+  sb.MSRP AS sf_MSRP,
+
+  ab.DEALCI AS acu_DEALCI,
+  sb.DEALCI AS sf_DEALCI,
+
+  ab.DISTCI AS acu_DISTCI,
+  sb.DISTCI AS sf_DISTCI,
 
 FROM acu_base ab
 JOIN candidates c
@@ -232,3 +242,25 @@ SELECT
 FROM base b
 WHERE b.acu_MSRP IS DISTINCT FROM b.sf_MSRP
   AND b.acu_MSRP > 0
+
+UNION ALL
+
+SELECT
+  b.PartNumber,
+  'DEALCI Price List Entry' AS AttributeToChange,
+  b.acu_DEALCI Acu_Value,
+  b.sf_DEALCI AS SF_Value
+FROM base b
+WHERE b.acu_DEALCI IS DISTINCT FROM b.sf_DEALCI
+  AND b.acu_DEALCI > 0
+
+UNION ALL
+
+SELECT
+  b.PartNumber,
+  'DISTCI Price List Entry' AS AttributeToChange,
+  b.acu_DISTCI Acu_Value,
+  b.sf_DISTCI AS SF_Value
+FROM base b
+WHERE b.acu_DISTCI IS DISTINCT FROM b.sf_DISTCI
+  AND b.acu_DISTCI > 0

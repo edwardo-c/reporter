@@ -55,7 +55,7 @@ PRODUCT_AUDIT_OBJ = AuditObj(
     sql=r"C:\Users\eddiec11us\dev_apps\reporter\scripts\salesforce\audit\SQL\compare_products.sql",
     
     artifacts={
-        "audited_products": r"C:\Users\eddiec11us\Desktop\SF_Audit_Files\product_fields.csv"
+        "audited_products": r"C:\Users\eddiec11us\Desktop\product_fields.csv"
         ,
     }
 )
@@ -87,7 +87,7 @@ CPG_AUDIT_OBJ = AuditObj(
     ),
 ],
     sql=r"C:\Users\eddiec11us\dev_apps\reporter\scripts\salesforce\audit\SQL\compare_cust_price_groups.sql",
-    artifacts={"audited_cpg": r"C:\Users\eddiec11us\Desktop\SF_Audit_Files\customer_price_groups.csv",}
+    artifacts={"audited_cpg": r"C:\Users\eddiec11us\Desktop\customer_price_groups.csv",}
 )
 
 # =======================================================

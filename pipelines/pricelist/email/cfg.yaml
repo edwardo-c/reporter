@@ -22,8 +22,8 @@ acumatica:
         "WhoId": "0056A000000ewTWQAY"
     "auth":
         "username": ${SF_USER}
-        "password": ${SF_PW}
         "security_token": ${SF_TOKEN}
+        "password": "${SF_PW}"
     "data":
         "internal":
             "soql": |

@@ -34,3 +34,16 @@ def external_boilerplate_email(brand: str):
         f"<p><i><span style='color: #0070C0;'>If you would like to be removed from, or add another recipient to, our distribution list, please reply to this email.</span></i></p>"
         f"</body></html>"
     )
+
+def external_price_increase_email_body(brand: str):
+    return (
+        f"<html><body>"
+        f"<p><strong>Attached is your monthly {brand} price list.</strong></p>"
+        f"<p>Pricing reflects adjustments made due to increased expenses.  Prices are in effect beginning July 1, 2026</p>"
+        f"<p>All End of Life, New Products or Pricing Changes will be called out each month. Here is a legend on how you will find each.</p>"
+        f"<p><span style='background-color: red; color: white'>End Of Life (EOL)</span> are on the <span style='background-color: red; color: white'>Red</span> tab.</p>"
+        f"<p><span style='background-color: #31FF21;'>New Products</span> will be highlighted on the price list tab in <span style='background-color: #31FF21;'>Green.</span> tab.</p>"
+        f"<p><span style='background-color: yellow;'>Price Changes</span> will be highlighted on the price list tab in <span style='background-color: yellow;'>Yellow.</span> tab.</p>"
+        f"<p><i><span style='color: #0070C0;'>If you would like to be removed from, or add another recipient to, our distribution list, please reply to this email.</span></i></p>"
+        f"</body></html>"
+    )

@@ -3,22 +3,22 @@ pos_sales_db: ${POS_DB}
 
 files_cfg:
   - file_id: "accu-tech"
-    reader: "invalid"
+    reader: "standard"
     src_id: "ACCUTECH"
     src_col_name: "Customer"
     CanonicalSchema:
-      SoldToName: "CUST NAME"
+      SoldToName: "Bill To Customer Name"
       SaleDate: ~
-      PiiPartNumber: "VENDOR ITEM #"
+      PiiPartNumber: "Mfr Item #"
       PartDescription: ~
       IsReturn: ~
-      ShipQuantity: "EXTND QTY"
+      ShipQuantity: "Qty"
       UnitCost: ~
-      ExtendedSales: "ENTND AVG COST"
-      BillToCustomerZip: "BILLING ZIP"
+      ExtendedSales: "Adj EXT Cost"
+      BillToCustomerZip: "Bill To Customer Postal Code"
       BillToCustomerState: ~
-      ShipToState: "SHIP TO STATE"
-      ShipToZip: "SHIP TO ZIP"
+      ShipToState: "Ship To State/Province"
+      ShipToZip: "Ship To Postal Code"
       BuyerName: ~
     return_id: ~ # value that signifies a return in the IsReturn Column
     
@@ -90,7 +90,7 @@ files_cfg:
   - file_id: "bluestar"
     reader: "standard"
     reader_cfg:
-      sheet_name: "CA"
+      sheet_name: "CAN"
     src_id: "BLUESTAR CN"
     src_col_name: "Customer"
     CanonicalSchema:
@@ -173,7 +173,7 @@ files_cfg:
       BuyerName: ~
     return_id: "Return"
 
-  - file_id: "td synnex ca"
+  - file_id: "td synnex cn"
     reader: "invalid"
     src_id: "SYNNEX CN"
     src_col_name: "Customer"
@@ -319,7 +319,7 @@ enricher:
         "State": ["IL", "IL"] 
         "ZipMin": [60000, 61200] 
         "ZipMax": [61199, 62999]
-        "SalesRep": ["SCHNEIDER", "WOLFE"]
+        "SalesRep": ["WARREN", "WOLFE"]
       rule_id: "IL Bill To Zip"
 
     - kind: "zip_range"
@@ -329,14 +329,14 @@ enricher:
         "State": ["CA", "CA"] 
         "ZipMin": [90000, 93300] 
         "ZipMax": [93301, 96699]
-        "SalesRep": ["MOSS", "MOSS"]
+        "SalesRep": ["BLANKENSOP", "NORTHWEST"]
       rule_id: "CA Bill To Zip"
 
     - kind: "mapping"
       left: "BillToCustomerState"
       map_args:
         path: ${STATE_ASSIGNMENTS}
-        sheet: "As of 1-1-25"
+        sheet: "As of 1-1-26"
         usecols: [1, 7]
         skiprows: 1
       rule_id: "Bill To State"
@@ -345,7 +345,7 @@ enricher:
       left: "ShipToState"
       map_args:
         path: ${STATE_ASSIGNMENTS}
-        sheet: "As of 1-1-25"
+        sheet: "As of 1-1-26"
         usecols: [1, 7]
         skiprows: 1
       rule_id: "Ship To State"
