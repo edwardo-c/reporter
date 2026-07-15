@@ -9,7 +9,6 @@ CREATE TEMP TABLE final_payload (
     Activity_Count__c         INTEGER NOT NULL,
     Activity_Score__c         INTEGER NOT NULL,
     
-    
     PRIMARY KEY (
         Sales_Rep__c, 
         Period_Start__c, 

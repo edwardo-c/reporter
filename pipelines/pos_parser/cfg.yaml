@@ -7,7 +7,7 @@ files_cfg:
     src_id: "ACCUTECH"
     src_col_name: "Customer"
     CanonicalSchema:
-      SoldToName: "Bill To Customer Name"
+      SoldToName: "Bill to Customer Name"
       SaleDate: ~
       PiiPartNumber: "Mfr Item #"
       PartDescription: ~
@@ -17,8 +17,8 @@ files_cfg:
       ExtendedSales: "Adj EXT Cost"
       BillToCustomerZip: "Bill To Customer Postal Code"
       BillToCustomerState: ~
-      ShipToState: "Ship To State/Province"
-      ShipToZip: "Ship To Postal Code"
+      ShipToState: "Ship to State/Province"
+      ShipToZip: "Ship to Postal Code"
       BuyerName: ~
     return_id: ~ # value that signifies a return in the IsReturn Column
     
@@ -173,9 +173,9 @@ files_cfg:
       BuyerName: ~
     return_id: "Return"
 
-  - file_id: "td synnex cn"
+  - file_id: "td synnex ca"
     reader: "invalid"
-    src_id: "SYNNEX CN"
+    src_id: "SYNNEX CA"
     src_col_name: "Customer"
     CanonicalSchema:
       SoldToName: "bill_to_cust_name"

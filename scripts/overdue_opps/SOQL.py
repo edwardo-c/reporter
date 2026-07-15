@@ -1,4 +1,0 @@
-USER_ROLES = """
-SELECT
-FROM UserRole
-"""
